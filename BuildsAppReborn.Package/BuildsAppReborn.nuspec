@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>BuildsAppReborn</id>
+    <!-- version will be replaced by MSBuild -->
+    <version>0.0.0.0</version>
+    <title>BuildsAppReborn</title>
+    <authors>Luka Grabarevic</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Enhanced version of the Visual Studio BuildNotificationApp to support latest TFS versions.</description>
+    <releaseNotes/>
+    <dependencies/>
+  </metadata>
+  <files>
+    <!--<file src="..\Output\Release\*.*" target="lib\net45\" exclude="*.pdb;*.nupkg;*.vshost.*;*.ico;*.xml"/>-->
+    <file src="..\Output\Release\*.dll" target="lib\net45\" exclude="*.vshost.*"/>
+    <file src="..\Output\Release\*.exe" target="lib\net45\" exclude="*.vshost.*"/>
+    <file src="..\Output\Release\*.config" target="lib\net45\" exclude="*.vshost.*"/>
+  </files>
+</package>

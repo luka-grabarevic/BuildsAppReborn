@@ -1,0 +1,84 @@
+﻿<controls:MetroWindow x:Class="BuildsAppReborn.Client.Views.SettingsView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
+                      xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
+                      Title="Settings"
+                      Width="800"
+                      Height="640"
+                      d:DataContext="{d:DesignInstance Type=viewModels:ServerSettingsViewModel}"
+                      Background="{DynamicResource MaterialDesignPaper}"
+                      GlowBrush="{DynamicResource AccentColorBrush}"
+                      Icon="../Resources/Icons/ICO/settings.ico"
+                      TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                      WindowTransitionsEnabled="False"
+                      mc:Ignorable="d">
+    <DockPanel>
+        <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                  DockPanel.Dock="Top"
+                                  Mode="PrimaryMid"
+                                  Padding="16">
+            <DockPanel>
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="22"
+                           Text="Server Settings" />
+            </DockPanel>
+        </materialDesign:ColorZone>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Row="0"
+                      Grid.Column="1"
+                      Margin="10"
+                      ItemsSource="{Binding AvailableProvider}"
+                      SelectedIndex="0"
+                      SelectedItem="{Binding SelectedProvider}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Grid.Row="0"
+                    Grid.Column="2"
+                    Width="32"
+                    Height="32"
+                    Margin="5 0 5 0"
+                    Command="{Binding AddProviderCommand}"
+                    Style="{DynamicResource MaterialDesignFloatingActionMiniButton}">
+                <materialDesign:PackIcon Kind="Plus" />
+            </Button>
+            <dragablz:TabablzControl Grid.Row="1"
+                                     Grid.Column="0"
+                                     Grid.ColumnSpan="3"
+                                     ClosingItemCallback="{Binding ClosingItemCallback}"
+                                     ItemsSource="{Binding Views}"
+                                     NewItemFactory="{Binding NewItemFactory}"
+                                     SelectedIndex="0"
+                                     ShowDefaultAddButton="false"
+                                     ShowDefaultCloseButton="True">
+                <dragablz:TabablzControl.HeaderItemTemplate>
+                    <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </dragablz:TabablzControl.HeaderItemTemplate>
+            </dragablz:TabablzControl>
+        </Grid>
+    </DockPanel>
+</controls:MetroWindow>
+

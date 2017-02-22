@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converter="clr-namespace:BuildsAppReborn.Client.Converter"
+                    xmlns:tb="http://www.hardcodet.net/taskbar">
+
+    <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
+        <MenuItem Command="{Binding ShowWindowCommand}" Header="Show Window" />
+        <MenuItem Command="{Binding ShowSettingsWindowCommand}" Header="Show Settings" />
+        <Separator />
+        <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
+    </ContextMenu>
+
+    <converter:FallBackNullToLoadingConverter x:Key="FallBackNullToLoadingConverter" />
+
+    <tb:TaskbarIcon x:Key="NotifyIcon"
+                    ContextMenu="{StaticResource SysTrayMenu}"
+                    DoubleClickCommand="{Binding ShowSettingsWindowCommand}"
+                    IconSource="{Binding TrayIcon,
+                                         Converter={StaticResource FallBackNullToLoadingConverter}}"
+                    LeftClickCommand="{Binding ShowWindowCommand}" />
+
+</ResourceDictionary>
