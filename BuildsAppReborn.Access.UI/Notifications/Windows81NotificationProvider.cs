@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-
 using Windows.UI.Notifications;
-
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 
@@ -32,6 +30,26 @@ namespace BuildsAppReborn.Access.UI.Notifications
             var imageElements = toastXml.GetElementsByTagName("image");
             var src = imageElements[0].Attributes.GetNamedItem("src");
             if (src != null) src.NodeValue = imagePath;
+
+            // Create the toast and attach event listeners
+            var toast = new ToastNotification(toastXml);
+            toast.Dismissed += ToastDismissed;
+
+            // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
+            ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
+        }
+
+        public void ShowMessage(String title, String message)
+        {
+            // Get a toast XML template
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+
+            // Fill in the text elements
+            var stringElements = toastXml.GetElementsByTagName("text");
+
+            stringElements[0].AppendChild(toastXml.CreateTextNode(title));
+            stringElements[1].AppendChild(toastXml.CreateTextNode(message));
+            //stringElements[2].AppendChild(toastXml.CreateTextNode();
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);

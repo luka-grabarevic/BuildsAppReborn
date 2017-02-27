@@ -1,6 +1,6 @@
 ﻿namespace BuildsAppReborn.Client.Interfaces
 {
-    public interface ISettingsView
+    public interface ISettingsView : IHasDataContext
     {
     }
 }

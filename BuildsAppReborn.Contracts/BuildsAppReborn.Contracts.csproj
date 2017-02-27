@@ -58,6 +58,7 @@
     <Compile Include="IBuildProvider.cs" />
     <Compile Include="Models\BuildMonitorSettings.cs" />
     <Compile Include="Models\BuildStatus.cs" />
+    <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IBuild.cs" />
     <Compile Include="Models\IBuildDefinition.cs" />
     <Compile Include="Models\IProject.cs" />

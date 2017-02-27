@@ -4,6 +4,7 @@
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+                      xmlns:interfaces="clr-namespace:BuildsAppReborn.Client.Interfaces"
                       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
@@ -11,74 +12,65 @@
                       Title="Settings"
                       Width="800"
                       Height="640"
-                      d:DataContext="{d:DesignInstance Type=viewModels:ServerSettingsViewModel}"
+                      d:DataContext="{d:DesignInstance Type=viewModels:SettingsViewModel}"
                       Background="{DynamicResource MaterialDesignPaper}"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       Icon="../Resources/Icons/ICO/settings.ico"
                       TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                       WindowTransitionsEnabled="False"
                       mc:Ignorable="d">
-    <DockPanel>
-        <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth2"
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <materialDesign:DialogHost Identifier="RootDialog" SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel>
+                    <ToggleButton Margin="16"
+                                  HorizontalAlignment="Right"
                                   DockPanel.Dock="Top"
-                                  Mode="PrimaryMid"
-                                  Padding="16">
+                                  IsChecked="{Binding ElementName=MenuToggleButton,
+                                                      Path=IsChecked,
+                                                      Mode=TwoWay}"
+                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                    <ListBox x:Name="SubSettingsListBox"
+                             Margin="0 16 0 16"
+                             ItemsSource="{Binding SubSettings}"
+                             SelectedIndex="0"
+                             PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="interfaces:ISubSettingsControl">
+                                <TextBlock Margin="32 0 32 0" Text="{Binding Title}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel>
-                <TextBlock HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="22"
-                           Text="Server Settings" />
+                <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                          DockPanel.Dock="Top"
+                                          Mode="PrimaryMid"
+                                          Padding="16">
+                    <DockPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
+                                        x:Name="MenuToggleButton"/>
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="22"
+                                   Text="{Binding ElementName=SubSettingsListBox,
+                                                  Path=SelectedItem.Title}" />
+                    </DockPanel>
+                </materialDesign:ColorZone>
+                <ContentControl Content="{Binding ElementName=SubSettingsListBox, Path=SelectedItem}" />
             </DockPanel>
-        </materialDesign:ColorZone>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <ComboBox Grid.Row="0"
-                      Grid.Column="1"
-                      Margin="10"
-                      ItemsSource="{Binding AvailableProvider}"
-                      SelectedIndex="0"
-                      SelectedItem="{Binding SelectedProvider}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Button Grid.Row="0"
-                    Grid.Column="2"
-                    Width="32"
-                    Height="32"
-                    Margin="5 0 5 0"
-                    Command="{Binding AddProviderCommand}"
-                    Style="{DynamicResource MaterialDesignFloatingActionMiniButton}">
-                <materialDesign:PackIcon Kind="Plus" />
-            </Button>
-            <dragablz:TabablzControl Grid.Row="1"
-                                     Grid.Column="0"
-                                     Grid.ColumnSpan="3"
-                                     ClosingItemCallback="{Binding ClosingItemCallback}"
-                                     ItemsSource="{Binding Views}"
-                                     NewItemFactory="{Binding NewItemFactory}"
-                                     SelectedIndex="0"
-                                     ShowDefaultAddButton="false"
-                                     ShowDefaultCloseButton="True">
-                <dragablz:TabablzControl.HeaderItemTemplate>
-                    <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding DisplayName}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </dragablz:TabablzControl.HeaderItemTemplate>
-            </dragablz:TabablzControl>
-        </Grid>
-    </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+
 </controls:MetroWindow>
 

@@ -4,8 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+
+using BuildsAppReborn.Client.Properties;
 using BuildsAppReborn.Client.ViewModels;
 using BuildsAppReborn.Contracts;
+
 using Hardcodet.Wpf.TaskbarNotification;
 
 namespace BuildsAppReborn.Client
@@ -19,8 +22,10 @@ namespace BuildsAppReborn.Client
 
         protected override void OnExit(ExitEventArgs e)
         {
+            if (e.ApplicationExitCode == 0) this.globalSettingsContainer.Save();
+
+            this.updateChecker.Stop();
             this.buildMonitor.Stop();
-            this.globalSettingsContainer.Save();
             this.notifyIcon.Dispose();
             base.OnExit(e);
         }
@@ -32,12 +37,16 @@ namespace BuildsAppReborn.Client
             EnsureOnlyOneInstance();
 
             var compositionContainer = BuildCompositionContainer();
+
+            this.updateChecker = compositionContainer.GetExportedValue<UpdateChecker>();
+            this.updateChecker.Start();
+            this.updateChecker.UpdateCheck();
             this.globalSettingsContainer = compositionContainer.GetExportedValue<GlobalSettingsContainer>();
 
             this.buildMonitor = compositionContainer.GetExportedValue<IBuildMonitorAdvanced>();
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, TimeSpan.FromMinutes(1));
 
-            this.notifyIcon = (TaskbarIcon) FindResource("NotifyIcon");
+            this.notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
             if (this.notifyIcon != null)
             {
                 this.notifyIcon.DataContext = compositionContainer.GetExportedValue<NotifyIconViewModel>();
@@ -55,8 +64,7 @@ namespace BuildsAppReborn.Client
             var directoryName = Path.GetDirectoryName(typeof(App).Assembly.Location);
             if (directoryName != null)
             {
-                var assemblies = Directory.GetFiles(directoryName, "*.dll").Union(Directory.GetFiles(directoryName, "*.exe"))
-                    .Where(a => !String.Equals(Path.GetFileName(a), "NuGet.Squirrel.dll", StringComparison.InvariantCultureIgnoreCase));
+                var assemblies = Directory.GetFiles(directoryName, "*.dll").Union(Directory.GetFiles(directoryName, "*.exe")).Where(a => !String.Equals(Path.GetFileName(a), "NuGet.Squirrel.dll", StringComparison.InvariantCultureIgnoreCase) && !String.Equals(Path.GetFileName(a), "Update.exe", StringComparison.InvariantCultureIgnoreCase));
 
                 foreach (var assembly in assemblies)
                 {
@@ -74,14 +82,17 @@ namespace BuildsAppReborn.Client
             return new CompositionContainer(catalog, true);
         }
 
-        private static void EnsureOnlyOneInstance()
+        #endregion
+
+        #region Private Methods
+
+        private void EnsureOnlyOneInstance()
         {
             var currentProcess = Process.GetCurrentProcess();
             var count = Process.GetProcesses().Count(p => p.ProcessName == currentProcess.ProcessName);
             if (count > 1)
             {
-                // MessageBox.Show("An instance is already running ...");
-                Current.Shutdown();
+                Current.Shutdown(-1);
             }
         }
 
@@ -94,6 +105,8 @@ namespace BuildsAppReborn.Client
         private GlobalSettingsContainer globalSettingsContainer;
 
         private TaskbarIcon notifyIcon;
+
+        private UpdateChecker updateChecker;
 
         #endregion
     }

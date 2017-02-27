@@ -19,6 +19,8 @@ namespace BuildsAppReborn.Client.Notification
             this.buildCache = buildCache;
             this.buildEqualityComparer = buildEqualityComparer;
             this.buildCache.CacheUpdated += (sender, args) => ShowNotification();
+
+            // ToDo: find the compatible provider for this system
             this.notificationProvider = notificationProviders.FirstOrDefault();
         }
 

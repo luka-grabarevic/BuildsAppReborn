@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Client.ViewModels;
 
@@ -34,12 +37,26 @@ namespace BuildsAppReborn.Client.Views
         #region Private Properties
 
         [Import]
-        private ServerSettingsViewModel ViewModel
+        private SettingsViewModel ViewModel
         {
-            set
+            set { SetValue(DataContextProperty, value); }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void UIElement_OnPreviewMouseLeftButtonUp(Object sender, MouseButtonEventArgs e)
+        {
+            //until we had a StaysOpen glag to Drawer, this will help with scroll bars
+            var dependencyObject = Mouse.Captured as DependencyObject;
+            while (dependencyObject != null)
             {
-                SetValue(DataContextProperty, value);
+                if (dependencyObject is ScrollBar) return;
+                dependencyObject = VisualTreeHelper.GetParent(dependencyObject);
             }
+
+            this.MenuToggleButton.IsChecked = false;
         }
 
         #endregion

@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="BuildsAppReborn.Client.Views.GeneralSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converter="clr-namespace:BuildsAppReborn.Client.Converter"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
+             d:DataContext="{d:DesignInstance Type=viewModels:GeneralSettingsViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:MinutesToTimeSpanConverter x:Key="MinutesToTimeSpanConverter" />
+    </UserControl.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   FontWeight="Bold"
+                   Text="While in pre release state some settings are not available!" />
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Check for updates" />
+        <CheckBox Grid.Row="1"
+                  Grid.Column="1"
+                  IsChecked="{Binding GeneralSettings.CheckForUpdates}"
+                  IsEnabled="True" />
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Check interval (minutes)" />
+        <TextBox Grid.Row="2"
+                 Grid.Column="1"
+                 IsEnabled="False"
+                 Text="{Binding GeneralSettings.UpdateCheckInterval,
+                                Converter={StaticResource MinutesToTimeSpanConverter}}" />
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Notify when updating or checking" />
+        <CheckBox Grid.Row="3"
+                  Grid.Column="1"
+                  IsChecked="{Binding GeneralSettings.NotifyOnNewUpdate}"
+                  IsEnabled="True" />
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Text="Auto install update" />
+        <CheckBox Grid.Row="4"
+                  Grid.Column="1"
+                  IsChecked="{Binding GeneralSettings.AutoInstall}"
+                  IsEnabled="False" />
+        <TextBlock Grid.Row="5"
+                   Grid.Column="0"
+                   Text="Include pre releases" />
+        <CheckBox Grid.Row="5"
+                  Grid.Column="1"
+                  IsChecked="{Binding GeneralSettings.IncludePreReleases}"
+                  IsEnabled="False" />
+    </Grid>
+</UserControl>
