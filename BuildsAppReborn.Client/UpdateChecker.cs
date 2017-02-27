@@ -76,26 +76,28 @@ namespace BuildsAppReborn.Client
             try
             {
                 var repo = Settings.Default.UpdateCheckUrl;
-                var updateMgrTask = UpdateManager.GitHubUpdateManager(repo, null, null, null, GeneralSettings.IncludePreReleases);
-
-                var updateManager = await updateMgrTask;
-
-                if (!GeneralSettings.AutoInstall)
+                using (var updateMgrTask = UpdateManager.GitHubUpdateManager(repo, null, null, null, GeneralSettings.IncludePreReleases))
                 {
-                    var updateInfo = await updateManager.CheckForUpdate();
-                    if (GeneralSettings.NotifyOnNewUpdate)
+                    using (var updateManager = await updateMgrTask)
                     {
-                        // ToDo: show if new update available
-                    }
-                    // ToDo: implement update when user accepts
-                }
-                else
-                {
-                    var result = await updateManager.UpdateApp();
-                    if (GeneralSettings.NotifyOnNewUpdate)
-                    {
-                        if (result == null) this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check finished", "Currently no new updates");
-                        else this.notificationProvider.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                        if (!GeneralSettings.AutoInstall)
+                        {
+                            var updateInfo = await updateManager.CheckForUpdate();
+                            if (GeneralSettings.NotifyOnNewUpdate)
+                            {
+                                // ToDo: show if new update available
+                            }
+                            // ToDo: implement update when user accepts
+                        }
+                        else
+                        {
+                            var result = await updateManager.UpdateApp();
+                            if (GeneralSettings.NotifyOnNewUpdate)
+                            {
+                                if (result == null) this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check finished", "Currently no new updates");
+                                else this.notificationProvider.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                            }
+                        }
                     }
                 }
             }
