@@ -10,6 +10,7 @@ using BuildsAppReborn.Client.ViewModels;
 using BuildsAppReborn.Contracts;
 
 using Hardcodet.Wpf.TaskbarNotification;
+using log4net.Config;
 
 namespace BuildsAppReborn.Client
 {
@@ -37,6 +38,8 @@ namespace BuildsAppReborn.Client
             EnsureOnlyOneInstance();
 
             var compositionContainer = BuildCompositionContainer();
+
+            XmlConfigurator.Configure();
 
             this.updateChecker = compositionContainer.GetExportedValue<UpdateChecker>();
             this.updateChecker.Start();

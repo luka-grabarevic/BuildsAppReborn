@@ -4,11 +4,12 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
+using BuildsAppReborn.Contracts.UI.Notifications;
 using BuildsAppReborn.Infrastructure;
+using log4net;
 
 namespace BuildsAppReborn.Access
 {
@@ -20,9 +21,10 @@ namespace BuildsAppReborn.Access
         #region Constructors
 
         [ImportingConstructor]
-        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders)
+        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders, [ImportMany] IEnumerable<INotificationProvider> notificationProviders)
         {
             this.buildProviders = buildProviders;
+            this.notificationProvider = notificationProviders.FirstOrDefault();
             this.timer.Elapsed += (sender, args) => BeginPollingBuilds();
         }
 
@@ -110,8 +112,16 @@ namespace BuildsAppReborn.Access
 
         private async void PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
         {
-            var builds = await Task.Run(() => provider.GetBuilds(settings.SelectedBuildDefinitions, settings));
-            OnBuildsUpdated(builds.ToList());
+            try
+            {
+                var builds = await Task.Run(() => provider.GetBuilds(settings.SelectedBuildDefinitions, settings));
+                OnBuildsUpdated(builds.ToList());
+            }
+            catch (Exception exception)
+            {
+                this.logger.Warn("Failure on polling builds", exception);
+                this.notificationProvider.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) {String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}.");
+            }
         }
 
         #endregion
@@ -121,6 +131,9 @@ namespace BuildsAppReborn.Access
         private readonly LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders;
 
         private Boolean isPolling;
+
+        private ILog logger = LogManager.GetLogger(typeof(BuildMonitor));
+        private INotificationProvider notificationProvider;
 
         private readonly Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>> providerSettingsGroup = new Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>>();
 
