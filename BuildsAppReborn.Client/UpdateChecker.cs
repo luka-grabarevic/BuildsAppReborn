@@ -9,6 +9,7 @@ using System.Timers;
 using BuildsAppReborn.Client.Properties;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
+using log4net;
 using Squirrel;
 
 namespace BuildsAppReborn.Client
@@ -72,7 +73,8 @@ namespace BuildsAppReborn.Client
         private async Task UpdateCheckInternal()
         {
             if (!GeneralSettings.CheckForUpdates) return;
-            if (GeneralSettings.NotifyOnNewUpdate) this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check started", "Checking for new updates...");
+
+            this.logger.Info("Checking for update...");
             try
             {
                 var repo = Settings.Default.UpdateCheckUrl;
@@ -92,10 +94,17 @@ namespace BuildsAppReborn.Client
                         else
                         {
                             var result = await updateManager.UpdateApp();
-                            if (GeneralSettings.NotifyOnNewUpdate)
+                            if (result != null)
                             {
-                                if (result == null) this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check finished", "Currently no new updates");
-                                else this.notificationProvider.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                                this.logger.Info("New Update found!");
+                                if (GeneralSettings.NotifyOnNewUpdate)
+                                {
+                                    this.notificationProvider.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                                }
+                            }
+                            else
+                            {
+                                this.logger.Info("No Update found!");
                             }
                         }
                     }
@@ -103,8 +112,11 @@ namespace BuildsAppReborn.Client
             }
             catch (Exception exception)
             {
-                // ToDo: add proper logging and change message text
-                if (GeneralSettings.NotifyOnNewUpdate) this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check failed!", "See (currently not existing) log file.");
+                this.logger.Error("Error while checking for update", exception);
+                if (GeneralSettings.NotifyOnNewUpdate)
+                {
+                    this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check failed!", "See log file for more information.");
+                }
             }
         }
 
@@ -113,6 +125,7 @@ namespace BuildsAppReborn.Client
         #region Private Fields
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
+        private ILog logger = LogManager.GetLogger(typeof(UpdateChecker));
         private INotificationProvider notificationProvider;
         private Timer timer = new Timer();
         private FileVersionInfo version = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);

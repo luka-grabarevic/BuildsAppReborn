@@ -47,7 +47,7 @@
                                 Converter={StaticResource MinutesToTimeSpanConverter}}" />
         <TextBlock Grid.Row="3"
                    Grid.Column="0"
-                   Text="Notify when updating or checking" />
+                   Text="Notify when update available" />
         <CheckBox Grid.Row="3"
                   Grid.Column="1"
                   IsChecked="{Binding GeneralSettings.NotifyOnNewUpdate}"
