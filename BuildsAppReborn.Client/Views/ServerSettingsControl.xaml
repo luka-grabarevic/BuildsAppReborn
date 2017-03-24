@@ -55,7 +55,7 @@
                 <dragablz:TabablzControl.HeaderItemTemplate>
                     <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding DisplayName}" />
+                            <TextBlock Text="{Binding ViewModel.DisplayName}" />
                         </StackPanel>
                     </DataTemplate>
                 </dragablz:TabablzControl.HeaderItemTemplate>

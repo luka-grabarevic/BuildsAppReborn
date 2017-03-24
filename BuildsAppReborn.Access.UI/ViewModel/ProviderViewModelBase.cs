@@ -1,5 +1,4 @@
 ﻿using System;
-
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
@@ -7,7 +6,7 @@ using BuildsAppReborn.Infrastructure;
 
 namespace BuildsAppReborn.Access.UI.ViewModel
 {
-    internal class ProviderViewModelBase : ViewModelBase, IBuildProviderViewModel
+    internal abstract class ProviderViewModelBase : ViewModelBase, IBuildProviderViewModel
     {
         #region Implementation of IBuildProviderViewModel
 
@@ -19,6 +18,12 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             MonitorSettings = settings;
             OnInitialized();
         }
+
+        #endregion
+
+        #region Public Properties
+
+        public abstract String DisplayName { get; protected set; }
 
         #endregion
 

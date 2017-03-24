@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
-
+﻿using System.ComponentModel.Composition;
 using BuildsAppReborn.Access.UI.ViewModel;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.UI;
@@ -19,12 +17,6 @@ namespace BuildsAppReborn.Access.UI.Views
         {
             InitializeComponent();
         }
-
-        #endregion
-
-        #region Overrides of Base
-
-        public override String DisplayName => Tfs2017BuildProvider.Name;
 
         #endregion
     }

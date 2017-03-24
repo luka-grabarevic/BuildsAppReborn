@@ -2,11 +2,9 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Controls;
-
 using BuildsAppReborn.Access.UI.ViewModel;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
-using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
 
@@ -25,9 +23,7 @@ namespace BuildsAppReborn.Access.UI
 
         #region Implementation of IBuildProviderView
 
-        public abstract String DisplayName { get; }
-
-        public IBuildProviderViewModel ViewModel => (IBuildProviderViewModel)DataContext;
+        public IBuildProviderViewModel ViewModel => (IBuildProviderViewModel) DataContext;
 
         #endregion
 
@@ -49,15 +45,9 @@ namespace BuildsAppReborn.Access.UI
 
         #endregion
 
-        #region Public Properties
-
-        public virtual BuildMonitorSettings MonitorSettings => null;
-
-        #endregion
-
         #region Private Properties
 
-        private ProviderViewModelBase ViewModelBase => (ProviderViewModelBase)ViewModel;
+        private ProviderViewModelBase ViewModelBase => (ProviderViewModelBase) ViewModel;
 
         #endregion
 

@@ -62,8 +62,6 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public ItemActionCallback ClosingItemCallback { get; }
 
-        public Func<Object> NewItemFactory { get; }
-
         public IBuildProviderMetadata SelectedProvider
         {
             get
