@@ -72,6 +72,10 @@ namespace BuildsAppReborn.Client
 
         private async Task UpdateCheckInternal()
         {
+#if DEBUG
+            return;
+#endif
+
             if (!GeneralSettings.CheckForUpdates) return;
 
             this.logger.Info("Checking for update...");

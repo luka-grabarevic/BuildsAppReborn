@@ -20,7 +20,7 @@ namespace BuildsAppReborn.Client.Views
 
         #region Implementation of ISubSettingsControl
 
-        public UInt32 Order => 0;
+        public UInt32 Order => 1;
 
         public String Title => "General Settings";
 

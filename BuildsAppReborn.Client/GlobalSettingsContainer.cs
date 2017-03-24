@@ -15,8 +15,16 @@ namespace BuildsAppReborn.Client
 
         public GlobalSettingsContainer()
         {
-            this.buildMonitorSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, "buildMonitorSettings.json");
-            this.generalSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, "generalSettings.json");
+            var buidSettings = "buildMonitorSettings.json";
+            var generalsettingsJson = "generalSettings.json";
+
+#if DEBUG
+            buidSettings = "buildMonitorSettings_debug.json";
+            generalsettingsJson = "generalSettings_debug.json";
+#endif
+
+            this.buildMonitorSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, buidSettings);
+            this.generalSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, generalsettingsJson);
 
             BuildMonitorSettingsContainer = SettingsContainer<BuildMonitorSettings>.Load(this.buildMonitorSettingsFilePath);
             this.generalSettingsContainer = SettingsContainer<GeneralSettings>.Load(this.generalSettingsFilePath);
