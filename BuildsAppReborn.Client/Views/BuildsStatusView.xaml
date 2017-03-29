@@ -124,7 +124,18 @@
                                             <Grid Width="10"
                                                   Margin="0 0 3 0"
                                                   Background="{Binding Build.Status,
-                                                                       Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}" />
+                                                                       Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                <Grid.ToolTip>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat=" {0} ({1} ago)">
+                                                                <Binding Path="Build.Requester.DisplayName"/>
+                                                                <Binding Path="BuildTime" Converter="{StaticResource BuildTimeToElapsedTimeConverter}"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </Grid.ToolTip>
+                                            </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
