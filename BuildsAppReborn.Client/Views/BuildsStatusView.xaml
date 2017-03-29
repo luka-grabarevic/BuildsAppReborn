@@ -167,6 +167,8 @@
         </Grid>
         <ProgressBar Grid.Column="0"
                      Margin="20"
+                     Width="128"
+                     Height="128"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
                      IsIndeterminate="True">
