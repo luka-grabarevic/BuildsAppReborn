@@ -86,7 +86,8 @@ namespace BuildsAppReborn.Client
 
         private async Task<Byte[]> GetRequesterImageWithDefaultCredentials(String requesterImageUrl)
         {
-            return await HttpRequestHelper.GetRequestResultsAsByteArray(requesterImageUrl, CredentialCache.DefaultCredentials);
+            var respone = await HttpRequestHelper.GetRequestResponse(requesterImageUrl, CredentialCache.DefaultCredentials);
+            return await respone.Content.ReadAsByteArrayAsync();
         }
 
         private async void OnBuildsUpdated(ICollection<IBuild> builds)

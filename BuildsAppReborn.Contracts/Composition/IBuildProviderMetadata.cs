@@ -1,14 +1,12 @@
-﻿using System;
+﻿using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Contracts.Composition
 {
-    public interface IBuildProviderMetadata
+    public interface IBuildProviderMetadata : IIdentifierMetadata
     {
         #region Public Properties
 
-        String Id { get; }
-
-        String Name { get; }
+        AuthenticationModes SupportedAuthenticationModes { get; }
 
         #endregion
     }

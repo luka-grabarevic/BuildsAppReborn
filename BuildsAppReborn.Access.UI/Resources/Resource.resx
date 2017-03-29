@@ -123,10 +123,13 @@
   <data name="TfsConnectButtonContent" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="TfsConnectionAccessTokenLabel" xml:space="preserve">
+    <value>Enter personal access token</value>
+  </data>
   <data name="TfsConnectionStringLabel" xml:space="preserve">
     <value>Enter full path to TFS Team Project:</value>
   </data>
   <data name="TfsCredentialsCacheText" xml:space="preserve">
-    <value>Credentials from Windows Credentials Cache will be used on Connect.</value>
+    <value>Default credentials will be used first when trying to connect.</value>
   </data>
 </root>

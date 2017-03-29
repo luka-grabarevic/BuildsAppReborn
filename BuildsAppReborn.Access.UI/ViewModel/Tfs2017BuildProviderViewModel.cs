@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using BuildsAppReborn.Access.UI.ViewModel.SubViewModels;
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 using BuildsAppReborn.Infrastructure.Collections;
@@ -14,7 +15,7 @@ using Prism.Commands;
 
 namespace BuildsAppReborn.Access.UI.ViewModel
 {
-    [Export]
+    [IdentifierExport(typeof(Tfs2017BuildProviderViewModel), Tfs2017BuildProvider.Id)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     internal class Tfs2017BuildProviderViewModel : ProviderViewModelBase
     {
@@ -62,6 +63,18 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #region Public Properties
 
+        public String AccessToken
+        {
+            // never show access token once provided
+            get { return String.Empty; }
+            set
+            {
+                MonitorSettings[Tfs2017BuildProvider.PersonalAccessTokenSettingsKey] = value;
+                OnPropertyChanged();
+                ConnectCommand?.RaiseCanExecuteChanged();
+            }
+        }
+
         public RangeObservableCollection<BuildDefinitionViewModel> BuildDefinitions { get; }
 
         public DelegateCommand ConnectCommand { get; private set; }
@@ -85,6 +98,16 @@ namespace BuildsAppReborn.Access.UI.ViewModel
                 MonitorSettings[Tfs2017BuildProvider.ProjectUrlSettingKey] = value;
                 OnPropertyChanged();
                 ConnectCommand?.RaiseCanExecuteChanged();
+            }
+        }
+
+        public Boolean ShowPersonalAccessTokenInput
+        {
+            get { return this.showPersonalAccessTokenInput; }
+            set
+            {
+                OnPropertyChanged();
+                this.showPersonalAccessTokenInput = value;
             }
         }
 
@@ -159,9 +182,24 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
                 var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitions(MonitorSettings));
 
-                Application.Current.Dispatcher.Invoke(() => { ApplyBuildDefinitions(buildDefinitions); });
-
-                StatusText = String.Empty;
+                if (buildDefinitions.IsSuccessStatusCode)
+                {
+                    Application.Current.Dispatcher.Invoke(() => { ApplyBuildDefinitions(buildDefinitions.Data); });
+                    StatusText = String.Empty;
+                    ShowPersonalAccessTokenInput = false;
+                }
+                else
+                {
+                    if (buildDefinitions.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        ShowPersonalAccessTokenInput = true;
+                        StatusText = $"Authorization failed, please provide personal access token!";
+                    }
+                    else
+                    {
+                        StatusText = $"Error connecting. StatusCode: {buildDefinitions.StatusCode}";
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -208,6 +246,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         private String displayName = Tfs2017BuildProvider.Name;
 
         private Boolean isConnecting;
+        private Boolean showPersonalAccessTokenInput;
 
         private String statusText;
 

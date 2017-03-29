@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using BuildsAppReborn.Contracts;
@@ -115,7 +116,13 @@ namespace BuildsAppReborn.Access
             try
             {
                 var builds = await Task.Run(() => provider.GetBuilds(settings.SelectedBuildDefinitions, settings));
-                OnBuildsUpdated(builds.ToList());
+
+                if (builds.StatusCode != HttpStatusCode.OK)
+                {
+                    this.logger.Warn($"Http status code {builds.StatusCode} returned while polling for builds!");
+                }
+
+                OnBuildsUpdated(builds.Data.ToList());
             }
             catch (Exception exception)
             {
