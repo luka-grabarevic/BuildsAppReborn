@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Contracts
@@ -7,9 +8,9 @@ namespace BuildsAppReborn.Contracts
     {
         #region Public Methods
 
-        IEnumerable<IBuildDefinition> GetBuildDefinitions(BuildMonitorSettings settings);
+        Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings);
 
-        IEnumerable<IBuild> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings);
+        Task<DataResponse<IEnumerable<IBuild>>> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings);
 
         #endregion
     }

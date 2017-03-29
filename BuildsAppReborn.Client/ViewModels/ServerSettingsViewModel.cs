@@ -24,7 +24,7 @@ namespace BuildsAppReborn.Client.ViewModels
         #region Constructors
 
         [ImportingConstructor]
-        internal ServerSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, ExportFactoryContainer<IBuildProviderView, IBuildProviderMetadata> buildProviderViews, IBuildMonitorAdvanced buildMonitor)
+        internal ServerSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> buildProviderViews, IBuildMonitorAdvanced buildMonitor)
         {
             this.globalSettingsContainer = globalSettingsContainer;
             this.buildMonitor = buildMonitor;
@@ -56,15 +56,13 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public DelegateCommand AddProviderCommand { get; }
 
-        public IEnumerable<IBuildProviderMetadata> AvailableProvider => BuildProviderViews.MetaData;
+        public IEnumerable<IIdentifierMetadata> AvailableProvider => BuildProviderViews.MetaData;
 
-        public ExportFactoryContainer<IBuildProviderView, IBuildProviderMetadata> BuildProviderViews { get; }
+        public ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> BuildProviderViews { get; }
 
         public ItemActionCallback ClosingItemCallback { get; }
 
-        public Func<Object> NewItemFactory { get; }
-
-        public IBuildProviderMetadata SelectedProvider
+        public IIdentifierMetadata SelectedProvider
         {
             get
             {
@@ -136,7 +134,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
 
-        private IBuildProviderMetadata selectedProvider;
+        private IIdentifierMetadata selectedProvider;
 
         #endregion
     }

@@ -1,13 +1,15 @@
 ﻿using System;
-
+using System.ComponentModel.Composition;
+using System.Linq;
 using BuildsAppReborn.Contracts;
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
 
 namespace BuildsAppReborn.Access.UI.ViewModel
 {
-    internal class ProviderViewModelBase : ViewModelBase, IBuildProviderViewModel
+    internal abstract class ProviderViewModelBase : ViewModelBase, IBuildProviderViewModel, IPartImportsSatisfiedNotification
     {
         #region Implementation of IBuildProviderViewModel
 
@@ -20,6 +22,50 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             OnInitialized();
         }
 
+        public abstract String DisplayName { get; protected set; }
+
+        #endregion
+
+        #region Implementation of IPartImportsSatisfiedNotification
+
+        public void OnImportsSatisfied()
+        {
+            var attributeType = typeof(IdentifierExportAttribute);
+            var customAttributes = GetType().GetCustomAttributes(attributeType, true);
+            if (!customAttributes.Any())
+            {
+                throw new Exception($"No attribute set of type {attributeType.FullName}!");
+            }
+
+            var identifierExportAttribute = customAttributes.Single() as IdentifierExportAttribute;
+            var result = this.buildProviders.SingleOrDefault(metadata => metadata.Metadata.Id == identifierExportAttribute?.Id);
+            if (result != null)
+            {
+                BuildProvider = result.Value;
+                BuildProviderMetaData = result.Metadata;
+            }
+            else
+            {
+                throw new Exception($"No build provider found for id {identifierExportAttribute?.Id}");
+            }
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
+
+        public Boolean SupportsPersonalAccessToken => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.AccessToken);
+
+        #endregion
+
+        #region Protected Properties
+
+        protected IBuildProvider BuildProvider { get; private set; }
+
+        protected IBuildProviderMetadata BuildProviderMetaData { get; private set; }
+
         #endregion
 
         #region Protected Methods
@@ -30,6 +76,13 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #endregion
 
-        protected internal IBuildProvider BuildProvider { get; set; }
+        #region Private Fields
+
+        [ImportMany]
+#pragma warning disable 649
+        private Lazy<IBuildProvider, IBuildProviderMetadata>[] buildProviders;
+#pragma warning restore 649
+
+        #endregion
     }
 }

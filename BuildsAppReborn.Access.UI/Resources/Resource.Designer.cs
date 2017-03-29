@@ -79,6 +79,15 @@ namespace BuildsAppReborn.Access.UI.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter personal access token.
+        /// </summary>
+        public static string TfsConnectionAccessTokenLabel {
+            get {
+                return ResourceManager.GetString("TfsConnectionAccessTokenLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter full path to TFS Team Project:.
         /// </summary>
         public static string TfsConnectionStringLabel {
@@ -88,7 +97,7 @@ namespace BuildsAppReborn.Access.UI.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Credentials from Windows Credentials Cache will be used on Connect..
+        ///   Looks up a localized string similar to Default credentials will be used first when trying to connect..
         /// </summary>
         public static string TfsCredentialsCacheText {
             get {

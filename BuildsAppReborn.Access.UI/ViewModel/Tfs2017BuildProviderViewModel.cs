@@ -6,17 +6,16 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-
 using BuildsAppReborn.Access.UI.ViewModel.SubViewModels;
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 using BuildsAppReborn.Infrastructure.Collections;
-
 using Prism.Commands;
 
 namespace BuildsAppReborn.Access.UI.ViewModel
 {
-    [Export]
+    [IdentifierExport(typeof(Tfs2017BuildProviderViewModel), Tfs2017BuildProvider.Id)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     internal class Tfs2017BuildProviderViewModel : ProviderViewModelBase
     {
@@ -27,12 +26,23 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         {
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             BuildDefinitions = new RangeObservableCollection<BuildDefinitionViewModel>();
+            BuildDefinitions.CollectionChanged += (sender, args) => SetDisplayName(BuildDefinitions.Select(a => a.BuildDefinition));
             InitializeCommands();
         }
 
         #endregion
 
         #region Overrides of Base
+
+        public override String DisplayName
+        {
+            get { return this.displayName; }
+            protected set
+            {
+                this.displayName = value;
+                OnPropertyChanged();
+            }
+        }
 
         protected override void OnInitialized()
         {
@@ -42,6 +52,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             {
                 MonitorSettings[Tfs2017BuildProvider.ProjectCredentialsSettingKey] = CredentialCache.DefaultCredentials;
             }
+            SetDisplayName(MonitorSettings.SelectedBuildDefinitions);
 
             // ReSharper disable once ExplicitCallerInfoArgument
             OnPropertyChanged(nameof(ProjectUrl));
@@ -52,16 +63,25 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #region Public Properties
 
+        public String AccessToken
+        {
+            // never show access token once provided
+            get { return String.Empty; }
+            set
+            {
+                MonitorSettings[Tfs2017BuildProvider.PersonalAccessTokenSettingsKey] = value;
+                OnPropertyChanged();
+                ConnectCommand?.RaiseCanExecuteChanged();
+            }
+        }
+
         public RangeObservableCollection<BuildDefinitionViewModel> BuildDefinitions { get; }
 
         public DelegateCommand ConnectCommand { get; private set; }
 
         public Boolean IsConnecting
         {
-            get
-            {
-                return this.isConnecting;
-            }
+            get { return this.isConnecting; }
             set
             {
                 this.isConnecting = value;
@@ -72,10 +92,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public String ProjectUrl
         {
-            get
-            {
-                return MonitorSettings?.GetDefaultValueIfNotExists<String>(Tfs2017BuildProvider.ProjectUrlSettingKey);
-            }
+            get { return MonitorSettings?.GetDefaultValueIfNotExists<String>(Tfs2017BuildProvider.ProjectUrlSettingKey); }
             set
             {
                 MonitorSettings[Tfs2017BuildProvider.ProjectUrlSettingKey] = value;
@@ -84,12 +101,19 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
         }
 
+        public Boolean ShowPersonalAccessTokenInput
+        {
+            get { return this.showPersonalAccessTokenInput; }
+            set
+            {
+                OnPropertyChanged();
+                this.showPersonalAccessTokenInput = value;
+            }
+        }
+
         public String StatusText
         {
-            get
-            {
-                return this.statusText;
-            }
+            get { return this.statusText; }
             set
             {
                 this.statusText = value;
@@ -101,24 +125,24 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #region Private Methods
 
-        private void AppyBuildDefinitions(IEnumerable<IBuildDefinition> buildDefinitions)
+        private void ApplyBuildDefinitions(IEnumerable<IBuildDefinition> buildDefinitions)
         {
             BuildDefinitions.AddRange(buildDefinitions.Select(buildDefinition =>
+                                                              {
+                                                                  var selectedBuildDefinitions = MonitorSettings.SelectedBuildDefinitions;
+
+                                                                  var vm = new BuildDefinitionViewModel(buildDefinition);
+
+                                                                  var definition = selectedBuildDefinitions.SingleOrDefault(a => a.Id == vm.BuildDefinition.Id);
+                                                                  if (definition != null && this.buildDefinitionEqualityComparer.Equals(definition, vm.BuildDefinition))
                                                                   {
-                                                                      var selectedBuildDefinitions = MonitorSettings.SelectedBuildDefinitions;
+                                                                      vm.IsSelected = true;
+                                                                  }
 
-                                                                      var vm = new BuildDefinitionViewModel(buildDefinition);
+                                                                  vm.PropertyChanged += BuildDefinitionPropertyChanged;
 
-                                                                      var definition = selectedBuildDefinitions.SingleOrDefault(a => a.Id == vm.BuildDefinition.Id);
-                                                                      if (definition != null && this.buildDefinitionEqualityComparer.Equals(definition, vm.BuildDefinition))
-                                                                      {
-                                                                          vm.IsSelected = true;
-                                                                      }
-
-                                                                      vm.PropertyChanged += BuildDefinitionPropertyChanged;
-
-                                                                      return vm;
-                                                                  }));
+                                                                  return vm;
+                                                              }));
         }
 
         private void BuildDefinitionPropertyChanged(Object sender, PropertyChangedEventArgs e)
@@ -147,20 +171,35 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             try
             {
                 Application.Current.Dispatcher.Invoke(() =>
+                                                      {
+                                                          foreach (var buildDefinitionViewModel in BuildDefinitions)
                                                           {
-                                                              foreach (var buildDefinitionViewModel in BuildDefinitions)
-                                                              {
-                                                                  buildDefinitionViewModel.PropertyChanged -= BuildDefinitionPropertyChanged;
-                                                              }
+                                                              buildDefinitionViewModel.PropertyChanged -= BuildDefinitionPropertyChanged;
+                                                          }
 
-                                                              BuildDefinitions.Clear();
-                                                          });
+                                                          BuildDefinitions.Clear();
+                                                      });
 
                 var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitions(MonitorSettings));
 
-                Application.Current.Dispatcher.Invoke(() => { AppyBuildDefinitions(buildDefinitions); });
-
-                StatusText = String.Empty;
+                if (buildDefinitions.IsSuccessStatusCode)
+                {
+                    Application.Current.Dispatcher.Invoke(() => { ApplyBuildDefinitions(buildDefinitions.Data); });
+                    StatusText = String.Empty;
+                    ShowPersonalAccessTokenInput = false;
+                }
+                else
+                {
+                    if (buildDefinitions.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        ShowPersonalAccessTokenInput = true;
+                        StatusText = $"Authorization failed, please provide personal access token!";
+                    }
+                    else
+                    {
+                        StatusText = $"Error connecting. StatusCode: {buildDefinitions.StatusCode}";
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -168,6 +207,21 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
 
             IsConnecting = false;
+        }
+
+        private void SetDisplayName(IEnumerable<IBuildDefinition> buildDefinitions)
+        {
+            // this is okay as they are from the same project
+            var buildDefinition = buildDefinitions.FirstOrDefault();
+            if (buildDefinition != null)
+            {
+                var projectName = buildDefinition.Project.Name;
+                DisplayName = $"{Tfs2017BuildProvider.Name} - {projectName}";
+            }
+            else
+            {
+                DisplayName = Tfs2017BuildProvider.Name;
+            }
         }
 
         private void UpdateSelectedBuildDefinitionList(BuildDefinitionViewModel buildDefinitionViewModel)
@@ -189,8 +243,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         #region Private Fields
 
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
+        private String displayName = Tfs2017BuildProvider.Name;
 
         private Boolean isConnecting;
+        private Boolean showPersonalAccessTokenInput;
 
         private String statusText;
 

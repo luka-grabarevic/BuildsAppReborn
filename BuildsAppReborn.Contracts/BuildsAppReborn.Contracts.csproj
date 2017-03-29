@@ -48,8 +48,10 @@
     <Compile Include="..\BuildsAppReborn.Client\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Composition\IdentifierExportAttribute.cs" />
     <Compile Include="Composition\BuildProviderExportAttribute.cs" />
     <Compile Include="Composition\IBuildProviderMetadata.cs" />
+    <Compile Include="Composition\IIdentifierMetadata.cs" />
     <Compile Include="Extensions\BuildDefinitionEqualityComparer.cs" />
     <Compile Include="Extensions\BuildEqualityComparer.cs" />
     <Compile Include="Extensions\BuildProviderSettingsExtensions.cs" />
@@ -58,6 +60,8 @@
     <Compile Include="IBuildProvider.cs" />
     <Compile Include="Models\BuildMonitorSettings.cs" />
     <Compile Include="Models\BuildStatus.cs" />
+    <Compile Include="Models\AuthenticationModes.cs" />
+    <Compile Include="Models\DataResponse.cs" />
     <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IBuild.cs" />
     <Compile Include="Models\IBuildDefinition.cs" />

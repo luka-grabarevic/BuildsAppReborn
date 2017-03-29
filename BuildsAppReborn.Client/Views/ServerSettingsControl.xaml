@@ -42,22 +42,41 @@
                 Style="{DynamicResource MaterialDesignFloatingActionMiniButton}">
             <materialDesign:PackIcon Kind="Plus" />
         </Button>
-        <dragablz:TabablzControl Grid.Row="1"
-                                 Grid.Column="0"
-                                 Grid.ColumnSpan="3"
-                                 ClosingItemCallback="{Binding ClosingItemCallback}"
-                                 ItemsSource="{Binding Views}"
-                                 NewItemFactory="{Binding NewItemFactory}"
-                                 SelectedIndex="0"
-                                 ShowDefaultAddButton="false"
-                                 ShowDefaultCloseButton="True">
-            <dragablz:TabablzControl.HeaderItemTemplate>
-                <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding DisplayName}" />
-                    </StackPanel>
-                </DataTemplate>
-            </dragablz:TabablzControl.HeaderItemTemplate>
-        </dragablz:TabablzControl>
+        <Grid Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="3">
+            <dragablz:TabablzControl Grid.Column="0"
+                                     ClosingItemCallback="{Binding ClosingItemCallback}"
+                                     ItemsSource="{Binding Views}"
+                                     NewItemFactory="{Binding NewItemFactory}"
+                                     SelectedIndex="0"
+                                     ShowDefaultAddButton="false"
+                                     ShowDefaultCloseButton="True">
+                <dragablz:TabablzControl.HeaderItemTemplate>
+                    <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding ViewModel.DisplayName}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </dragablz:TabablzControl.HeaderItemTemplate>
+            </dragablz:TabablzControl>
+            <TextBlock Grid.Column="0"
+                       Margin="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Text="Add new build server by choosing the needed build provider from the drop down list above." TextWrapping="WrapWithOverflow">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Views.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>
