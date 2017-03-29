@@ -112,7 +112,7 @@
                                     </Grid>
 
                                     <!--  Build history  -->
-                                    <ItemsControl Grid.Row="1"
+                                        <ItemsControl Grid.Row="1"
                                                   Grid.Column="0"
                                                   Margin="1 10 0 10"
                                                   HorizontalContentAlignment="Stretch"
@@ -121,33 +121,33 @@
                                                   BorderBrush="Transparent"
                                                   BorderThickness="0"
                                                   ItemsSource="{Binding PreviousBuilds}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <VirtualizingStackPanel Orientation="Horizontal" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Width="10"
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Width="10"
                                                       Margin="0 0 3 0"
                                                       Background="{Binding Build.Status,
                                                                            Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
-                                                    <Grid.ToolTip>
-                                                        <TextBlock>
-                                                            <TextBlock.Text>
-                                                                <MultiBinding StringFormat=" {0} ({1} ago)">
-                                                                    <Binding Path="Build.Requester.DisplayName" />
-                                                                    <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                    </Grid.ToolTip>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                                        <Grid.ToolTip>
+                                                            <TextBlock>
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding StringFormat=" {0} ({1} ago)">
+                                                                        <Binding Path="Build.Requester.DisplayName" />
+                                                                        <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                        </Grid.ToolTip>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
 
-                                    <!--  current build status with icon and text and date  -->
+                                        <!--  current build status with icon and text and date  -->
                                     <Grid Grid.Row="1" Grid.Column="1">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
