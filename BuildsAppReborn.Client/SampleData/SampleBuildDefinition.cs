@@ -12,6 +12,7 @@ namespace BuildsAppReborn.Client.SampleData
         public IProject Project { get; set; }
         public String Type { get; set; }
         public String Url { get; }
+        public String BuildSettingsId { get; }
 
         #endregion
     }

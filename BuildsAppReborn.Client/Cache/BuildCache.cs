@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using BuildsAppReborn.Client.Resources;
 using BuildsAppReborn.Contracts;
@@ -84,13 +82,7 @@ namespace BuildsAppReborn.Client
 
         #region Private Methods
 
-        private async Task<Byte[]> GetRequesterImageWithDefaultCredentials(String requesterImageUrl)
-        {
-            var respone = await HttpRequestHelper.GetRequestResponse(requesterImageUrl, CredentialCache.DefaultCredentials);
-            return await respone.Content.ReadAsByteArrayAsync();
-        }
-
-        private async void OnBuildsUpdated(ICollection<IBuild> builds)
+        private void OnBuildsUpdated(ICollection<IBuild> builds)
         {
             if (!builds.Any()) return;
 
@@ -102,7 +94,6 @@ namespace BuildsAppReborn.Client
 
                 newStatus.BuildDefinition = grp.Key;
                 newStatus.AllBuildItems = grp.Select(a => new BuildItem(a)).ToList();
-                newStatus.CurrentBuild.RequesterImage = await GetRequesterImageWithDefaultCredentials(newStatus.CurrentBuild.Build.Requester.ImageUrl);
                 buildStatusGroups.Add(newStatus);
             }
             Application.Current.Dispatcher.Invoke(() =>
@@ -163,7 +154,6 @@ namespace BuildsAppReborn.Client
         #region Private Fields
 
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
-
         private BuildCacheStatus cacheStatus;
         private String currentIcon;
 

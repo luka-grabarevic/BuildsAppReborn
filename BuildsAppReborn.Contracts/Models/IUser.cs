@@ -10,6 +10,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         String Id { get; }
 
+        Byte[] ImageData { get; }
+
         String ImageUrl { get; }
 
         String UniqueName { get; }

@@ -17,6 +17,8 @@ namespace BuildsAppReborn.Infrastructure.Tests.TestData
 
         public String Url { get; }
 
+        public String BuildSettingsId { get; }
+
         #endregion
     }
 }

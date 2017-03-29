@@ -29,16 +29,6 @@ namespace BuildsAppReborn.Contracts.UI
             }
         }
 
-        public Byte[] RequesterImage
-        {
-            get { return this.requesterImage; }
-            set
-            {
-                this.requesterImage = value;
-                OnPropertyChanged();
-            }
-        }
-
         #endregion
 
         #region Private Methods
@@ -66,12 +56,6 @@ namespace BuildsAppReborn.Contracts.UI
             }
             return result;
         }
-
-        #endregion
-
-        #region Private Fields
-
-        private Byte[] requesterImage;
 
         #endregion
     }

@@ -33,6 +33,10 @@ namespace BuildsAppReborn.Access
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
                     var data = JsonConvert.DeserializeObject<List<Tfs2017BuildDefinition>>(JObject.Parse(result)["value"].ToString());
+                    foreach (var buildDefinition in data)
+                    {
+                        buildDefinition.BuildSettingsId = settings.UniqueId;
+                    }
 
                     return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
@@ -65,6 +69,8 @@ namespace BuildsAppReborn.Access
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
                     var data = JsonConvert.DeserializeObject<List<Tfs2017Build>>(JObject.Parse(result)["value"].ToString());
+                    data.Select(d => d.Definition).OfType<Tfs2017BuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
+                    data.Select(d => d.Requester).OfType<Tfs2017User>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
 
                     return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
@@ -77,6 +83,17 @@ namespace BuildsAppReborn.Access
         #endregion
 
         #region Private Static Methods
+
+        private static async Task<Byte[]> GetImageData(BuildMonitorSettings settings, IUser user)
+        {
+            var response = await GetRequestResponse(user.ImageUrl, settings);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+
+            return null;
+        }
 
         private static async Task<HttpResponseMessage> GetRequestResponse(String requestUrl, BuildMonitorSettings settings)
         {

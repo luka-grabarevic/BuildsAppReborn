@@ -28,6 +28,9 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("url")]
         public String Url { get; private set; }
 
+        [JsonIgnore]
+        public String BuildSettingsId { get; internal set; }
+
         #endregion
     }
 }
