@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Reflection;
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
@@ -20,7 +22,18 @@ namespace BuildsAppReborn.Client.ViewModels
 
         #endregion
 
+        #region Implementation of ICloseable
+
+        public void OnClose()
+        {
+            this.updateChecker.Start();
+        }
+
+        #endregion
+
         #region Public Properties
+
+        public Version CurrentAppVersion => Assembly.GetEntryAssembly().GetName().Version;
 
         public GeneralSettings GeneralSettings => this.globalSettingsContainer.GeneralSettings;
 
@@ -30,11 +43,6 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
         private readonly UpdateChecker updateChecker;
-
-        public void OnClose()
-        {
-            this.updateChecker.Start();
-        }
 
         #endregion
     }

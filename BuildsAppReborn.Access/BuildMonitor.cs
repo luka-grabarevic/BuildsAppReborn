@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using BuildsAppReborn.Contracts;
@@ -117,17 +116,20 @@ namespace BuildsAppReborn.Access
             {
                 var builds = await Task.Run(() => provider.GetBuilds(settings.SelectedBuildDefinitions, settings));
 
-                if (builds.StatusCode != HttpStatusCode.OK)
+                if (!builds.IsSuccessStatusCode)
                 {
                     this.logger.Warn($"Http status code {builds.StatusCode} returned while polling for builds!");
+                    this.notificationProvider.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. StatusCode was '{builds.StatusCode}'. See log for more details.");
                 }
-
-                OnBuildsUpdated(builds.Data.ToList());
+                else
+                {
+                    OnBuildsUpdated(builds.Data.ToList());
+                }
             }
             catch (Exception exception)
             {
                 this.logger.Warn("Failure on polling builds", exception);
-                this.notificationProvider.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) {String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}.");
+                this.notificationProvider.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. See log for details.");
             }
         }
 

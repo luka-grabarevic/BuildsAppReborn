@@ -69,9 +69,13 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             get { return String.Empty; }
             set
             {
-                MonitorSettings[Tfs2017BuildProvider.PersonalAccessTokenSettingsKey] = value;
-                OnPropertyChanged();
-                ConnectCommand?.RaiseCanExecuteChanged();
+                // ToDo: Token should only be saved if connection was successful
+                if (!String.IsNullOrWhiteSpace(value))
+                {
+                    MonitorSettings[Tfs2017BuildProvider.PersonalAccessTokenSettingsKey] = value;
+                    OnPropertyChanged();
+                    ConnectCommand?.RaiseCanExecuteChanged();
+                }
             }
         }
 

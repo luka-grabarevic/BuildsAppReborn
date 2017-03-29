@@ -69,7 +69,6 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
-                           Margin="6 0 0 0"
                            HorizontalAlignment="Left"
                            Content="{x:Static resources:Resource.TfsConnectionAccessTokenLabel}" />
                     <TextBox Grid.Column="1"
@@ -89,7 +88,7 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"
                             Width="150"
-                            Margin="6 0 0 0"
+                            Margin="6 6 0 0"
                             Command="{Binding ConnectCommand}"
                             Content="{x:Static resources:Resource.TfsConnectButtonContent}" />
                     <ProgressBar Grid.Column="1"
@@ -99,7 +98,7 @@
                                  Visibility="{Binding IsConnecting,
                                                       Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Grid>
-                <TextBlock Grid.Row="5" Text="{Binding StatusText}" Foreground="Red" />
+                <TextBlock Margin="6 6 0 0" Grid.Row="5" Text="{Binding StatusText}" Foreground="Red" />
                 <ItemsControl Grid.Row="6"
                               Grid.IsSharedSizeScope="True"
                               ItemsSource="{Binding BuildDefinitions}">

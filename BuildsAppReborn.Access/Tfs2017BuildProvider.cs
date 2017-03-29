@@ -29,10 +29,14 @@ namespace BuildsAppReborn.Access
                 var requestUrl = $"{projectUrl}/_apis/build/definitions?api-version={ApiVersion}";
 
                 var requestResponse = await GetRequestResponse(requestUrl, settings);
-                var result = await requestResponse.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<List<Tfs2017BuildDefinition>>(JObject.Parse(result)["value"].ToString());
+                if (requestResponse.IsSuccessStatusCode)
+                {
+                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<List<Tfs2017BuildDefinition>>(JObject.Parse(result)["value"].ToString());
 
-                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
+                }
+                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
@@ -56,12 +60,15 @@ namespace BuildsAppReborn.Access
             {
                 var buildDefinitionsCommaList = String.Join(",", buildDefinitionsList.Select(a => a.Id));
                 var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&definitions={buildDefinitionsCommaList}&maxBuildsPerDefinition={maxBuilds}";
-
                 var requestResponse = await GetRequestResponse(requestUrl, settings);
-                var result = await requestResponse.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<List<Tfs2017Build>>(JObject.Parse(result)["value"].ToString());
+                if (requestResponse.IsSuccessStatusCode)
+                {
+                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<List<Tfs2017Build>>(JObject.Parse(result)["value"].ToString());
 
-                return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
+                }
+                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
