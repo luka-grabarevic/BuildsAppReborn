@@ -56,7 +56,7 @@ namespace BuildsAppReborn.Client.Converter
                     return minutes > 30 ? $"{hours + 1}h" : $"{hours}h";
                 }
             }
-            if (days > 1)
+            if (days >= 1)
             {
                 return hours > 12 ? $"{days + 1}d" : $"{days}d";
             }
