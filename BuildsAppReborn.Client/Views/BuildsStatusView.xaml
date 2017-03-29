@@ -94,7 +94,7 @@
                                           Grid.RowSpan="3"
                                           Grid.Column="0"
                                           Grid.ColumnSpan="3"
-                                          Margin="10 0 0 0"
+                                          Margin="0 0 0 0"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Center">
                                         <Grid.RowDefinitions>
