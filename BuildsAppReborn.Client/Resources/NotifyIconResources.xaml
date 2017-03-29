@@ -14,7 +14,7 @@
 
     <tb:TaskbarIcon x:Key="NotifyIcon"
                     ContextMenu="{StaticResource SysTrayMenu}"
-                    DoubleClickCommand="{Binding ShowSettingsWindowCommand}"
+                    DoubleClickCommand="{Binding ShowWindowCommand}"
                     IconSource="{Binding TrayIcon,
                                          Converter={StaticResource FallBackNullToLoadingConverter}}"
                     LeftClickCommand="{Binding ShowWindowCommand}" />
