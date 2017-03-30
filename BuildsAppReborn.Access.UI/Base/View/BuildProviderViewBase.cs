@@ -1,7 +1,8 @@
 ﻿using System.Windows.Controls;
+
 using BuildsAppReborn.Contracts.UI;
 
-namespace BuildsAppReborn.Access.UI
+namespace BuildsAppReborn.Access.UI.View
 {
     internal abstract class BuildProviderViewBase : UserControl, IBuildProviderView
     {

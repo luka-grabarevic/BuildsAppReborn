@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using BuildsAppReborn.Contracts.Models;
 
@@ -15,7 +16,7 @@ namespace BuildsAppReborn.Contracts
 
         #region Public Methods
 
-        void BeginPollingBuilds();
+        Task BeginPollingBuilds();
 
         #endregion
 

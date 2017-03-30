@@ -4,11 +4,13 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 using BuildsAppReborn.Infrastructure;
+
 using log4net;
 
 namespace BuildsAppReborn.Access
@@ -25,7 +27,9 @@ namespace BuildsAppReborn.Access
         {
             this.buildProviders = buildProviders;
             this.notificationProvider = notificationProviders.FirstOrDefault();
+#pragma warning disable 4014
             this.timer.Elapsed += (sender, args) => BeginPollingBuilds();
+#pragma warning restore 4014
         }
 
         #endregion
@@ -57,18 +61,22 @@ namespace BuildsAppReborn.Access
 
         public event BuildsUpdatedEventHandler BuildsUpdated;
 
-        public void BeginPollingBuilds()
+        public async Task BeginPollingBuilds()
         {
             if (this.isPolling) return;
 
+            var builds = new List<IBuild>();
             this.isPolling = true;
             foreach (var pair in this.providerSettingsGroup)
             {
                 foreach (var setting in pair.Value)
                 {
-                    PollBuilds(pair.Key, setting);
+                    builds.AddRange(await PollBuilds(pair.Key, setting));
                 }
             }
+
+            OnBuildsUpdated(builds);
+
             this.isPolling = false;
         }
 
@@ -110,7 +118,7 @@ namespace BuildsAppReborn.Access
             MonitorStopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private async void PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
+        private async Task<IEnumerable<IBuild>> PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
         {
             try
             {
@@ -123,7 +131,7 @@ namespace BuildsAppReborn.Access
                 }
                 else
                 {
-                    OnBuildsUpdated(builds.Data.ToList());
+                    return builds.Data;
                 }
             }
             catch (Exception exception)
@@ -131,6 +139,8 @@ namespace BuildsAppReborn.Access
                 this.logger.Warn("Failure on polling builds", exception);
                 this.notificationProvider.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. See log for details.");
             }
+
+            return Enumerable.Empty<IBuild>();
         }
 
         #endregion
@@ -142,6 +152,7 @@ namespace BuildsAppReborn.Access
         private Boolean isPolling;
 
         private ILog logger = LogManager.GetLogger(typeof(BuildMonitor));
+
         private INotificationProvider notificationProvider;
 
         private readonly Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>> providerSettingsGroup = new Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>>();

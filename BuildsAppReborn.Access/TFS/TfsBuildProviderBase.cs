@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using BuildsAppReborn.Access.Models;
 using BuildsAppReborn.Contracts;
-using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BuildsAppReborn.Access
 {
-    [BuildProviderExport(typeof(IBuildProvider), Id, Name, AuthenticationModes.Default | AuthenticationModes.AccessToken)]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class Tfs2017BuildProvider : IBuildProvider
+    internal abstract class TfsBuildProviderBase : IBuildProvider
     {
         #region Implementation of IBuildProvider
 
-        public async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings)
+        protected abstract String ApiVersion { get; }
+
+        public virtual async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
             if (!String.IsNullOrWhiteSpace(projectUrl))
@@ -32,26 +32,26 @@ namespace BuildsAppReborn.Access
                 if (requestResponse.IsSuccessStatusCode)
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<List<Tfs2017BuildDefinition>>(JObject.Parse(result)["value"].ToString());
+                    var data = JsonConvert.DeserializeObject<List<TfsBuildDefinition>>(JObject.Parse(result)["value"].ToString());
                     foreach (var buildDefinition in data)
                     {
                         buildDefinition.BuildSettingsId = settings.UniqueId;
                     }
 
-                    return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuildDefinition>> { Data = data, StatusCode = requestResponse.StatusCode };
                 }
-                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuildDefinition>> { Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode };
             }
 
             throw new Exception($"Error while processing method!");
         }
 
-        public async Task<DataResponse<IEnumerable<IBuild>>> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings)
+        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings)
         {
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
             {
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>()};
+                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>() };
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -68,13 +68,13 @@ namespace BuildsAppReborn.Access
                 if (requestResponse.IsSuccessStatusCode)
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<List<Tfs2017Build>>(JObject.Parse(result)["value"].ToString());
-                    data.Select(d => d.Definition).OfType<Tfs2017BuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
-                    data.Select(d => d.Requester).OfType<Tfs2017User>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
+                    var data = JsonConvert.DeserializeObject<List<TfsBuild>>(JObject.Parse(result)["value"].ToString());
+                    data.Select(d => d.Definition).OfType<TfsBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
+                    data.Select(d => d.Requester).OfType<TfsUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
 
-                    return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
                 }
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode };
             }
 
             throw new Exception($"Error while processing method!");
@@ -109,11 +109,7 @@ namespace BuildsAppReborn.Access
 
         #endregion
 
-        private const String ApiVersion = "2.0";
 
-        internal const String Id = "08e2efa9-2407-4f2e-a159-aa2b223abaac";
-
-        internal const String Name = "TFS 2017";
 
         internal const String ProjectUrlSettingKey = "ProjectUrl";
 

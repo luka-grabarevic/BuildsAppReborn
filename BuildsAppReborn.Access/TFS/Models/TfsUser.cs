@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Tfs2017User : IUser
+    internal class TfsUser : IUser
     {
         #region Implementation of IUser
 

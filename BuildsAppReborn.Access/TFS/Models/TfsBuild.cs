@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Tfs2017Build : IBuild
+    internal class TfsBuild : IBuild
     {
         #region Implementation of IBuild
 
         [JsonProperty("definition")]
-        [JsonConverter(typeof(InterfaceTypeConverter<Tfs2017BuildDefinition, IBuildDefinition>))]
+        [JsonConverter(typeof(InterfaceTypeConverter<TfsBuildDefinition, IBuildDefinition>))]
         public IBuildDefinition Definition { get; private set; }
 
         [JsonProperty("id")]
@@ -85,7 +85,7 @@ namespace BuildsAppReborn.Access.Models
         private String status;
 
         [JsonProperty("requestedFor")]
-        [JsonConverter(typeof(InterfaceTypeConverter<Tfs2017User, IUser>))]
+        [JsonConverter(typeof(InterfaceTypeConverter<TfsUser, IUser>))]
         public IUser Requester { get; private set; }
 
         [JsonProperty("url")]

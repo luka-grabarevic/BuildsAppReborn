@@ -28,7 +28,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #region Implementation of IPartImportsSatisfiedNotification
 
-        public void OnImportsSatisfied()
+        public virtual void OnImportsSatisfied()
         {
             var attributeType = typeof(IdentifierExportAttribute);
             var customAttributes = GetType().GetCustomAttributes(attributeType, true);

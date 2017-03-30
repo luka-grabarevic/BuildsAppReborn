@@ -53,12 +53,14 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BuildMonitor.cs" />
-    <Compile Include="Models\Tfs2017Build.cs" />
-    <Compile Include="Models\Tfs2017BuildDefinition.cs" />
-    <Compile Include="Models\Tfs2017Project.cs" />
-    <Compile Include="Models\Tfs2017User.cs" />
+    <Compile Include="TFS2017\Tfs2017BuildProvider.cs" />
+    <Compile Include="TFS\Models\TfsBuild.cs" />
+    <Compile Include="TFS\Models\TfsBuildDefinition.cs" />
+    <Compile Include="TFS\Models\TfsProject.cs" />
+    <Compile Include="TFS\Models\TfsUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tfs2017BuildProvider.cs" />
+    <Compile Include="TFS\TfsBuildProviderBase.cs" />
+    <Compile Include="VSTS\VstsBuildProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildsAppReborn.Contracts.UI\BuildsAppReborn.Contracts.UI.csproj">
@@ -77,6 +79,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

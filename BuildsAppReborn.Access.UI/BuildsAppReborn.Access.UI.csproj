@@ -53,22 +53,26 @@
     <Compile Include="..\BuildsAppReborn.Client\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="BuildProviderViewBase.cs" />
+    <Compile Include="Base\View\BuildProviderViewBase.cs" />
     <Compile Include="Notifications\Windows81NotificationProvider.cs" />
     <Compile Include="Resources\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\SubViewModels\BuildDefinitionViewModel.cs" />
-    <Compile Include="ViewModel\ProviderViewModelBase.cs" />
-    <Compile Include="ViewModel\Tfs2017BuildProviderViewModel.cs" />
-    <Page Include="Views\Tfs2017BuildProviderView.xaml">
+    <Compile Include="Base\ViewModel\SubViewModels\BuildDefinitionViewModel.cs" />
+    <Compile Include="Base\ViewModel\ProviderViewModelBase.cs" />
+    <Compile Include="TFS2017\ViewModel\Tfs2017BuildProviderViewModel.cs" />
+    <Compile Include="TFS2017\View\Tfs2017BuildProviderView.cs" />
+    <Compile Include="TFS\ViewModel\TfsBuildProviderViewModelBase.cs" />
+    <Compile Include="VSTS\View\VstsBuildProviderView.cs" />
+    <Compile Include="VSTS\ViewModel\VstsBuildProviderViewModel.cs" />
+    <Page Include="TFS\Views\TfsBuildProviderViewBase.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Views\Tfs2017BuildProviderView.xaml.cs">
-      <DependentUpon>Tfs2017BuildProviderView.xaml</DependentUpon>
+    <Compile Include="TFS\Views\TfsBuildProviderViewBase.xaml.cs">
+      <DependentUpon>TfsBuildProviderViewBase.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

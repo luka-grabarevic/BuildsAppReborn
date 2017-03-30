@@ -5,9 +5,10 @@ namespace BuildsAppReborn.Contracts.Models
     [Flags]
     public enum AuthenticationModes
     {
-        Default = 0,
-        UsernamePassword = 1,
-        AccessToken = 2,
-        OAuth = 4
+        None = 0,
+        Default = 1,
+        UsernamePassword = 2,
+        AccessToken = 4,
+        OAuth = 8
     }
 }

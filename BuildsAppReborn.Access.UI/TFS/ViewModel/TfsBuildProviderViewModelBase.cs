@@ -1,28 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+
 using BuildsAppReborn.Access.UI.ViewModel.SubViewModels;
-using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 using BuildsAppReborn.Infrastructure.Collections;
+
 using Prism.Commands;
 
 namespace BuildsAppReborn.Access.UI.ViewModel
 {
-    [IdentifierExport(typeof(Tfs2017BuildProviderViewModel), Tfs2017BuildProvider.Id)]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
-    internal class Tfs2017BuildProviderViewModel : ProviderViewModelBase
+    internal abstract class TfsBuildProviderViewModelBase : ProviderViewModelBase
     {
         #region Constructors
 
-        [ImportingConstructor]
-        public Tfs2017BuildProviderViewModel(IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
+        protected TfsBuildProviderViewModelBase(IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
         {
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             BuildDefinitions = new RangeObservableCollection<BuildDefinitionViewModel>();
@@ -36,7 +33,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public override String DisplayName
         {
-            get { return this.displayName; }
+            get
+            {
+                return String.IsNullOrWhiteSpace(this.displayName) ? ProviderName : this.displayName;
+            }
             protected set
             {
                 this.displayName = value;
@@ -48,15 +48,28 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         {
             base.OnInitialized();
 
-            if (!MonitorSettings.ContainsKey(Tfs2017BuildProvider.ProjectCredentialsSettingKey))
+            if (!MonitorSettings.ContainsKey(TfsBuildProviderBase.ProjectCredentialsSettingKey))
             {
-                MonitorSettings[Tfs2017BuildProvider.ProjectCredentialsSettingKey] = CredentialCache.DefaultCredentials;
+                MonitorSettings[TfsBuildProviderBase.ProjectCredentialsSettingKey] = CredentialCache.DefaultCredentials;
             }
             SetDisplayName(MonitorSettings.SelectedBuildDefinitions);
 
             // ReSharper disable once ExplicitCallerInfoArgument
             OnPropertyChanged(nameof(ProjectUrl));
             ConnectCommand?.RaiseCanExecuteChanged();
+
+            if (!SupportsDefaultCredentials && SupportsPersonalAccessToken)
+            {
+                ShowPersonalAccessTokenInput = true;
+                if (MonitorSettings.ContainsKey(TfsBuildProviderBase.PersonalAccessTokenSettingsKey))
+                {
+                    var token = MonitorSettings?.GetDefaultValueIfNotExists<String>(TfsBuildProviderBase.PersonalAccessTokenSettingsKey);
+                    if (!String.IsNullOrWhiteSpace(token))
+                    {
+                        ShowPersonalAccessTokenInput = false;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -66,13 +79,16 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         public String AccessToken
         {
             // never show access token once provided
-            get { return String.Empty; }
+            get
+            {
+                return String.Empty;
+            }
             set
             {
                 // ToDo: Token should only be saved if connection was successful
                 if (!String.IsNullOrWhiteSpace(value))
                 {
-                    MonitorSettings[Tfs2017BuildProvider.PersonalAccessTokenSettingsKey] = value;
+                    MonitorSettings[TfsBuildProviderBase.PersonalAccessTokenSettingsKey] = value;
                     OnPropertyChanged();
                     ConnectCommand?.RaiseCanExecuteChanged();
                 }
@@ -85,7 +101,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public Boolean IsConnecting
         {
-            get { return this.isConnecting; }
+            get
+            {
+                return this.isConnecting;
+            }
             set
             {
                 this.isConnecting = value;
@@ -96,10 +115,13 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public String ProjectUrl
         {
-            get { return MonitorSettings?.GetDefaultValueIfNotExists<String>(Tfs2017BuildProvider.ProjectUrlSettingKey); }
+            get
+            {
+                return MonitorSettings?.GetDefaultValueIfNotExists<String>(TfsBuildProviderBase.ProjectUrlSettingKey);
+            }
             set
             {
-                MonitorSettings[Tfs2017BuildProvider.ProjectUrlSettingKey] = value;
+                MonitorSettings[TfsBuildProviderBase.ProjectUrlSettingKey] = value;
                 OnPropertyChanged();
                 ConnectCommand?.RaiseCanExecuteChanged();
             }
@@ -107,7 +129,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public Boolean ShowPersonalAccessTokenInput
         {
-            get { return this.showPersonalAccessTokenInput; }
+            get
+            {
+                return this.showPersonalAccessTokenInput;
+            }
             set
             {
                 OnPropertyChanged();
@@ -117,7 +142,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public String StatusText
         {
-            get { return this.statusText; }
+            get
+            {
+                return this.statusText;
+            }
             set
             {
                 this.statusText = value;
@@ -127,26 +155,32 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         #endregion
 
+        #region Protected Properties
+
+        protected abstract String ProviderName { get; }
+
+        #endregion
+
         #region Private Methods
 
         private void ApplyBuildDefinitions(IEnumerable<IBuildDefinition> buildDefinitions)
         {
             BuildDefinitions.AddRange(buildDefinitions.Select(buildDefinition =>
-                                                              {
-                                                                  var selectedBuildDefinitions = MonitorSettings.SelectedBuildDefinitions;
-
-                                                                  var vm = new BuildDefinitionViewModel(buildDefinition);
-
-                                                                  var definition = selectedBuildDefinitions.SingleOrDefault(a => a.Id == vm.BuildDefinition.Id);
-                                                                  if (definition != null && this.buildDefinitionEqualityComparer.Equals(definition, vm.BuildDefinition))
                                                                   {
-                                                                      vm.IsSelected = true;
-                                                                  }
+                                                                      var selectedBuildDefinitions = MonitorSettings.SelectedBuildDefinitions;
 
-                                                                  vm.PropertyChanged += BuildDefinitionPropertyChanged;
+                                                                      var vm = new BuildDefinitionViewModel(buildDefinition);
 
-                                                                  return vm;
-                                                              }));
+                                                                      var definition = selectedBuildDefinitions.SingleOrDefault(a => a.Id == vm.BuildDefinition.Id);
+                                                                      if (definition != null && this.buildDefinitionEqualityComparer.Equals(definition, vm.BuildDefinition))
+                                                                      {
+                                                                          vm.IsSelected = true;
+                                                                      }
+
+                                                                      vm.PropertyChanged += BuildDefinitionPropertyChanged;
+
+                                                                      return vm;
+                                                                  }));
         }
 
         private void BuildDefinitionPropertyChanged(Object sender, PropertyChangedEventArgs e)
@@ -175,14 +209,14 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             try
             {
                 Application.Current.Dispatcher.Invoke(() =>
-                                                      {
-                                                          foreach (var buildDefinitionViewModel in BuildDefinitions)
                                                           {
-                                                              buildDefinitionViewModel.PropertyChanged -= BuildDefinitionPropertyChanged;
-                                                          }
+                                                              foreach (var buildDefinitionViewModel in BuildDefinitions)
+                                                              {
+                                                                  buildDefinitionViewModel.PropertyChanged -= BuildDefinitionPropertyChanged;
+                                                              }
 
-                                                          BuildDefinitions.Clear();
-                                                      });
+                                                              BuildDefinitions.Clear();
+                                                          });
 
                 var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitions(MonitorSettings));
 
@@ -220,11 +254,11 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             if (buildDefinition != null)
             {
                 var projectName = buildDefinition.Project.Name;
-                DisplayName = $"{Tfs2017BuildProvider.Name} - {projectName}";
+                DisplayName = $"{ProviderName} - {projectName}";
             }
             else
             {
-                DisplayName = Tfs2017BuildProvider.Name;
+                DisplayName = ProviderName;
             }
         }
 
@@ -247,9 +281,11 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         #region Private Fields
 
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
-        private String displayName = Tfs2017BuildProvider.Name;
+
+        private String displayName;
 
         private Boolean isConnecting;
+
         private Boolean showPersonalAccessTokenInput;
 
         private String statusText;
