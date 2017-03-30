@@ -115,14 +115,14 @@
 
                                     <!--  Build history  -->
                                     <ItemsControl Grid.Row="1"
-                                                Grid.Column="0"
-                                                Margin="1 10 0 10"
-                                                HorizontalContentAlignment="Stretch"
-                                                VerticalContentAlignment="Stretch"
-                                                Background="Transparent"
-                                                BorderBrush="Transparent"
-                                                BorderThickness="0"
-                                                ItemsSource="{Binding PreviousBuilds}">
+                                            Grid.Column="0"
+                                            Margin="1 10 0 10"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Stretch"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            ItemsSource="{Binding PreviousBuilds}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel Orientation="Horizontal" />
@@ -131,7 +131,7 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Width="10"
-                                                    Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
                                                     <Grid.Margin>
                                                         <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
                                                             <Binding Path="Build"/>
