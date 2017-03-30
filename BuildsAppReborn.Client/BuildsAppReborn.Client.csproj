@@ -136,6 +136,7 @@
     <Compile Include="Cache\BuildCache.cs" />
     <Compile Include="Cache\BuildCacheStatus.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="Converter\BuildItemToRelativeMarginConverter.cs" />
     <Compile Include="Converter\BuildStatusToImageConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushForegroundConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushBackgroundConverter.cs" />

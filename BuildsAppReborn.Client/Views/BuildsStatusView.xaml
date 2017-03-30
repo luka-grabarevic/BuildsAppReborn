@@ -8,6 +8,7 @@
                       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
+                      xmlns:system="clr-namespace:System;assembly=mscorlib"
                       Title="Builds Overview"
                       Width="450"
                       Height="600"
@@ -26,6 +27,7 @@
             <converter:BuildStatusToSolidColorBrushForegroundConverter x:Key="BuildStatusToSolidColorBrushForegroundConverter" />
             <converter:BuildStatusToImageConverter x:Key="BuildStatusToImageConverter" />
             <converter:BuildTimeToElapsedTimeConverter x:Key="BuildTimeToElapsedTimeConverter" />
+            <converter:BuildItemToRelativeMarginConverter x:Key="BuildItemToRelativeMarginConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <Window.Icon>
@@ -112,42 +114,47 @@
                                     </Grid>
 
                                     <!--  Build history  -->
-                                        <ItemsControl Grid.Row="1"
-                                                  Grid.Column="0"
-                                                  Margin="1 10 0 10"
-                                                  HorizontalContentAlignment="Stretch"
-                                                  VerticalContentAlignment="Stretch"
-                                                  Background="Transparent"
-                                                  BorderBrush="Transparent"
-                                                  BorderThickness="0"
-                                                  ItemsSource="{Binding PreviousBuilds}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <VirtualizingStackPanel Orientation="Horizontal" />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Width="10"
-                                                      Margin="0 0 3 0"
-                                                      Background="{Binding Build.Status,
-                                                                           Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
-                                                        <Grid.ToolTip>
-                                                            <TextBlock>
-                                                                <TextBlock.Text>
-                                                                    <MultiBinding StringFormat=" {0} ({1} ago)">
-                                                                        <Binding Path="Build.Requester.DisplayName" />
-                                                                        <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
-                                                                    </MultiBinding>
-                                                                </TextBlock.Text>
-                                                            </TextBlock>
-                                                        </Grid.ToolTip>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                    <ItemsControl Grid.Row="1"
+                                                Grid.Column="0"
+                                                Margin="1 10 0 10"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                ItemsSource="{Binding PreviousBuilds}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Width="10"
+                                                    Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                    <Grid.Margin>
+                                                        <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
+                                                            <Binding Path="Build"/>
+                                                            <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ItemsControl}"/>
+                                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ItemsControl}"/>
+                                                        </MultiBinding>
+                                                    </Grid.Margin>
+                                                    <Grid.ToolTip>
+                                                        <TextBlock>
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat=" {0} ({1} ago)">
+                                                                    <Binding Path="Build.Requester.DisplayName" />
+                                                                    <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </Grid.ToolTip>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
 
-                                        <!--  current build status with icon and text and date  -->
+                                    <!--  current build status with icon and text and date  -->
                                     <Grid Grid.Row="1" Grid.Column="1">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
