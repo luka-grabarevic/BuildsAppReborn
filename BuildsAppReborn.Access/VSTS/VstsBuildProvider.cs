@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-
+using BuildsAppReborn.Access.Models;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Access
 {
     [BuildProviderExport(typeof(IBuildProvider), Id, Name, AuthenticationModes.AccessToken)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class VstsBuildProvider : TfsBuildProviderBase
+    internal class VstsBuildProvider : TfsBuildProviderBase<VstsBuild, VstsBuildDefinition, VstsUser>
     {
         #region Overrides of Base
 

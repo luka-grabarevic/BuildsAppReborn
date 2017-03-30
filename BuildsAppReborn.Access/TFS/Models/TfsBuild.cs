@@ -10,13 +10,12 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class TfsBuild : IBuild
+    internal abstract class TfsBuild : IBuild
     {
         #region Implementation of IBuild
 
         [JsonProperty("definition")]
-        [JsonConverter(typeof(InterfaceTypeConverter<TfsBuildDefinition, IBuildDefinition>))]
-        public IBuildDefinition Definition { get; private set; }
+        public abstract IBuildDefinition Definition { get; protected set; }
 
         [JsonProperty("id")]
         public Int32 Id { get; private set; }
@@ -74,6 +73,12 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("startTime")]
         public DateTime StartDateTime { get; private set; }
 
+        [JsonProperty("requestedFor")]
+        public abstract IUser Requester { get; protected set; }
+
+        [JsonProperty("url")]
+        public String Url { get; private set; }
+
         #endregion
 
         #region Private Fields
@@ -83,13 +88,6 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("status")]
         private String status;
-
-        [JsonProperty("requestedFor")]
-        [JsonConverter(typeof(InterfaceTypeConverter<TfsUser, IUser>))]
-        public IUser Requester { get; private set; }
-
-        [JsonProperty("url")]
-        public String Url { get; private set; }
 
         #endregion
     }

@@ -4,22 +4,21 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
 using BuildsAppReborn.Access.Models;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BuildsAppReborn.Access
 {
-    internal abstract class TfsBuildProviderBase : IBuildProvider
+    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser> : TfsBuildProviderBase, IBuildProvider
+        where TBuild : TfsBuild, new()
+        where TBuildDefinition : TfsBuildDefinition, new()
+        where TUser : TfsUser, new()
     {
         #region Implementation of IBuildProvider
-
-        protected abstract String ApiVersion { get; }
 
         public virtual async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings)
         {
@@ -32,15 +31,15 @@ namespace BuildsAppReborn.Access
                 if (requestResponse.IsSuccessStatusCode)
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<List<TfsBuildDefinition>>(JObject.Parse(result)["value"].ToString());
+                    var data = JsonConvert.DeserializeObject<List<TBuildDefinition>>(JObject.Parse(result)["value"].ToString());
                     foreach (var buildDefinition in data)
                     {
                         buildDefinition.BuildSettingsId = settings.UniqueId;
                     }
 
-                    return new DataResponse<IEnumerable<IBuildDefinition>> { Data = data, StatusCode = requestResponse.StatusCode };
+                    return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
-                return new DataResponse<IEnumerable<IBuildDefinition>> { Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode };
+                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
@@ -51,7 +50,7 @@ namespace BuildsAppReborn.Access
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
             {
-                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>() };
+                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>()};
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -68,17 +67,23 @@ namespace BuildsAppReborn.Access
                 if (requestResponse.IsSuccessStatusCode)
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<List<TfsBuild>>(JObject.Parse(result)["value"].ToString());
-                    data.Select(d => d.Definition).OfType<TfsBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
-                    data.Select(d => d.Requester).OfType<TfsUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
+                    var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+                    data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
+                    data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
 
-                    return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
+                    return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
-                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode };
+                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
         }
+
+        #endregion
+
+        #region Protected Properties
+
+        protected abstract String ApiVersion { get; }
 
         #endregion
 
@@ -108,9 +113,10 @@ namespace BuildsAppReborn.Access
         }
 
         #endregion
+    }
 
-
-
+    internal abstract class TfsBuildProviderBase
+    {
         internal const String ProjectUrlSettingKey = "ProjectUrl";
 
         internal const String ProjectCredentialsSettingKey = "ProjectCredentials";

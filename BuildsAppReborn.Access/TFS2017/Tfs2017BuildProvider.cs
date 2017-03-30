@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-
+using BuildsAppReborn.Access.Models;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Access
 {
     [BuildProviderExport(typeof(IBuildProvider), Id, Name, AuthenticationModes.Default | AuthenticationModes.AccessToken)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class Tfs2017BuildProvider : TfsBuildProviderBase
+    internal class Tfs2017BuildProvider : TfsBuildProviderBase<Tfs2017Build, Tfs2017BuildDefinition, Tfs2017User>
     {
         #region Overrides of Base
 

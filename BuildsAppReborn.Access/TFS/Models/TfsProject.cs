@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class TfsProject : IProject
+    public abstract class TfsProject : IProject
     {
         #region Implementation of IProject
 

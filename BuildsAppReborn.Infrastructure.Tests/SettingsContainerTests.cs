@@ -26,7 +26,6 @@ namespace BuildsAppReborn.Infrastructure.Tests
             //settings.Add("Test3", new List<IBuildDefinition> { GetTestBuildDefinition(1), GetTestBuildDefinition(2) });
 
             var container = new SettingsContainer<BuildMonitorSettings>();
-            var settingsKey = "TestSettings1";
             container.Add(settings);
 
             container.Save(tempFile);
