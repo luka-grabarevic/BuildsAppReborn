@@ -28,7 +28,7 @@ namespace BuildsAppReborn.Client.Converter
                     barHeight = 1;
                 }
                 var topMargin = height - barHeight;
-                return new Thickness(0, Math.Round(topMargin), 3, 0);
+                return new Thickness(0, Math.Round(topMargin), 0, 0);
             }
             return default(Thickness);
         }

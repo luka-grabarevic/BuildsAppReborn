@@ -5,10 +5,8 @@
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:converter="clr-namespace:BuildsAppReborn.Client.Converter"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
-                      xmlns:system="clr-namespace:System;assembly=mscorlib"
                       Title="Builds Overview"
                       Width="450"
                       Height="600"
@@ -115,14 +113,14 @@
 
                                     <!--  Build history  -->
                                     <ItemsControl Grid.Row="1"
-                                            Grid.Column="0"
-                                            Margin="1 10 0 10"
-                                            HorizontalContentAlignment="Stretch"
-                                            VerticalContentAlignment="Stretch"
-                                            Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            BorderThickness="0"
-                                            ItemsSource="{Binding PreviousBuilds}">
+                                                  Grid.Column="0"
+                                                  Margin="1 10 0 10"
+                                                  HorizontalContentAlignment="Stretch"
+                                                  VerticalContentAlignment="Stretch"
+                                                  Background="Transparent"
+                                                  BorderBrush="Transparent"
+                                                  BorderThickness="0"
+                                                  ItemsSource="{Binding PreviousBuilds}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel Orientation="Horizontal" />
@@ -131,14 +129,8 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Width="10"
-                                                Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
-                                                    <Grid.Margin>
-                                                        <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
-                                                            <Binding Path="Build"/>
-                                                            <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ItemsControl}"/>
-                                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=ItemsControl}"/>
-                                                        </MultiBinding>
-                                                    </Grid.Margin>
+                                                      Margin="0 0 3 0"
+                                                      Background="Transparent">
                                                     <Grid.ToolTip>
                                                         <TextBlock>
                                                             <TextBlock.Text>
@@ -149,6 +141,15 @@
                                                             </TextBlock.Text>
                                                         </TextBlock>
                                                     </Grid.ToolTip>
+                                                    <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                        <Grid.Margin>
+                                                            <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
+                                                                <Binding Path="Build" />
+                                                                <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Grid.Margin>
+                                                    </Grid>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
