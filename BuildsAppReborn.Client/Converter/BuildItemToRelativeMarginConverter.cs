@@ -22,13 +22,13 @@ namespace BuildsAppReborn.Client.Converter
             {
                 var durations = buildItems.Select(b => (b.Build.FinishDateTime - b.Build.StartDateTime).TotalSeconds);
                 var duration = (currentBuild.FinishDateTime - currentBuild.StartDateTime).TotalSeconds;
-                var barHeight = (height*duration)/durations.Max();
+                var barHeight = (height * duration) / durations.Max();
                 if (barHeight < 1)
                 {
                     barHeight = 1;
                 }
                 var topMargin = height - barHeight;
-                return new Thickness(0, topMargin, 3, 0);
+                return new Thickness(0, Math.Round(topMargin), 3, 0);
             }
             return default(Thickness);
         }
