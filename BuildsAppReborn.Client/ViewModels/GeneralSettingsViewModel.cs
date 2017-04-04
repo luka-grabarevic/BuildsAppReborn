@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reflection;
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts.Models;
@@ -33,7 +34,20 @@ namespace BuildsAppReborn.Client.ViewModels
 
         #region Public Properties
 
-        public Version CurrentAppVersion => Assembly.GetEntryAssembly().GetName().Version;
+        public String CurrentAppVersion
+        {
+            get
+            {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly.Location != null)
+                {
+                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+                    var version = fileVersionInfo.ProductVersion;
+                    return version;
+                }
+                return assembly.GetName().Version.ToString();
+            }
+        }
 
         public GeneralSettings GeneralSettings => this.globalSettingsContainer.GeneralSettings;
 

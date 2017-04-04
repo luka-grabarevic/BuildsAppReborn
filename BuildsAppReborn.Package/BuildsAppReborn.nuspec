@@ -8,6 +8,7 @@
     <authors>Luka Grabarevic</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Enhanced version of the Visual Studio BuildNotificationApp to support latest TFS versions.</description>
+    <iconUrl>https://raw.githubusercontent.com/lgrabarevic/BuildsAppReborn/master/BuildsAppReborn.Client/Resources/Icons/PNG/succeeded.png</iconUrl>
     <releaseNotes/>
     <dependencies/>
   </metadata>
