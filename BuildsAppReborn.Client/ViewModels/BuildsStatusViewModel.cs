@@ -1,8 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Timers;
 using BuildsAppReborn.Client.Interfaces;
+using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
+using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
 {
@@ -19,6 +22,7 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
             this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
+            HistoryClickCommand = new DelegateCommand<BuildItem>(OnHistoryClickCommand);
         }
 
         #endregion
@@ -39,6 +43,8 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public BuildCache BuildCache { get; }
 
+        public DelegateCommand<BuildItem> HistoryClickCommand { get; set; }
+
         #endregion
 
         #region Private Methods
@@ -51,6 +57,15 @@ namespace BuildsAppReborn.Client.ViewModels
                 buildStatus.CurrentBuild.BuildTime = DateTime.UtcNow;
             }
             this.timer?.Start();
+        }
+
+        private void OnHistoryClickCommand(BuildItem item)
+        {
+            var url = item?.Build?.PortalUrl;
+            if (!String.IsNullOrWhiteSpace(url))
+            {
+                Process.Start(url);
+            }
         }
 
         #endregion

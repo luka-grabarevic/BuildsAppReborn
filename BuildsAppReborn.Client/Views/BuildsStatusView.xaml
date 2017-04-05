@@ -128,29 +128,35 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Width="10"
-                                                      Margin="0 0 3 0"
-                                                      Background="Transparent">
-                                                    <Grid.ToolTip>
-                                                        <TextBlock>
-                                                            <TextBlock.Text>
-                                                                <MultiBinding StringFormat=" {0} ({1} ago)">
-                                                                    <Binding Path="Build.Requester.DisplayName" />
-                                                                    <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                    </Grid.ToolTip>
-                                                    <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
-                                                        <Grid.Margin>
-                                                            <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
-                                                                <Binding Path="Build" />
-                                                                <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
-                                                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
-                                                            </MultiBinding>
-                                                        </Grid.Margin>
-                                                    </Grid>
-                                                </Grid>
+                                                <Button Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}" CommandParameter="{Binding}">
+                                                    <Button.Template>
+                                                        <ControlTemplate>
+                                                            <Grid Width="10"
+                                                                  Margin="0 0 3 0"
+                                                                  Background="Transparent">
+                                                                <Grid.ToolTip>
+                                                                    <TextBlock>
+                                                                        <TextBlock.Text>
+                                                                            <MultiBinding StringFormat=" {0} ({1} ago)">
+                                                                                <Binding Path="Build.Requester.DisplayName" />
+                                                                                <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
+                                                                            </MultiBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+                                                                </Grid.ToolTip>
+                                                                <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                                    <Grid.Margin>
+                                                                        <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
+                                                                            <Binding Path="Build" />
+                                                                            <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                        </MultiBinding>
+                                                                    </Grid.Margin>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
