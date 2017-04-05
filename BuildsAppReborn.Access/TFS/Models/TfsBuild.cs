@@ -1,6 +1,5 @@
 ﻿using System;
 using BuildsAppReborn.Contracts.Models;
-using BuildsAppReborn.Infrastructure;
 using Newtonsoft.Json;
 
 #pragma warning disable 649
@@ -28,7 +27,8 @@ namespace BuildsAppReborn.Access.Models
              * result: enum { succeeded, partiallySucceeded, failed, canceled } 
              * status: enum { inProgress, completed, cancelling, postponed, notStarted, all } 
              * 
-             */ get
+             */
+            get
             {
                 if (this.status == "inProgress")
                 {
@@ -78,6 +78,9 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("url")]
         public String Url { get; private set; }
+
+        [JsonIgnore]
+        public String PortalUrl { get; internal set; }
 
         #endregion
 

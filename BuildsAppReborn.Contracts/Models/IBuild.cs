@@ -22,6 +22,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         String Url { get; }
 
+        String PortalUrl { get; }
+
         #endregion
     }
 }

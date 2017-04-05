@@ -152,10 +152,6 @@
     <Compile Include="Interfaces\ICloseable.cs" />
     <Compile Include="Notification\NotificationManager.cs" />
     <Compile Include="Resources\IconProvider.cs" />
-    <Compile Include="SampleData\SampleBuild.cs" />
-    <Compile Include="SampleData\SampleBuildDefinition.cs" />
-    <Compile Include="SampleData\SampleDataGenerator.cs" />
-    <Compile Include="SampleData\SampleProject.cs" />
     <Compile Include="UpdateChecker.cs" />
     <Compile Include="ViewModels\GeneralSettingsViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />

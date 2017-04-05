@@ -68,6 +68,7 @@ namespace BuildsAppReborn.Access
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
                     var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+                    data.ForEach(b => b.PortalUrl = $"{projectUrl}/_build/index?buildId={b.Id}");
                     data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
                     data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
 
