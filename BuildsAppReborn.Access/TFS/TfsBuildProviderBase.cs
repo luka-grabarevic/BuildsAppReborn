@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BuildsAppReborn.Access.Models;
+using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
@@ -68,9 +69,10 @@ namespace BuildsAppReborn.Access
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
                     var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
-                    data.ForEach(b => b.PortalUrl = $"{projectUrl}/_build/index?buildId={b.Id}");
                     data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
                     data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
+
+                    await ResolveSourceVersion(data, projectUrl, settings);
 
                     return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
@@ -111,6 +113,48 @@ namespace BuildsAppReborn.Access
                 return await HttpRequestHelper.GetRequestResponse(requestUrl, accessToken);
             }
             return await HttpRequestHelper.GetRequestResponse(requestUrl, credentials);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private async Task GetSourceVersion(BuildMonitorSettings settings, String requestUrl, TBuild build)
+        {
+            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var result = await requestResponse.Content.ReadAsStringAsync();
+                build.SourceVersion = JsonConvert.DeserializeObject<TfsSourceVersion>(result);
+            }
+        }
+
+        private async Task ResolveSourceVersion(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        {
+            var grpByRepoType = builds.GroupBy(a => a.Repository.RepositoryType);
+            foreach (var group in grpByRepoType)
+            {
+                if (group.Key == RepositoryType.TfsVersionControl)
+                {
+                    foreach (var build in group)
+                    {
+                        var requestUrl = $"{projectUrl}/_apis/tfvc/changesets/{build.SourceVersionInternal}?api-version=1.0&includeDetails=true";
+                        await GetSourceVersion(settings, requestUrl, build);
+                    }
+                }
+                else if (group.Key == RepositoryType.TfsGit)
+                {
+                    foreach (var build in group)
+                    {
+                        var requestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{build.SourceVersionInternal}?api-version=1.0";
+                        await GetSourceVersion(settings, requestUrl, build);
+                    }
+                }
+                else if (group.Key == RepositoryType.GitHub)
+                {
+                    // ToDo: implement GitHub
+                }
+            }
         }
 
         #endregion

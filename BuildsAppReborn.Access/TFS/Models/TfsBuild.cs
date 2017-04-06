@@ -1,4 +1,5 @@
 ﻿using System;
+using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts.Models;
 using Newtonsoft.Json;
 
@@ -9,9 +10,12 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal abstract class TfsBuild : IBuild
+    internal abstract class TfsBuild : LinksContainer, IBuild
     {
         #region Implementation of IBuild
+
+        [JsonProperty("buildNumber")]
+        public String BuildNumber { get; private set; }
 
         [JsonProperty("definition")]
         public abstract IBuildDefinition Definition { get; protected set; }
@@ -80,7 +84,23 @@ namespace BuildsAppReborn.Access.Models
         public String Url { get; private set; }
 
         [JsonIgnore]
-        public String PortalUrl { get; internal set; }
+        public String PortalUrl => base.WebLink;
+
+        [JsonIgnore]
+        public ISourceVersion SourceVersion { get; internal set; }
+
+        #endregion
+
+        #region Internal Properties
+
+        [JsonProperty("repository")]
+        internal Repository Repository { get; private set; }
+
+        [JsonProperty("sourceBranch")]
+        internal String SourceBranch { get; private set; }
+
+        [JsonProperty("sourceVersion")]
+        internal String SourceVersionInternal { get; private set; }
 
         #endregion
 
