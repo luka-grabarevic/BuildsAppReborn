@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+
+using BuildsAppReborn.Access.Base;
 using BuildsAppReborn.Contracts.Models;
+
 using Newtonsoft.Json;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -8,7 +11,7 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal abstract class TfsUser : IUser
+    internal abstract class TfsUser : NamedObject, IUser
     {
         #region Implementation of IUser
 
@@ -37,6 +40,22 @@ namespace BuildsAppReborn.Access.Models
                     this.imageData = Task.Run(() => ImageDataLoader).Result;
                 }
                 return this.imageData;
+            }
+        }
+
+        #endregion
+
+        #region Overrides of Base
+
+        public override String Name
+        {
+            get
+            {
+                return base.Name ?? DisplayName;
+            }
+            protected set
+            {
+                base.Name = value;
             }
         }
 

@@ -6,6 +6,8 @@ namespace BuildsAppReborn.Contracts.Models
     {
         #region Public Properties
 
+        INamedObject Author { get; }
+
         String Comment { get; }
 
         String PortalUrl { get; }

@@ -65,6 +65,7 @@
     <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IBuild.cs" />
     <Compile Include="Models\IBuildDefinition.cs" />
+    <Compile Include="Models\INamedObject.cs" />
     <Compile Include="Models\IProject.cs" />
     <Compile Include="Models\ISourceVersion.cs" />
     <Compile Include="Models\IUser.cs" />

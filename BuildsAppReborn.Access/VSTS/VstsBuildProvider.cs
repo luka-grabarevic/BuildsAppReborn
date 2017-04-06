@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Access
 {
     [BuildProviderExport(typeof(IBuildProvider), Id, Name, AuthenticationModes.AccessToken)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class VstsBuildProvider : TfsBuildProviderBase<VstsBuild, VstsBuildDefinition, VstsUser>
+    internal class VstsBuildProvider : TfsBuildProviderBase<VstsBuild, VstsBuildDefinition, VstsUser, VstsSourceVersion>
     {
         #region Overrides of Base
 

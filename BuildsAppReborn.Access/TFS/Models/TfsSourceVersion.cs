@@ -1,13 +1,14 @@
 ﻿using System;
 using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts.Models;
+
 using Newtonsoft.Json;
 
 // ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace BuildsAppReborn.Access.Models
 {
-    internal class TfsSourceVersion : LinksContainer, ISourceVersion
+    internal abstract class TfsSourceVersion : LinksContainer, ISourceVersion
     {
         #region Implementation of ISourceVersion
 
@@ -16,6 +17,9 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonIgnore]
         public String PortalUrl => WebLink;
+
+        [JsonProperty("author")]
+        public abstract INamedObject Author { get; protected set; }
 
         #endregion
     }

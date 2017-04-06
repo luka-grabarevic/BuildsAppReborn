@@ -18,6 +18,7 @@ namespace BuildsAppReborn.Infrastructure
                 handler.Credentials = credentials;
                 using (var client = new HttpClient(handler))
                 {
+                    AddUserAgent(client);
                     return await client.GetAsync(url);
                 }
             }
@@ -27,7 +28,17 @@ namespace BuildsAppReborn.Infrastructure
         {
             using (var client = new HttpClient())
             {
+                AddUserAgent(client);
                 AddAccessTokenToHeader(personalAccessToken, client);
+                return await client.GetAsync(url);
+            }
+        }
+
+        public static async Task<HttpResponseMessage> GetRequestResponse(String url)
+        {
+            using (var client = new HttpClient())
+            {
+                AddUserAgent(client);
                 return await client.GetAsync(url);
             }
         }
@@ -40,6 +51,12 @@ namespace BuildsAppReborn.Infrastructure
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($":{personalAccessToken}")));
+        }
+
+        private static void AddUserAgent(HttpClient client)
+        {
+            // fix for issue with GitHub - https://stackoverflow.com/questions/2482715#comment64584330_22134980
+            client.DefaultRequestHeaders.Add("User-Agent", "Anything");
         }
 
         #endregion

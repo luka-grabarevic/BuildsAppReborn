@@ -1,4 +1,5 @@
 ﻿using System;
+
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -21,13 +22,18 @@ namespace BuildsAppReborn.Contracts.UI
 
         public DateTime BuildTime
         {
-            get { return GetBuildTime(); }
+            get
+            {
+                return GetBuildTime();
+            }
             set
             {
                 // hack mc hack hack
                 OnPropertyChanged();
             }
         }
+
+        public String Comment => Build?.SourceVersion?.Comment ?? "-";
 
         #endregion
 

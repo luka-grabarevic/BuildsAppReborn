@@ -4,20 +4,20 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using BuildsAppReborn.Access.Models;
 using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BuildsAppReborn.Access
 {
-    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser> : TfsBuildProviderBase, IBuildProvider
-        where TBuild : TfsBuild, new()
-        where TBuildDefinition : TfsBuildDefinition, new()
-        where TUser : TfsUser, new()
+    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser, TSourceVersion> : TfsBuildProviderBase, IBuildProvider
+        where TBuild : TfsBuild, new() where TBuildDefinition : TfsBuildDefinition, new() where TUser : TfsUser, new() where TSourceVersion : TfsSourceVersion, new()
     {
         #region Implementation of IBuildProvider
 
@@ -38,9 +38,9 @@ namespace BuildsAppReborn.Access
                         buildDefinition.BuildSettingsId = settings.UniqueId;
                     }
 
-                    return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuildDefinition>> { Data = data, StatusCode = requestResponse.StatusCode };
                 }
-                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuildDefinition>> { Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode };
             }
 
             throw new Exception($"Error while processing method!");
@@ -51,7 +51,7 @@ namespace BuildsAppReborn.Access
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
             {
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>()};
+                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>() };
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -74,9 +74,9 @@ namespace BuildsAppReborn.Access
 
                     await ResolveSourceVersion(data, projectUrl, settings);
 
-                    return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
                 }
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode };
             }
 
             throw new Exception($"Error while processing method!");
@@ -119,14 +119,24 @@ namespace BuildsAppReborn.Access
 
         #region Private Methods
 
-        private async Task GetSourceVersion(BuildMonitorSettings settings, String requestUrl, TBuild build)
+        private Tuple<String, String> GetGitOwnerAndRepo(String gitHubRepoUrl)
         {
-            var requestResponse = await GetRequestResponse(requestUrl, settings);
-            if (requestResponse.IsSuccessStatusCode)
+            if (!String.IsNullOrWhiteSpace(gitHubRepoUrl))
             {
-                var result = await requestResponse.Content.ReadAsStringAsync();
-                build.SourceVersion = JsonConvert.DeserializeObject<TfsSourceVersion>(result);
+                var split = gitHubRepoUrl.Split('/');
+
+                if (split.Length > 2)
+                {
+                    var owner = split[split.Length - 2];
+                    var repoRaw = split[split.Length - 1];
+                    var gitIndex = repoRaw.LastIndexOf(".git", StringComparison.InvariantCultureIgnoreCase);
+                    var repo = repoRaw.Substring(0, gitIndex != -1 ? gitIndex : repoRaw.Length);
+
+                    return new Tuple<String, String>(owner, repo);
+                }
             }
+
+            return null;
         }
 
         private async Task ResolveSourceVersion(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
@@ -139,7 +149,7 @@ namespace BuildsAppReborn.Access
                     foreach (var build in group)
                     {
                         var requestUrl = $"{projectUrl}/_apis/tfvc/changesets/{build.SourceVersionInternal}?api-version=1.0&includeDetails=true";
-                        await GetSourceVersion(settings, requestUrl, build);
+                        await SetSourceVersion<TSourceVersion>(settings, requestUrl, build);
                     }
                 }
                 else if (group.Key == RepositoryType.TfsGit)
@@ -147,13 +157,39 @@ namespace BuildsAppReborn.Access
                     foreach (var build in group)
                     {
                         var requestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{build.SourceVersionInternal}?api-version=1.0";
-                        await GetSourceVersion(settings, requestUrl, build);
+                        await SetSourceVersion<TSourceVersion>(settings, requestUrl, build);
                     }
                 }
                 else if (group.Key == RepositoryType.GitHub)
                 {
-                    // ToDo: implement GitHub
+                    // ToDo: can't poll everytime because of rate limits...
+#if DEBUG
+
+                    // special case when it is a TFS project with external GitHub repository
+                    foreach (var build in group)
+                    {
+                        var ownerAndRepo = GetGitOwnerAndRepo(build.Repository.Id);
+                        var requestUrl = $"{GitHubApiPrefix}/repos/{ownerAndRepo.Item1}/{ownerAndRepo.Item2}/commits/{build.SourceVersionInternal}";
+
+                        var requestResponse = await HttpRequestHelper.GetRequestResponse(requestUrl);
+                        if (requestResponse.IsSuccessStatusCode)
+                        {
+                            var result = await requestResponse.Content.ReadAsStringAsync();
+                            build.SourceVersion = JsonConvert.DeserializeObject<GitHubSourceVersion>(result);
+                        }
+                    }
+#endif
                 }
+            }
+        }
+
+        private async Task SetSourceVersion<TInnerSourceVersion>(BuildMonitorSettings settings, String requestUrl, TBuild build) where TInnerSourceVersion : ISourceVersion, new()
+        {
+            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var result = await requestResponse.Content.ReadAsStringAsync();
+                build.SourceVersion = JsonConvert.DeserializeObject<TInnerSourceVersion>(result);
             }
         }
 
@@ -162,6 +198,8 @@ namespace BuildsAppReborn.Access
 
     internal abstract class TfsBuildProviderBase
     {
+        internal const String GitHubApiPrefix = "https://api.github.com";
+
         internal const String ProjectUrlSettingKey = "ProjectUrl";
 
         internal const String ProjectCredentialsSettingKey = "ProjectCredentials";

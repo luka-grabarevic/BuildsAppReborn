@@ -140,7 +140,7 @@
                                                                             <MultiBinding StringFormat="{}{0} ({1} ago)&#x0d;&#x0a;{2}">
                                                                                 <Binding Path="Build.Requester.DisplayName" />
                                                                                 <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
-                                                                                <Binding Path="Build.SourceVersion.Comment" />
+                                                                                <Binding Path="Comment" />
                                                                             </MultiBinding>
                                                                         </TextBlock.Text>
                                                                     </TextBlock>
