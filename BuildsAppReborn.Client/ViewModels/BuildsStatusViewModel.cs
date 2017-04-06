@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Linq;
 using System.Timers;
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts.UI;
@@ -52,7 +53,7 @@ namespace BuildsAppReborn.Client.ViewModels
         private void OnBuildCacheUpdated(Object sender, EventArgs eventArgs)
         {
             this.timer?.Stop();
-            foreach (var buildStatus in BuildCache.BuildsStatus)
+            foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
             {
                 buildStatus.CurrentBuild.BuildTime = DateTime.UtcNow;
             }
