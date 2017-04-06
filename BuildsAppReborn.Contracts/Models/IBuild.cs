@@ -20,6 +20,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         IUser Requester { get; }
 
+        ISourceVersion SourceVersion { get; }
+
         DateTime StartDateTime { get; }
 
         BuildStatus Status { get; }

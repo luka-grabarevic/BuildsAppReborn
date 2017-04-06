@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts.Models;
 using Newtonsoft.Json;
 
@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace BuildsAppReborn.Access.Models
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal abstract class TfsBuild : IBuild
+    internal abstract class TfsBuild : LinksContainer, IBuild
     {
         #region Implementation of IBuild
 
@@ -84,29 +84,27 @@ namespace BuildsAppReborn.Access.Models
         public String Url { get; private set; }
 
         [JsonIgnore]
-        public String PortalUrl
-        {
-            get
-            {
-                if (this.links?.ContainsKey(Web) != null)
-                {
-                    var web = this.links[Web];
-                    if (web?.ContainsKey(Href) != null)
-                    {
-                        return web[Href];
-                    }
-                }
-                return String.Empty;
-            }
-        }
+        public String PortalUrl => base.WebLink;
+
+        [JsonIgnore]
+        public ISourceVersion SourceVersion { get; internal set; }
+
+        #endregion
+
+        #region Internal Properties
+
+        [JsonProperty("repository")]
+        internal Repository Repository { get; private set; }
+
+        [JsonProperty("sourceBranch")]
+        internal String SourceBranch { get; private set; }
+
+        [JsonProperty("sourceVersion")]
+        internal String SourceVersionInternal { get; private set; }
 
         #endregion
 
         #region Private Fields
-
-        [JsonProperty("_links")]
-        private Dictionary<String, Dictionary<String, String>> links;
-
 
         [JsonProperty("result")]
         private String result;
@@ -115,9 +113,5 @@ namespace BuildsAppReborn.Access.Models
         private String status;
 
         #endregion
-
-        private const String Web = "web";
-
-        private const String Href = "href";
     }
 }
