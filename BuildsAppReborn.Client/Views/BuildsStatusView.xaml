@@ -173,7 +173,7 @@
                                                        VerticalAlignment="Center"
                                                        Text="{Binding CurrentBuild.BuildTime,
                                                                       Converter={StaticResource BuildTimeToElapsedTimeConverter},
-                                                                      StringFormat={} ({0} ago)}"
+                                                                      StringFormat={}({0} ago)}"
                                                        TextTrimming="CharacterEllipsis" />
                                             <Image Grid.Column="3"
                                                    Height="18"
