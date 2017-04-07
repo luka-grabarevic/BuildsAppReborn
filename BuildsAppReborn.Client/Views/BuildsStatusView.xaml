@@ -8,8 +8,9 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
                       Title="Builds Overview"
-                      Width="450"
-                      Height="600"
+                      Width="500"
+                      Height="400"
+                      MinWidth="500"
                       d:DataContext="{d:DesignInstance Type=viewModels:BuildsStatusViewModel}"
                       Background="{DynamicResource MaterialDesignPaper}"
                       GlowBrush="{DynamicResource AccentColorBrush}"
@@ -69,58 +70,21 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="White" BorderThickness="0 0 0 1">
+
+                            <!--  The row's content:  -->
                             <Grid HorizontalAlignment="Stretch" Background="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToColorBackgroundConverter}}">
-                                <Grid Margin="10">
+                                <Grid Margin="12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="80" />
                                     </Grid.RowDefinitions>
 
-                                    <!--  build definition name  -->
-                                    <TextBlock Grid.Row="0"
-                                               Grid.Column="0"
-                                               Grid.ColumnSpan="3"
-                                               FontWeight="Bold"
-                                               Text="{Binding BuildDefinition.Name}" />
-
-                                    <!--  requester name with image  -->
-                                    <Grid Grid.Row="0"
-                                          Grid.RowSpan="3"
-                                          Grid.Column="0"
-                                          Grid.ColumnSpan="3"
-                                          Margin="0 0 0 0"
-                                          HorizontalAlignment="Right"
-                                          VerticalAlignment="Center">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Image Grid.Row="0"
-                                               Height="50"
-                                               HorizontalAlignment="Right"
-                                               Source="{Binding CurrentBuild.Build.Requester.ImageData}" />
-                                        <TextBlock Grid.Row="1"
-                                                   HorizontalAlignment="Right"
-                                                   Text="{Binding CurrentBuild.Build.Requester.DisplayName}" />
-
-                                    </Grid>
-
                                     <!--  Build history  -->
-                                    <ItemsControl Grid.Row="1"
-                                                  Grid.Column="0"
-                                                  Margin="1 10 0 10"
-                                                  HorizontalContentAlignment="Stretch"
-                                                  VerticalContentAlignment="Stretch"
-                                                  Background="Transparent"
-                                                  BorderBrush="Transparent"
-                                                  BorderThickness="0"
-                                                  ItemsSource="{Binding PreviousBuilds}">
+                                    <ItemsControl Grid.Column="0" ItemsSource="{Binding AllBuildItems}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel Orientation="Horizontal" />
@@ -128,11 +92,15 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Button Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}" CommandParameter="{Binding}">
+                                                <Button Height="{Binding Path=ActualHeight,
+                                                                         RelativeSource={RelativeSource AncestorType=Grid}}"
+                                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window},
+                                                                          Path=DataContext.HistoryClickCommand}"
+                                                        CommandParameter="{Binding}">
                                                     <Button.Template>
                                                         <ControlTemplate>
-                                                            <Grid Width="10"
-                                                                  Margin="0 0 3 0"
+                                                            <Grid Width="12"
+                                                                  Margin="0 0 5 0"
                                                                   Background="Transparent">
                                                                 <Grid.ToolTip>
                                                                     <TextBlock>
@@ -162,27 +130,70 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
 
-                                    <!--  current build status with icon and text and date  -->
-                                    <Grid Grid.Row="1" Grid.Column="1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <Image Grid.Column="0"
-                                               Height="32"
-                                               Margin="0 0 0 0"
-                                               Source="{Binding CurrentBuild.Build.Status,
-                                                                Converter={StaticResource BuildStatusToImageConverter}}" />
-                                        <TextBlock Grid.Column="1"
+                                    <!--  requester image  -->
+                                    <Image Grid.Column="1"
+                                           Margin="7 0 0 0"
+                                           Source="{Binding CurrentBuild.Build.Requester.ImageData}" />
+
+                                    <!--
+                                        Rows with details:
+                                        0: Definition name,
+                                        1: last status, last ago time, status icon
+                                        2: requester name,
+                                        3: checkin comment
+                                    -->
+                                    <Grid Grid.Column="2" Margin="10 0 0 0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition Height="20" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0"
                                                    VerticalAlignment="Center"
-                                                   Text="{Binding CurrentBuild.Build.Status}" />
-                                        <TextBlock Grid.Column="2"
+                                                   FontSize="14"
+                                                   FontWeight="Bold"
+                                                   Text="{Binding BuildDefinition.Name}"
+                                                   TextTrimming="CharacterEllipsis" />
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="1"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding CurrentBuild.Build.Status}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="2"
+                                                       Margin="3 0 0 0"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding CurrentBuild.BuildTime,
+                                                                      Converter={StaticResource BuildTimeToElapsedTimeConverter},
+                                                                      StringFormat={} ({0} ago)}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Image Grid.Column="3"
+                                                   Height="18"
                                                    Margin="3 0 0 0"
                                                    VerticalAlignment="Center"
-                                                   Text="{Binding CurrentBuild.BuildTime,
-                                                                  Converter={StaticResource BuildTimeToElapsedTimeConverter},
-                                                                  StringFormat={} ({0} ago)}" />
+                                                   Source="{Binding CurrentBuild.Build.Status,
+                                                                    Converter={StaticResource BuildStatusToImageConverter}}" />
+                                        </Grid>
+
+                                        <TextBlock Grid.Row="2"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding CurrentBuild.Build.Requester.DisplayName}"
+                                                   TextTrimming="CharacterEllipsis" />
+
+                                        <TextBlock Grid.Row="3"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding CurrentBuild.Comment}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="Wrap" />
+
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -191,6 +202,8 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Grid>
+
+        <!--  in case there are no builds (loaded yet):  -->
         <ProgressBar Grid.Column="0"
                      Width="128"
                      Height="128"
