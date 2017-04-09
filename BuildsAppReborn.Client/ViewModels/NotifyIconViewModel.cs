@@ -60,27 +60,54 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private void Initialize()
         {
-            ShowWindowCommand = new DelegateCommand(() =>
-                                                    {
-                                                        var window = this.buildsExportFactory.CreateExport().Value as Window;
-                                                        Application.Current.MainWindow = window;
-                                                        if (Application.Current.MainWindow != null)
-                                                        {
-                                                            Application.Current.MainWindow.Show();
-                                                        }
-                                                    }, () => !(Application.Current.MainWindow is IBuildsStatusView));
+            ShowWindowCommand = new DelegateCommand(() => { OpenWindow<IBuildsStatusView>(this.buildsExportFactory); });
 
-            ShowSettingsWindowCommand = new DelegateCommand(() =>
-                                                            {
-                                                                var window = this.settingsExportFactory.CreateExport().Value as Window;
-                                                                Application.Current.MainWindow = window;
-                                                                if (Application.Current.MainWindow != null)
-                                                                {
-                                                                    Application.Current.MainWindow.Show();
-                                                                }
-                                                            }, () => !(Application.Current.MainWindow is ISettingsView));
+            ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
 
             ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
+        }
+
+        private void OpenWindow<T>(ExportFactory<T> newWindow)
+        {
+            var currentMainWindow = Application.Current.MainWindow;
+            if (currentMainWindow is T)
+            {
+                if (currentMainWindow.WindowState == WindowState.Minimized)
+                {
+                    currentMainWindow.WindowState = WindowState.Normal;
+                }
+                if (!currentMainWindow.IsActive)
+                {
+                    currentMainWindow.Show();
+                }
+                currentMainWindow.Activate();
+                return;
+            }
+            Window buildStatusWindow = null;
+            foreach (var window in Application.Current.Windows)
+            {
+                if (window as Window is T)
+                {
+                    buildStatusWindow = window as Window;
+                    break;
+                }
+            }
+            if (buildStatusWindow == null)
+            {
+                (newWindow.CreateExport().Value as Window)?.Show();
+            }
+            if (buildStatusWindow != null)
+            {
+                if (buildStatusWindow.WindowState == WindowState.Minimized)
+                {
+                    buildStatusWindow.WindowState = WindowState.Normal;
+                }
+                if (!currentMainWindow.IsActive)
+                {
+                    buildStatusWindow.Show();
+                }
+                buildStatusWindow.Activate();
+            }
         }
 
         #endregion
