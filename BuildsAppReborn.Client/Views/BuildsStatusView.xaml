@@ -6,6 +6,7 @@
                       xmlns:converter="clr-namespace:BuildsAppReborn.Client.Converter"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:models="clr-namespace:BuildsAppReborn.Contracts.Models;assembly=BuildsAppReborn.Contracts"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
                       Title="Builds Overview"
                       Width="500"
@@ -27,6 +28,7 @@
             <converter:BuildStatusToImageConverter x:Key="BuildStatusToImageConverter" />
             <converter:BuildTimeToElapsedTimeConverter x:Key="BuildTimeToElapsedTimeConverter" />
             <converter:BuildItemToRelativeMarginConverter x:Key="BuildItemToRelativeMarginConverter" />
+            <converter:TimeSpanToNiceStringConverter x:Key="TimeSpanToNiceStringConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <Window.Icon>
@@ -54,13 +56,13 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Template>
                     <ControlTemplate>
-                        <Border Background="{TemplateBinding Panel.Background}"
+                        <Border Padding="{TemplateBinding Control.Padding}"
+                                Background="{TemplateBinding Panel.Background}"
                                 BorderBrush="{TemplateBinding Border.BorderBrush}"
                                 BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                Padding="{TemplateBinding Control.Padding}"
                                 SnapsToDevicePixels="True">
-                            <ScrollViewer Focusable="False"
-                                          Padding="{TemplateBinding Control.Padding}"
+                            <ScrollViewer Padding="{TemplateBinding Control.Padding}"
+                                          Focusable="False"
                                           VerticalScrollBarVisibility="Auto">
                                 <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </ScrollViewer>
@@ -92,10 +94,8 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Button Height="{Binding Path=ActualHeight,
-                                                                         RelativeSource={RelativeSource AncestorType=Grid}}"
-                                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window},
-                                                                          Path=DataContext.HistoryClickCommand}"
+                                                <Button Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
+                                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
                                                         CommandParameter="{Binding}">
                                                     <Button.Template>
                                                         <ControlTemplate>
@@ -104,21 +104,42 @@
                                                                   Background="Transparent">
                                                                 <Grid.ToolTip>
                                                                     <TextBlock>
-                                                                        <TextBlock.Text>
-                                                                            <MultiBinding StringFormat="{}{0} ({1} ago)&#x0d;&#x0a;{2}">
-                                                                                <Binding Path="Build.Requester.DisplayName" />
-                                                                                <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildTime" />
-                                                                                <Binding Path="Comment" />
-                                                                            </MultiBinding>
-                                                                        </TextBlock.Text>
+                                                                        <TextBlock.Style>
+                                                                            <Style TargetType="TextBlock">
+                                                                                <Setter Property="Text">
+                                                                                    <Setter.Value>
+                                                                                        <MultiBinding StringFormat="{}{0} ({1} ago, ran for {3})&#x0d;&#x0a;{2}">
+                                                                                            <Binding Path="Build.Requester.DisplayName" />
+                                                                                            <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
+                                                                                            <Binding Path="Comment" />
+                                                                                            <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                        </MultiBinding>
+                                                                                    </Setter.Value>
+                                                                                </Setter>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
+                                                                                        <Setter Property="Text">
+                                                                                            <Setter.Value>
+                                                                                                <MultiBinding StringFormat="{}{0} (ran for {2})&#x0d;&#x0a;{1}">
+                                                                                                    <Binding Path="Build.Requester.DisplayName" />
+                                                                                                    <Binding Path="Comment" />
+                                                                                                    <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                                </MultiBinding>
+                                                                                            </Setter.Value>
+                                                                                        </Setter>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </TextBlock.Style>
                                                                     </TextBlock>
                                                                 </Grid.ToolTip>
                                                                 <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
                                                                     <Grid.Margin>
                                                                         <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
-                                                                            <Binding Path="Build" />
+                                                                            <Binding />
                                                                             <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
                                                                             <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                            <Binding Path="BuildStateTime" />
                                                                         </MultiBinding>
                                                                     </Grid.Margin>
                                                                 </Grid>
@@ -171,16 +192,30 @@
                                             <TextBlock Grid.Column="2"
                                                        Margin="3 0 0 0"
                                                        VerticalAlignment="Center"
-                                                       Text="{Binding CurrentBuild.BuildTime,
-                                                                      Converter={StaticResource BuildTimeToElapsedTimeConverter},
-                                                                      StringFormat={}({0} ago)}"
-                                                       TextTrimming="CharacterEllipsis" />
+                                                       TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text">
+                                                            <Setter.Value>
+                                                                <MultiBinding StringFormat="{}({0} ago, ran for {1})">
+                                                                    <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="CurrentBuild.BuildStateTime" />
+                                                                    <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="CurrentBuild.BuildDuration" />
+                                                                </MultiBinding>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CurrentBuild.BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
+                                                                <Setter Property="Text" Value="{Binding StringFormat='{}(ran for {0})', Converter={StaticResource TimeSpanToNiceStringConverter}, Path=CurrentBuild.BuildDuration}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                             <Image Grid.Column="3"
                                                    Height="18"
                                                    Margin="3 0 0 0"
                                                    VerticalAlignment="Center"
-                                                   Source="{Binding CurrentBuild.Build.Status,
-                                                                    Converter={StaticResource BuildStatusToImageConverter}}" />
+                                                   Source="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToImageConverter}}" />
                                         </Grid>
 
                                         <TextBlock Grid.Row="2"

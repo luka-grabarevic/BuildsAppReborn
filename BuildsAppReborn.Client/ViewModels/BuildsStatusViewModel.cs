@@ -55,7 +55,7 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer?.Stop();
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
             {
-                buildStatus.CurrentBuild.BuildTime = DateTime.UtcNow;
+                buildStatus.CurrentBuild.Refresh();
             }
             this.timer?.Start();
         }

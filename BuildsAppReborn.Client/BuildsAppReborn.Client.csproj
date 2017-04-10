@@ -144,6 +144,7 @@
     <Compile Include="Converter\BuildStatusToSolidColorBrushForegroundConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushBackgroundConverter.cs" />
     <Compile Include="Converter\MinutesToTimeSpanConverter.cs" />
+    <Compile Include="Converter\TimeSpanToNiceStringConverter.cs" />
     <Compile Include="Interfaces\IHasDataContext.cs" />
     <Compile Include="Interfaces\ISubSettingsControl.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />

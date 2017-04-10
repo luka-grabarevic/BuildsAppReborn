@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Diagnostics.CodeAnalysis;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -18,49 +18,79 @@ namespace BuildsAppReborn.Contracts.UI
 
         #region Public Properties
 
-        public IBuild Build { get; private set; }
+        public IBuild Build { get; }
 
-        public DateTime BuildTime
+        public TimeSpan BuildDuration => BuildEndTime - BuildStartTime;
+
+        public DateTime BuildEndTime
         {
             get
             {
-                return GetBuildTime();
-            }
-            set
-            {
-                // hack mc hack hack
-                OnPropertyChanged();
+                switch (Build.Status)
+                {
+                    case BuildStatus.Queued:
+                    case BuildStatus.Running:
+                    case BuildStatus.Unknown:
+                        return DateTime.UtcNow;
+                    default:
+                        return Build.FinishDateTime;
+                }
             }
         }
+
+        public DateTime BuildStartTime
+        {
+            get
+            {
+                switch (Build.Status)
+                {
+                    case BuildStatus.Queued:
+                    case BuildStatus.Unknown:
+                        return Build.QueueDateTime;
+                    default:
+                        return Build.StartDateTime;
+                }
+            }
+        }
+
+        public DateTime BuildStateTime
+        {
+            get
+            {
+                switch (Build.Status)
+                {
+                    case BuildStatus.Unknown:
+                        return Build.QueueDateTime;
+                    case BuildStatus.Succeeded:
+                    case BuildStatus.PartiallySucceeded:
+                    case BuildStatus.Failed:
+                    case BuildStatus.Stopped:
+                        return Build.FinishDateTime;
+                    case BuildStatus.Running:
+                        return Build.StartDateTime;
+                    case BuildStatus.Queued:
+                    default:
+                        return Build.QueueDateTime;
+                }
+            }
+        }
+
+        public BuildStatus BuildStatus => Build?.Status ?? BuildStatus.Unknown;
 
         public String Comment => Build?.SourceVersion?.Comment ?? "-";
 
         #endregion
 
-        #region Private Methods
+        #region Public Methods
 
-        private DateTime GetBuildTime()
+        [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
+        public void Refresh()
         {
-            var result = DateTime.UtcNow;
-            switch (Build.Status)
-            {
-                case BuildStatus.Unknown:
-                    result = Build.QueueDateTime;
-                    break;
-                case BuildStatus.Succeeded:
-                case BuildStatus.PartiallySucceeded:
-                case BuildStatus.Failed:
-                case BuildStatus.Stopped:
-                    result = Build.FinishDateTime;
-                    break;
-                case BuildStatus.Running:
-                    result = Build.StartDateTime;
-                    break;
-                case BuildStatus.Queued:
-                    result = Build.QueueDateTime;
-                    break;
-            }
-            return result;
+            OnPropertyChanged(nameof(BuildStartTime));
+            OnPropertyChanged(nameof(BuildEndTime));
+            OnPropertyChanged(nameof(BuildStateTime));
+            OnPropertyChanged(nameof(BuildDuration));
+            OnPropertyChanged(nameof(BuildStatus));
         }
 
         #endregion

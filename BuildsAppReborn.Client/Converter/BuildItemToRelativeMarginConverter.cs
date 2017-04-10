@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
-using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 
 namespace BuildsAppReborn.Client.Converter
@@ -15,14 +14,19 @@ namespace BuildsAppReborn.Client.Converter
 
         public Object Convert(Object[] values, Type targetType, Object parameter, CultureInfo culture)
         {
-            var currentBuild = values[0] as IBuild;
+            if (values == null || values.Length < 4)
+                return default(Thickness);
+
+            var currentBuildItem = values[0] as BuildItem;
             var buildItems = values[1] as List<BuildItem>;
             var height = (Double) values[2];
-            if (currentBuild != null && buildItems != null)
+            if (currentBuildItem != null && buildItems != null)
             {
-                var durations = buildItems.Select(b => (b.Build.FinishDateTime - b.Build.StartDateTime).TotalSeconds);
-                var duration = (currentBuild.FinishDateTime - currentBuild.StartDateTime).TotalSeconds;
-                var barHeight = (height * duration) / durations.Max();
+                // get longest build time
+                var longestDuration = buildItems.Select(b => b.BuildDuration.TotalSeconds).Max();
+
+                var duration = currentBuildItem.BuildDuration.TotalSeconds;
+                var barHeight = height * duration / longestDuration;
                 if (barHeight < 1)
                 {
                     barHeight = 1;
@@ -36,7 +40,7 @@ namespace BuildsAppReborn.Client.Converter
 
         public Object[] ConvertBack(Object value, Type[] targetTypes, Object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         #endregion
