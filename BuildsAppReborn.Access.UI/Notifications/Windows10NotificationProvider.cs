@@ -1,18 +1,22 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
+
 using Windows.UI.Notifications;
+
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 
 namespace BuildsAppReborn.Access.UI.Notifications
 {
-    [Export(typeof(INotificationProvider))]
-    internal class Windows81NotificationProvider : INotificationProvider
+    [PriorityExport(typeof(INotificationProvider), 100)]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    internal class Windows10NotificationProvider : INotificationProvider
     {
         #region Implementation of INotificationProvider
 
-        public void ShowBuild(IBuild build, Func<IBuild, String> iconProvider)
+        public void ShowBuild(IBuild build, Func<IBuild, String> iconProvider, Action<IBuild> notificationClickAction)
         {
             // Get a toast XML template
             var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
@@ -33,7 +37,7 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
-            toast.Dismissed += ToastDismissed;
+            toast.Activated += (sender, args) => { notificationClickAction?.Invoke(build); };
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
@@ -53,28 +57,24 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
-            toast.Dismissed += ToastDismissed;
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs e)
+        public Boolean IsSupported
         {
-            // ToDo: open build etc.
-            //switch (e.Reason)
-            //{
-            //    case ToastDismissalReason.ApplicationHidden:
-            //        break;
-            //    case ToastDismissalReason.UserCanceled:
-            //        break;
-            //    case ToastDismissalReason.TimedOut:
-            //        break;
-            //}
+            get
+            {
+                // somehow windows version is not correctly provided when in debug, but release works
+#if !DEBUG
+                var os = Environment.OSVersion;
+                return os.Version.Major >= 10;
+#endif
+#if DEBUG
+                return true;
+#endif
+            }
         }
 
         #endregion

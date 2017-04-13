@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Windows;
+using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Client.Resources;
+using BuildsAppReborn.Client.ViewModels;
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
+using BuildsAppReborn.Infrastructure;
 
 namespace BuildsAppReborn.Client.Notification
 {
@@ -14,14 +19,14 @@ namespace BuildsAppReborn.Client.Notification
         #region Constructors
 
         [ImportingConstructor]
-        public NotificationManager([ImportMany] IEnumerable<INotificationProvider> notificationProviders, BuildCache buildCache, IEqualityComparer<IBuild> buildEqualityComparer)
+        public NotificationManager(LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders, BuildCache buildCache, IEqualityComparer<IBuild> buildEqualityComparer, ExportFactory<IBuildsStatusView> buildsExportFactory)
         {
             this.buildCache = buildCache;
             this.buildEqualityComparer = buildEqualityComparer;
+            this.buildsExportFactory = buildsExportFactory;
             this.buildCache.CacheUpdated += (sender, args) => ShowNotification();
 
-            // ToDo: find the compatible provider for this system
-            this.notificationProvider = notificationProviders.FirstOrDefault();
+            this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
         }
 
         #endregion
@@ -45,10 +50,7 @@ namespace BuildsAppReborn.Client.Notification
                             result.Add(build);
                         }
                     }
-                    else
-                    {
-                        result.Add(build);
-                    }
+                    result.Add(build);
                 }
             }
 
@@ -63,7 +65,7 @@ namespace BuildsAppReborn.Client.Notification
             var changedBuilds = GetChangedBuilds(builds);
             foreach (var build in changedBuilds)
             {
-                this.notificationProvider?.ShowBuild(build, b => IconProvider.GetCachedIconPathForBuildStatus(b.Status));
+                this.notificationProvider?.ShowBuild(build, b => IconProvider.GetCachedIconPathForBuildStatus(b.Status), b => { Application.Current.Dispatcher.Invoke(() => { NotifyIconViewModel.OpenWindow(this.buildsExportFactory); }); });
             }
         }
 
@@ -73,6 +75,7 @@ namespace BuildsAppReborn.Client.Notification
 
         private readonly BuildCache buildCache;
         private readonly IEqualityComparer<IBuild> buildEqualityComparer;
+        private readonly ExportFactory<IBuildsStatusView> buildsExportFactory;
         private INotificationProvider notificationProvider;
         private IList<IBuild> oldBuilds;
 

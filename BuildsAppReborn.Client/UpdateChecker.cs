@@ -7,8 +7,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using BuildsAppReborn.Client.Properties;
+using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
+using BuildsAppReborn.Infrastructure;
+
 using log4net;
 using Squirrel;
 
@@ -21,14 +24,13 @@ namespace BuildsAppReborn.Client
         #region Constructors
 
         [ImportingConstructor]
-        public UpdateChecker(GlobalSettingsContainer globalSettingsContainer, [ImportMany] IEnumerable<INotificationProvider> notificationProviders)
+        public UpdateChecker(GlobalSettingsContainer globalSettingsContainer, LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders)
         {
             this.globalSettingsContainer = globalSettingsContainer;
 
             this.timer.Elapsed += TimerOnElapsed;
 
-            // ToDo: find the compatible provider for this system
-            this.notificationProvider = notificationProviders.FirstOrDefault();
+            this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
         }
 
         #endregion
@@ -103,7 +105,7 @@ namespace BuildsAppReborn.Client
                                 this.logger.Info("New Update found!");
                                 if (GeneralSettings.NotifyOnNewUpdate)
                                 {
-                                    this.notificationProvider.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                                    this.notificationProvider?.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
                                 }
                             }
                             else
@@ -119,7 +121,7 @@ namespace BuildsAppReborn.Client
                 this.logger.Error("Error while checking for update", exception);
                 if (GeneralSettings.NotifyOnNewUpdate)
                 {
-                    this.notificationProvider.ShowMessage($"{this.version.ProductName} Update Check failed!", "See log file for more information.");
+                    this.notificationProvider?.ShowMessage($"{this.version.ProductName} Update Check failed!", "See log file for more information.");
                 }
             }
         }

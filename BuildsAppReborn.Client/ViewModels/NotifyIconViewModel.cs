@@ -56,18 +56,9 @@ namespace BuildsAppReborn.Client.ViewModels
 
         #endregion
 
-        #region Private Methods
+        #region Internal Static Methods
 
-        private void Initialize()
-        {
-            ShowWindowCommand = new DelegateCommand(() => { OpenWindow<IBuildsStatusView>(this.buildsExportFactory); });
-
-            ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
-
-            ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
-        }
-
-        private void OpenWindow<T>(ExportFactory<T> newWindow)
+        internal static void OpenWindow<T>(ExportFactory<T> newWindow)
         {
             var currentMainWindow = Application.Current.MainWindow;
             if (currentMainWindow is T)
@@ -108,6 +99,19 @@ namespace BuildsAppReborn.Client.ViewModels
                 }
                 buildStatusWindow.Activate();
             }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void Initialize()
+        {
+            ShowWindowCommand = new DelegateCommand(() => { OpenWindow<IBuildsStatusView>(this.buildsExportFactory); });
+
+            ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
+
+            ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
         }
 
         #endregion
