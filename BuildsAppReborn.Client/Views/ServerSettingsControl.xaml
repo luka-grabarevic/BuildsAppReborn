@@ -7,76 +7,98 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
              xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
+             xmlns:views="clr-namespace:BuildsAppReborn.Client.Views"
              d:DataContext="{d:DesignInstance Type=viewModels:ServerSettingsViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Row="0"
-                  Grid.Column="1"
-                  Margin="10"
-                  ItemsSource="{Binding AvailableProvider}"
-                  SelectedIndex="0"
-                  SelectedItem="{Binding SelectedProvider}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <Button Grid.Row="0"
-                Grid.Column="2"
-                Width="32"
-                Height="32"
-                Margin="5 0 5 0"
-                Command="{Binding AddProviderCommand}"
-                Style="{DynamicResource MaterialDesignFloatingActionMiniButton}">
-            <materialDesign:PackIcon Kind="Plus" />
-        </Button>
-        <Grid Grid.Row="1"
+        <Grid Grid.Row="0"
+              Grid.RowSpan="2"
               Grid.Column="0"
-              Grid.ColumnSpan="3">
-            <dragablz:TabablzControl Grid.Column="0"
-                                     ClosingItemCallback="{Binding ClosingItemCallback}"
-                                     ItemsSource="{Binding Views}"
-                                     NewItemFactory="{Binding NewItemFactory}"
-                                     SelectedIndex="0"
-                                     ShowDefaultAddButton="false"
-                                     ShowDefaultCloseButton="True">
-                <dragablz:TabablzControl.HeaderItemTemplate>
-                    <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding ViewModel.DisplayName}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </dragablz:TabablzControl.HeaderItemTemplate>
-            </dragablz:TabablzControl>
-            <TextBlock Grid.Column="0"
-                       Margin="20"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontSize="16"
-                       Text="Add new build server by choosing the needed build provider from the drop down list above." TextWrapping="WrapWithOverflow">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Views.Count}" Value="0">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+              Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="1"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="3">
+                <dragablz:TabablzControl Grid.Column="0"
+                                         ClosingItemCallback="{Binding ClosingItemCallback}"
+                                         ItemsSource="{Binding Views}"
+                                         SelectedIndex="0"
+                                         ShowDefaultAddButton="false"
+                                         ShowDefaultCloseButton="True">
+                    <dragablz:TabablzControl.HeaderItemTemplate>
+                        <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding ViewModel.DisplayName}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </dragablz:TabablzControl.HeaderItemTemplate>
+                </dragablz:TabablzControl>
+                <TextBlock Grid.Column="0"
+                           Margin="20"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           Text="Add new build server by choosing the needed build provider from the drop down list above."
+                           TextWrapping="WrapWithOverflow">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Views.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
         </Grid>
+        <materialDesign:PopupBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 Margin="0 0 28 28"
+                                 PlacementMode="TopAndAlignCentres"
+                                 Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
+                                 ToolTip="Add new build provider">
+            <ItemsControl ItemsSource="{Binding AvailableProvider}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Width="100"
+                                Margin="0 12 8 0"
+                                Command="{Binding Path=DataContext.AddProviderCommand,
+                                                  RelativeSource={RelativeSource AncestorType=views:ServerSettingsControl}}"
+                                CommandParameter="{Binding}"
+                                Content="{Binding Name}"
+                                Style="{StaticResource MaterialDesignRaisedButton}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </materialDesign:PopupBox>
     </Grid>
 </UserControl>

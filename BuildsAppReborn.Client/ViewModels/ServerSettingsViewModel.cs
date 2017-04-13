@@ -34,7 +34,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
             InitializeSettings();
 
-            AddProviderCommand = new DelegateCommand(OnAddProvider, () => SelectedProvider != null);
+            AddProviderCommand = new DelegateCommand<IIdentifierMetadata>(OnAddProvider);
 
             ClosingItemCallback += args => OnRemoveView(args.DragablzItem.DataContext as IBuildProviderView);
         }
@@ -54,27 +54,13 @@ namespace BuildsAppReborn.Client.ViewModels
 
         #region Public Properties
 
-        public DelegateCommand AddProviderCommand { get; }
+        public DelegateCommand<IIdentifierMetadata> AddProviderCommand { get; }
 
         public IEnumerable<IIdentifierMetadata> AvailableProvider => BuildProviderViews.MetaData;
 
         public ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> BuildProviderViews { get; }
 
         public ItemActionCallback ClosingItemCallback { get; }
-
-        public IIdentifierMetadata SelectedProvider
-        {
-            get
-            {
-                return this.selectedProvider;
-            }
-            set
-            {
-                this.selectedProvider = value;
-                OnPropertyChanged();
-                AddProviderCommand.RaiseCanExecuteChanged();
-            }
-        }
 
         public ObservableCollection<IBuildProviderView> Views { get; }
 
@@ -103,9 +89,9 @@ namespace BuildsAppReborn.Client.ViewModels
             }
         }
 
-        private void OnAddProvider()
+        private void OnAddProvider(IIdentifierMetadata selectedProvider)
         {
-            var providerid = SelectedProvider.Id;
+            var providerid = selectedProvider.Id;
             var buildMonitorSettings = new BuildMonitorSettings(providerid);
             this.globalSettingsContainer.BuildMonitorSettingsContainer.Add(buildMonitorSettings);
 
@@ -133,8 +119,6 @@ namespace BuildsAppReborn.Client.ViewModels
         private readonly IBuildMonitorAdvanced buildMonitor;
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
-
-        private IIdentifierMetadata selectedProvider;
 
         #endregion
     }
