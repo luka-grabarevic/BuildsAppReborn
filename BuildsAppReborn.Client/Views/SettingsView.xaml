@@ -3,11 +3,9 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
                       xmlns:interfaces="clr-namespace:BuildsAppReborn.Client.Interfaces"
                       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
                       Title="Settings"
                       Width="800"
@@ -42,8 +40,8 @@
                     <ListBox x:Name="SubSettingsListBox"
                              Margin="0 16 0 16"
                              ItemsSource="{Binding SubSettings}"
-                             SelectedIndex="0"
-                             PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp">
+                             PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                             SelectedIndex="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="interfaces:ISubSettingsControl">
                                 <TextBlock Margin="32 0 32 0" Text="{Binding Title}" />
@@ -58,13 +56,31 @@
                                           Mode="PrimaryMid"
                                           Padding="16">
                     <DockPanel>
-                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
-                                        x:Name="MenuToggleButton"/>
+                        <ToggleButton x:Name="MenuToggleButton"
+                                      DockPanel.Dock="Left"
+                                      IsChecked="False"
+                                      Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                        <Button Command="{Binding ElementName=SubSettingsListBox,
+                                                  Path=SelectedItem.DataContext.SaveCommand}"
+                                Content="SAVE"
+                                DockPanel.Dock="Right">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource MaterialDesignRaisedLightButton}" TargetType="Button">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=SubSettingsListBox, Path=SelectedItem.DataContext.SaveCommand}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    FontSize="22"
                                    Text="{Binding ElementName=SubSettingsListBox,
                                                   Path=SelectedItem.Title}" />
+
                     </DockPanel>
                 </materialDesign:ColorZone>
                 <ContentControl Content="{Binding ElementName=SubSettingsListBox, Path=SelectedItem}" />

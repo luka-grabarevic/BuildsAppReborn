@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Windows.Input;
+
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
@@ -23,6 +26,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         }
 
         public abstract String DisplayName { get; protected set; }
+
+        public abstract IEnumerable<IBuildDefinition> SelectedBuildDefinitions { get; }
+
+        public abstract String Url { get; }
 
         #endregion
 
@@ -81,6 +88,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         [ImportMany]
 #pragma warning disable 649
         private Lazy<IBuildProvider, IBuildProviderMetadata>[] buildProviders;
+
 #pragma warning restore 649
 
         #endregion

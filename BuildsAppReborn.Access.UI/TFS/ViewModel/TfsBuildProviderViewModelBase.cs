@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
@@ -72,6 +73,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
         }
 
+        public override IEnumerable<IBuildDefinition> SelectedBuildDefinitions => new ObservableCollection<IBuildDefinition>(MonitorSettings.SelectedBuildDefinitions);
+
+        public override String Url => ProjectUrl;
+
         #endregion
 
         #region Public Properties
@@ -123,6 +128,8 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             {
                 MonitorSettings[TfsBuildProviderBase.ProjectUrlSettingKey] = value;
                 OnPropertyChanged();
+                // ReSharper disable once ExplicitCallerInfoArgument
+                OnPropertyChanged(nameof(Url));
                 ConnectCommand?.RaiseCanExecuteChanged();
             }
         }
@@ -274,6 +281,9 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
                 MonitorSettings.SelectedBuildDefinitions.Remove(currentItem);
             }
+
+            // ReSharper disable once ExplicitCallerInfoArgument
+            OnPropertyChanged(nameof(SelectedBuildDefinitions));
         }
 
         #endregion

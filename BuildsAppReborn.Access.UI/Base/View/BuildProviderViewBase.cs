@@ -1,5 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
+using BuildsAppReborn.Access.UI.Resources;
 using BuildsAppReborn.Contracts.UI;
 
 namespace BuildsAppReborn.Access.UI.View
@@ -10,9 +12,17 @@ namespace BuildsAppReborn.Access.UI.View
 
         public virtual IBuildProviderViewModel ViewModel
         {
-            get { return (IBuildProviderViewModel) DataContext; }
-            protected set { this.DataContext = value; }
+            get
+            {
+                return (IBuildProviderViewModel)DataContext;
+            }
+            protected set
+            {
+                DataContext = value;
+            }
         }
+
+        public String Header => Resource.TfsConnectBoxLabel;
 
         #endregion
     }

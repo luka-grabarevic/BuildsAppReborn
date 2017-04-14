@@ -156,6 +156,7 @@
     <Compile Include="Converter\BuildStatusToSolidColorBrushBackgroundConverter.cs" />
     <Compile Include="Converter\MinutesToTimeSpanConverter.cs" />
     <Compile Include="Converter\TimeSpanToNiceStringConverter.cs" />
+    <Compile Include="Interfaces\ISaveable.cs" />
     <Compile Include="Interfaces\IHasDataContext.cs" />
     <Compile Include="Interfaces\ISubSettingsControl.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
@@ -196,6 +197,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Views\FancyItemsControl.cs" />
     <Compile Include="Views\GeneralSettingsControl.xaml.cs">
       <DependentUpon>GeneralSettingsControl.xaml</DependentUpon>
     </Compile>

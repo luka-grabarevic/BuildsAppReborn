@@ -18,117 +18,114 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
-        <GroupBox Margin="10,10,0,0"
-                  HorizontalAlignment="Left"
-                  VerticalAlignment="Top"
-                  Header="{x:Static resources:Resource.TfsConnectBoxLabel}">
-            <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Label Grid.Row="0"
+        <Grid Margin="10,10,0,0"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0"
+                   HorizontalAlignment="Left"
+                   Content="{x:Static resources:Resource.TfsConnectionStringLabel}" />
+            <TextBox Grid.Row="1"
+                     MinWidth="300"
+                     Margin="6 0 0 0"
+                     HorizontalAlignment="Stretch"
+                     IsEnabled="{Binding IsConnecting,
+                                         Converter={StaticResource InverseBooleanConverter}}"
+                     Text="{Binding ProjectUrl,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <Label Grid.Row="2"
+                   HorizontalAlignment="Left"
+                   Content="{x:Static resources:Resource.TfsCredentialsCacheText}"
+                   Visibility="{Binding SupportsDefaultCredentials,
+                                        Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <Grid Grid.Row="3">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding SupportsPersonalAccessToken}" Value="True" />
+                                    <Condition Binding="{Binding ShowPersonalAccessTokenInput}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0"
                        HorizontalAlignment="Left"
-                       Content="{x:Static resources:Resource.TfsConnectionStringLabel}" />
-                <TextBox Grid.Row="1"
-                         Margin="6 0 0 0"
+                       Content="{x:Static resources:Resource.TfsConnectionAccessTokenLabel}" />
+                <TextBox Grid.Column="1"
                          MinWidth="300"
+                         Margin="6 0 0 0"
                          HorizontalAlignment="Stretch"
                          IsEnabled="{Binding IsConnecting,
                                              Converter={StaticResource InverseBooleanConverter}}"
-                         Text="{Binding ProjectUrl,
-                                        Mode=TwoWay,
+                         Text="{Binding AccessToken,
+                                        Mode=OneWayToSource,
                                         UpdateSourceTrigger=PropertyChanged}" />
-                <Label Grid.Row="2"
-                       HorizontalAlignment="Left"
-                       Content="{x:Static resources:Resource.TfsCredentialsCacheText}"
-                       Visibility="{Binding SupportsDefaultCredentials,
-                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <Grid Grid.Row="3">
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding SupportsPersonalAccessToken}" Value="True" />
-                                        <Condition Binding="{Binding ShowPersonalAccessTokenInput}" Value="True" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0"
-                           HorizontalAlignment="Left"
-                           Content="{x:Static resources:Resource.TfsConnectionAccessTokenLabel}" />
-                    <TextBox Grid.Column="1"
-                             Margin="6 0 0 0"
-                             MinWidth="300"
-                             HorizontalAlignment="Stretch"
-                             IsEnabled="{Binding IsConnecting,
-                                                 Converter={StaticResource InverseBooleanConverter}}"
-                             Text="{Binding AccessToken,
-                                            Mode=OneWayToSource,
-                                            UpdateSourceTrigger=PropertyChanged}" />
-                </Grid>
-
-                <Grid Grid.Row="4" HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"
-                            Width="150"
-                            Margin="6 6 0 0"
-                            Command="{Binding ConnectCommand}"
-                            Content="{x:Static resources:Resource.TfsConnectButtonContent}" />
-                    <ProgressBar Grid.Column="1"
-                                 Margin="20,0,0,0"
-                                 IsIndeterminate="True"
-                                 Style="{DynamicResource MaterialDesignCircularProgressBar}"
-                                 Visibility="{Binding IsConnecting,
-                                                      Converter={StaticResource BooleanToVisibilityConverter}}" />
-                </Grid>
-                <TextBlock Grid.Row="5"
-                           Margin="6 6 0 0"
-                           Foreground="Red"
-                           Text="{Binding StatusText}" />
-                <ItemsControl Grid.Row="6"
-                              Grid.IsSharedSizeScope="True"
-                              ItemsSource="{Binding BuildDefinitions}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type subViewModels:BuildDefinitionViewModel}">
-                            <Border x:Name="Border" Padding="8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition SharedSizeGroup="Checkerz" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsSelected}" />
-                                    <StackPanel Grid.Column="1" Margin="8 0 0 0">
-                                        <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
             </Grid>
-        </GroupBox>
+
+            <Grid Grid.Row="4" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        Width="150"
+                        Margin="6 6 0 0"
+                        Command="{Binding ConnectCommand}"
+                        Content="{x:Static resources:Resource.TfsConnectButtonContent}" />
+                <ProgressBar Grid.Column="1"
+                             Margin="20,0,0,0"
+                             IsIndeterminate="True"
+                             Style="{DynamicResource MaterialDesignCircularProgressBar}"
+                             Visibility="{Binding IsConnecting,
+                                                  Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </Grid>
+            <TextBlock Grid.Row="5"
+                       Margin="6 6 0 0"
+                       Foreground="Red"
+                       Text="{Binding StatusText}" />
+            <ItemsControl Grid.Row="6"
+                          Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding BuildDefinitions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type subViewModels:BuildDefinitionViewModel}">
+                        <Border x:Name="Border" Padding="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Checkerz" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsSelected}" />
+                                <StackPanel Grid.Column="1" Margin="8 0 0 0">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
     </Grid>
 </view:BuildProviderViewBase>

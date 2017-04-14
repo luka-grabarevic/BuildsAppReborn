@@ -11,15 +11,13 @@ using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
 
-using Dragablz;
-
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
 {
     [Export]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class ServerSettingsViewModel : ViewModelBase, ICloseable
+    public class ServerSettingsViewModel : ViewModelBase, ISaveable, ICloseable
     {
         #region Constructors
 
@@ -34,9 +32,9 @@ namespace BuildsAppReborn.Client.ViewModels
 
             InitializeSettings();
 
+            SaveCommand = new DelegateCommand(OnSave);
             AddProviderCommand = new DelegateCommand<IIdentifierMetadata>(OnAddProvider);
-
-            ClosingItemCallback += args => OnRemoveView(args.DragablzItem.DataContext as IBuildProviderView);
+            RemoveProviderCommand = new DelegateCommand<IBuildProviderView>(OnRemoveView);
         }
 
         #endregion
@@ -45,9 +43,19 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public void OnClose()
         {
-            this.globalSettingsContainer.Save();
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, TimeSpan.FromMinutes(1));
             this.buildMonitor.BeginPollingBuilds();
+        }
+
+        #endregion
+
+        #region Implementation of ISaveable
+
+        public DelegateCommand SaveCommand { get; }
+
+        public void OnSave()
+        {
+            this.globalSettingsContainer.Save();
         }
 
         #endregion
@@ -60,7 +68,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> BuildProviderViews { get; }
 
-        public ItemActionCallback ClosingItemCallback { get; }
+        public DelegateCommand<IBuildProviderView> RemoveProviderCommand { get; }
 
         public ObservableCollection<IBuildProviderView> Views { get; }
 

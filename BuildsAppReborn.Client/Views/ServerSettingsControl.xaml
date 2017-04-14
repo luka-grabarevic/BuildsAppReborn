@@ -2,10 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
              xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
              xmlns:views="clr-namespace:BuildsAppReborn.Client.Views"
              d:DataContext="{d:DesignInstance Type=viewModels:ServerSettingsViewModel}"
@@ -15,7 +13,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Card.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -46,20 +46,111 @@
             <Grid Grid.Row="1"
                   Grid.Column="0"
                   Grid.ColumnSpan="3">
-                <dragablz:TabablzControl Grid.Column="0"
-                                         ClosingItemCallback="{Binding ClosingItemCallback}"
-                                         ItemsSource="{Binding Views}"
-                                         SelectedIndex="0"
-                                         ShowDefaultAddButton="false"
-                                         ShowDefaultCloseButton="True">
-                    <dragablz:TabablzControl.HeaderItemTemplate>
-                        <DataTemplate DataType="{x:Type ui:IBuildProviderView}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding ViewModel.DisplayName}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </dragablz:TabablzControl.HeaderItemTemplate>
-                </dragablz:TabablzControl>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <views:FancyItemsControl ItemsSource="{Binding Views}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <materialDesign:Flipper Margin="4 4 0 0" Style="{StaticResource MaterialDesignCardFlipper}">
+                                        <materialDesign:Flipper.BackContent>
+                                            <Grid Name="backGrid">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <materialDesign:ColorZone Mode="PrimaryMid" Padding="5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Button HorizontalAlignment="Left"
+                                                                Command="{x:Static materialDesign:Flipper.FlipCommand}"
+                                                                Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                                            <materialDesign:PackIcon HorizontalAlignment="Right" Kind="ArrowLeft" />
+                                                        </Button>
+                                                        <TextBlock Margin="8 0 0 0"
+                                                                   VerticalAlignment="Center"
+                                                                   Text="{Binding Header}" />
+                                                    </StackPanel>
+                                                </materialDesign:ColorZone>
+                                                <ContentPresenter Grid.Row="1"
+                                                                  Margin="2 0 "
+                                                                  Content="{Binding}" />
+                                            </Grid>
+                                        </materialDesign:Flipper.BackContent>
+                                        <materialDesign:Flipper.FrontContent>
+                                            <Grid Width="{Binding ElementName=backGrid, Path=ActualWidth}" Height="{Binding ElementName=backGrid, Path=ActualHeight}">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <materialDesign:ColorZone Mode="PrimaryMid" Padding="5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Margin="8 0 0 0"
+                                                                   VerticalAlignment="Center"
+                                                                   Text="{Binding ViewModel.DisplayName}" />
+                                                    </StackPanel>
+                                                </materialDesign:ColorZone>
+                                                <Grid Grid.Row="0"
+                                                      Margin="0 0 16 -20"
+                                                      HorizontalAlignment="Right"
+                                                      VerticalAlignment="Bottom">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="10" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0"
+                                                            Command="{x:Static materialDesign:Flipper.FlipCommand}"
+                                                            Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
+                                                        <materialDesign:PackIcon Kind="Pencil" />
+                                                    </Button>
+                                                    <Button Grid.Column="2"
+                                                            Command="{Binding Path=DataContext.RemoveProviderCommand,
+                                                                              RelativeSource={RelativeSource AncestorType=views:ServerSettingsControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
+                                                        <materialDesign:PackIcon Kind="Delete" />
+                                                    </Button>
+                                                </Grid>
+                                                <ScrollViewer Grid.Row="1"
+                                                              Margin="10 25 0 0"
+                                                              VerticalScrollBarVisibility="Auto">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="15" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="*" />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Grid.Row="0" Text="{Binding ViewModel.Url}" />
+                                                        <TextBlock Grid.Row="2" FontWeight="Bold">Selected BuildDefinitions:</TextBlock>
+                                                        <ItemsControl Grid.Row="3"
+                                                                      Margin="5 0 0 0"
+                                                                      ItemsSource="{Binding ViewModel.SelectedBuildDefinitions,
+                                                                                            NotifyOnSourceUpdated=True,
+                                                                                            UpdateSourceTrigger=PropertyChanged}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <BulletDecorator>
+                                                                        <TextBlock Text="{Binding Name}" />
+                                                                    </BulletDecorator>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </Grid>
+                                                </ScrollViewer>
+                                            </Grid>
+                                        </materialDesign:Flipper.FrontContent>
+
+                                    </materialDesign:Flipper>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </views:FancyItemsControl>
+                </ScrollViewer>
                 <TextBlock Grid.Column="0"
                            Margin="20"
                            HorizontalAlignment="Center"

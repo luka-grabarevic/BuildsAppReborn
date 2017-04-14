@@ -2,15 +2,18 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reflection;
+
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
+
+using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
 {
     [Export]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GeneralSettingsViewModel : ViewModelBase, ICloseable
+    public class GeneralSettingsViewModel : ViewModelBase, ICloseable, ISaveable
     {
         #region Constructors
 
@@ -19,6 +22,7 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.globalSettingsContainer = globalSettingsContainer;
             this.updateChecker = updateChecker;
+            SaveCommand = new DelegateCommand(OnSave);
         }
 
         #endregion
@@ -28,6 +32,17 @@ namespace BuildsAppReborn.Client.ViewModels
         public void OnClose()
         {
             this.updateChecker.Start();
+        }
+
+        #endregion
+
+        #region Implementation of ISaveable
+
+        public DelegateCommand SaveCommand { get; }
+
+        public void OnSave()
+        {
+            this.globalSettingsContainer.Save();
         }
 
         #endregion
@@ -56,6 +71,7 @@ namespace BuildsAppReborn.Client.ViewModels
         #region Private Fields
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
+
         private readonly UpdateChecker updateChecker;
 
         #endregion
