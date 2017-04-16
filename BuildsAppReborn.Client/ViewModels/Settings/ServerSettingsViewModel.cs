@@ -45,6 +45,7 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, TimeSpan.FromMinutes(1));
             this.buildMonitor.BeginPollingBuilds();
+            this.buildMonitorSettingsContainer = null;
         }
 
         #endregion
@@ -55,6 +56,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public void OnSave()
         {
+            this.globalSettingsContainer.BuildMonitorSettingsContainer = this.buildMonitorSettingsContainer.Clone();
             this.globalSettingsContainer.Save();
         }
 
@@ -90,7 +92,8 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private void InitializeSettings()
         {
-            foreach (var buildMonitorSettings in this.globalSettingsContainer.BuildMonitorSettingsContainer)
+            this.buildMonitorSettingsContainer = this.globalSettingsContainer.BuildMonitorSettingsContainer.Clone();
+            foreach (var buildMonitorSettings in this.buildMonitorSettingsContainer)
             {
                 var providerid = buildMonitorSettings.BuildProviderId;
                 AddView(providerid, buildMonitorSettings);
@@ -101,7 +104,7 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             var providerid = selectedProvider.Id;
             var buildMonitorSettings = new BuildMonitorSettings(providerid);
-            this.globalSettingsContainer.BuildMonitorSettingsContainer.Add(buildMonitorSettings);
+            this.buildMonitorSettingsContainer.Add(buildMonitorSettings);
 
             AddView(providerid, buildMonitorSettings);
         }
@@ -112,10 +115,10 @@ namespace BuildsAppReborn.Client.ViewModels
             {
                 Views.Remove(view);
 
-                var settings = this.globalSettingsContainer.BuildMonitorSettingsContainer.SingleOrDefault(a => a.UniqueId == view.ViewModel.MonitorSettings.UniqueId);
+                var settings = this.buildMonitorSettingsContainer.SingleOrDefault(a => a.UniqueId == view.ViewModel.MonitorSettings.UniqueId);
                 if (settings != null)
                 {
-                    this.globalSettingsContainer.BuildMonitorSettingsContainer.Remove(settings);
+                    this.buildMonitorSettingsContainer.Remove(settings);
                 }
             }
         }
@@ -125,6 +128,8 @@ namespace BuildsAppReborn.Client.ViewModels
         #region Private Fields
 
         private readonly IBuildMonitorAdvanced buildMonitor;
+
+        private SettingsContainer<BuildMonitorSettings> buildMonitorSettingsContainer;
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
 

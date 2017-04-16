@@ -21,7 +21,7 @@ namespace BuildsAppReborn.Infrastructure
 
             var json = File.ReadAllText(fileName);
 
-            return JsonConvert.DeserializeObject<SettingsContainer<TValue>>(json, jsonSerializerSettings);
+            return JsonConvert.DeserializeObject<SettingsContainer<TValue>>(json, Consts.JsonSerializerSettings);
         }
 
         #endregion
@@ -30,7 +30,7 @@ namespace BuildsAppReborn.Infrastructure
 
         public void Save(String fileName)
         {
-            var json = JsonConvert.SerializeObject(this, jsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(this, Consts.JsonSerializerSettings);
 
             var directoryPath = Path.GetDirectoryName(fileName);
             if (!Directory.Exists(directoryPath))
@@ -42,7 +42,5 @@ namespace BuildsAppReborn.Infrastructure
         }
 
         #endregion
-
-        private static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All, PreserveReferencesHandling = PreserveReferencesHandling.All };
     }
 }

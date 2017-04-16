@@ -21,6 +21,7 @@ namespace BuildsAppReborn.Client.ViewModels
         internal GeneralSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, UpdateChecker updateChecker)
         {
             this.globalSettingsContainer = globalSettingsContainer;
+            this.GeneralSettings = this.globalSettingsContainer.GeneralSettings.Clone();
             this.updateChecker = updateChecker;
             SaveCommand = new DelegateCommand(OnSave);
         }
@@ -31,6 +32,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public void OnClose()
         {
+            this.GeneralSettings = null;
             this.updateChecker.Start();
         }
 
@@ -42,6 +44,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public void OnSave()
         {
+            this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
             this.globalSettingsContainer.Save();
         }
 
@@ -64,7 +67,7 @@ namespace BuildsAppReborn.Client.ViewModels
             }
         }
 
-        public GeneralSettings GeneralSettings => this.globalSettingsContainer.GeneralSettings;
+        public GeneralSettings GeneralSettings { get; private set; }
 
         #endregion
 

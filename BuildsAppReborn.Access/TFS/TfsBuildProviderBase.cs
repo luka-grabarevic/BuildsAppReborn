@@ -163,6 +163,7 @@ namespace BuildsAppReborn.Access
                 else if (group.Key == RepositoryType.GitHub)
                 {
                     // ToDo: can't poll everytime because of rate limits...
+                    return;
 #if DEBUG
 
                     // special case when it is a TFS project with external GitHub repository

@@ -166,8 +166,8 @@
     <Compile Include="Notification\NotificationManager.cs" />
     <Compile Include="Resources\IconProvider.cs" />
     <Compile Include="UpdateChecker.cs" />
-    <Compile Include="ViewModels\GeneralSettingsViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\Settings\GeneralSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
     <Compile Include="Views\BuildsStatusView.xaml.cs">
       <DependentUpon>BuildsStatusView.xaml</DependentUpon>
     </Compile>
@@ -176,7 +176,7 @@
     <Compile Include="Interfaces\ISettingsView.cs" />
     <Compile Include="ViewModels\BuildsStatusViewModel.cs" />
     <Compile Include="ViewModels\NotifyIconViewModel.cs" />
-    <Compile Include="ViewModels\ServerSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Settings\ServerSettingsViewModel.cs" />
     <Page Include="Views\BuildsStatusView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

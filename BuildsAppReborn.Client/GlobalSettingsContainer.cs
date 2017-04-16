@@ -23,7 +23,7 @@ namespace BuildsAppReborn.Client
 
         #region Public Properties
 
-        public SettingsContainer<BuildMonitorSettings> BuildMonitorSettingsContainer { get; private set; }
+        public SettingsContainer<BuildMonitorSettings> BuildMonitorSettingsContainer { get; set; }
 
         /// <summary>
         /// Gets the general settings.
@@ -31,16 +31,22 @@ namespace BuildsAppReborn.Client
         /// <value>
         /// The general settings.
         /// </value>
-        public GeneralSettings GeneralSettings => this.generalSettingsContainer.Single();
+        public GeneralSettings GeneralSettings
+        {
+            get
+            {
+                return this.generalSettingsContainer.Single();
+            }
+            set
+            {
+                this.generalSettingsContainer.Clear();
+                this.generalSettingsContainer.Add(value);
+            }
+        }
 
         #endregion
 
         #region Public Methods
-
-        public void DiscardChanges()
-        {
-            Load();
-        }
 
         public void Save()
         {
