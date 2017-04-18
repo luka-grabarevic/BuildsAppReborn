@@ -33,7 +33,7 @@ namespace BuildsAppReborn.Client.Converter
             }
             if (hours > 0) values.Add(hours + "h");
             if (minutes > 0) values.Add(minutes + "m");
-            if (seconds > 0) values.Add(seconds + "s");
+            if (seconds >= 0) values.Add(seconds + "s");
 
             var result = String.Join("", values.Take(2));
             return result;
