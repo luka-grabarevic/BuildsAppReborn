@@ -51,7 +51,7 @@ namespace BuildsAppReborn.Access
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
             {
-                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>() };
+                return new DataResponse<IEnumerable<IBuild>> { Data = Enumerable.Empty<IBuild>(), StatusCode = HttpStatusCode.NoContent };
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
