@@ -50,7 +50,10 @@ namespace BuildsAppReborn.Client.Notification
                             result.Add(build);
                         }
                     }
-                    result.Add(build);
+                    else
+                    {
+                        result.Add(build);
+                    }
                 }
             }
 
