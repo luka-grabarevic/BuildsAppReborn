@@ -93,7 +93,7 @@ namespace BuildsAppReborn.Client.ViewModels
                 {
                     buildStatusWindow.WindowState = WindowState.Normal;
                 }
-                if (!currentMainWindow.IsActive)
+                if (currentMainWindow == null || !currentMainWindow.IsActive)
                 {
                     buildStatusWindow.Show();
                 }

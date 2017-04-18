@@ -33,7 +33,6 @@ namespace BuildsAppReborn.Client.ViewModels
         public void OnClose()
         {
             this.GeneralSettings = null;
-            this.updateChecker.Start();
         }
 
         #endregion
@@ -46,6 +45,7 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
             this.globalSettingsContainer.Save();
+            this.updateChecker.Start();
         }
 
         #endregion
