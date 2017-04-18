@@ -108,11 +108,12 @@
                                                                             <Style TargetType="TextBlock">
                                                                                 <Setter Property="Text">
                                                                                     <Setter.Value>
-                                                                                        <MultiBinding StringFormat="{}{0} ({1} ago, ran for {3})&#x0d;&#x0a;{2}">
+                                                                                        <MultiBinding StringFormat="{}{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
                                                                                             <Binding Path="Build.Requester.DisplayName" />
                                                                                             <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
                                                                                             <Binding Path="Comment" />
                                                                                             <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                            <Binding Path="BuildStatus" />
                                                                                         </MultiBinding>
                                                                                     </Setter.Value>
                                                                                 </Setter>
@@ -120,10 +121,11 @@
                                                                                     <DataTrigger Binding="{Binding BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
                                                                                         <Setter Property="Text">
                                                                                             <Setter.Value>
-                                                                                                <MultiBinding StringFormat="{}{0} (ran for {2})&#x0d;&#x0a;{1}">
+                                                                                                <MultiBinding StringFormat="{}{0} ({3} for {2})&#x0d;&#x0a;{1}">
                                                                                                     <Binding Path="Build.Requester.DisplayName" />
                                                                                                     <Binding Path="Comment" />
                                                                                                     <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                                    <Binding Path="BuildStatus" />
                                                                                                 </MultiBinding>
                                                                                             </Setter.Value>
                                                                                         </Setter>
