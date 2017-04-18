@@ -34,7 +34,7 @@ namespace BuildsAppReborn.Client.Converter
                     color = Colors.DarkCyan;
                     break;
                 case BuildStatus.Stopped:
-                    color = Colors.Firebrick;
+                    color = Colors.Black;
                     break;
                 case BuildStatus.Queued:
                     color = Colors.DarkGray;
