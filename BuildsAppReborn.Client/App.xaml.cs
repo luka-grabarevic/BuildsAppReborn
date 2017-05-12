@@ -3,14 +3,13 @@ using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
-
-using BuildsAppReborn.Client.Properties;
 using BuildsAppReborn.Client.ViewModels;
 using BuildsAppReborn.Contracts;
-
 using Hardcodet.Wpf.TaskbarNotification;
 using log4net.Config;
+using Microsoft.Win32;
 
 namespace BuildsAppReborn.Client
 {
@@ -35,6 +34,8 @@ namespace BuildsAppReborn.Client
         {
             base.OnStartup(e);
 
+            RegisterToWindowsStartUp();
+
             EnsureOnlyOneInstance();
 
             var compositionContainer = BuildCompositionContainer();
@@ -49,7 +50,7 @@ namespace BuildsAppReborn.Client
             this.buildMonitor = compositionContainer.GetExportedValue<IBuildMonitorAdvanced>();
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, TimeSpan.FromMinutes(1));
 
-            this.notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
+            this.notifyIcon = (TaskbarIcon) FindResource("NotifyIcon");
             if (this.notifyIcon != null)
             {
                 this.notifyIcon.DataContext = compositionContainer.GetExportedValue<NotifyIconViewModel>();
@@ -96,6 +97,17 @@ namespace BuildsAppReborn.Client
             if (count > 1)
             {
                 Current.Shutdown(-1);
+            }
+        }
+
+        private void RegisterToWindowsStartUp()
+        {
+            using (
+                var key =
+                    Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            {
+                var fileName = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
+                key?.SetValue(Consts.ApplicationName, $"\"{Path.Combine(Consts.InstallationFolder, fileName)}\"");
             }
         }
 
