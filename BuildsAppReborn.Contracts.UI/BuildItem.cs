@@ -77,7 +77,21 @@ namespace BuildsAppReborn.Contracts.UI
 
         public BuildStatus BuildStatus => Build?.Status ?? BuildStatus.Unknown;
 
-        public String Comment => Build?.SourceVersion?.Comment ?? "-";
+        public String Comment
+        {
+            get
+            {
+                if (Build?.SourceVersion?.Comment != null)
+                {
+                    return !RequesterIsCommitter ? $"{Build.SourceVersion.Author.Name}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
+                }
+                return "-";
+            }
+        }
+
+        public Byte[] RequesterImage => Build?.Requester?.ImageData;
+
+        public String RequesterText => !RequesterIsCommitter ? $"Requested by: {Build.Requester.DisplayName}" : Build.Requester.DisplayName;
 
         #endregion
 
@@ -92,6 +106,12 @@ namespace BuildsAppReborn.Contracts.UI
             OnPropertyChanged(nameof(BuildDuration));
             OnPropertyChanged(nameof(BuildStatus));
         }
+
+        #endregion
+
+        #region Private Properties
+
+        private Boolean RequesterIsCommitter => Build.SourceVersion.Author.Name == Build?.Requester?.DisplayName;
 
         #endregion
     }

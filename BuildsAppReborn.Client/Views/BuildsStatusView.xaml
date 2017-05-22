@@ -109,7 +109,7 @@
                                                                                 <Setter Property="Text">
                                                                                     <Setter.Value>
                                                                                         <MultiBinding StringFormat="{}{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
-                                                                                            <Binding Path="Build.Requester.DisplayName" />
+                                                                                            <Binding Path="RequesterText" />
                                                                                             <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
                                                                                             <Binding Path="Comment" />
                                                                                             <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
@@ -122,7 +122,7 @@
                                                                                         <Setter Property="Text">
                                                                                             <Setter.Value>
                                                                                                 <MultiBinding StringFormat="{}{0} ({3} for {2})&#x0d;&#x0a;{1}">
-                                                                                                    <Binding Path="Build.Requester.DisplayName" />
+                                                                                                    <Binding Path="RequesterText" />
                                                                                                     <Binding Path="Comment" />
                                                                                                     <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
                                                                                                     <Binding Path="BuildStatus" />
@@ -156,7 +156,7 @@
                                     <!--  requester image  -->
                                     <Image Grid.Column="1"
                                            Margin="7 0 0 0"
-                                           Source="{Binding CurrentBuild.Build.Requester.ImageData}" />
+                                           Source="{Binding CurrentBuild.RequesterImage}" />
 
                                     <!--
                                         Rows with details:
@@ -222,7 +222,7 @@
 
                                         <TextBlock Grid.Row="2"
                                                    VerticalAlignment="Center"
-                                                   Text="{Binding CurrentBuild.Build.Requester.DisplayName}"
+                                                   Text="{Binding CurrentBuild.RequesterText}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <TextBlock Grid.Row="3"
