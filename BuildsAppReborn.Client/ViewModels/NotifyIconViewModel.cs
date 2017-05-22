@@ -19,13 +19,14 @@ namespace BuildsAppReborn.Client.ViewModels
         #region Constructors
 
         [ImportingConstructor]
-        public NotifyIconViewModel(ExportFactory<IBuildsStatusView> buildsExportFactory, ExportFactory<ISettingsView> settingsExportFactory, BuildCache buildCache, NotificationManager notificationManager)
+        internal NotifyIconViewModel(ExportFactory<IBuildsStatusView> buildsExportFactory, ExportFactory<ISettingsView> settingsExportFactory, BuildCache buildCache, NotificationManager notificationManager, UpdateChecker updateChecker)
         {
             if (buildCache.CacheStatus == BuildCacheStatus.NotConfigured) TrayIcon = IconProvider.SettingsIcon;
             else TrayIcon = IconProvider.LoadingIcon;
 
             this.buildsExportFactory = buildsExportFactory;
             this.settingsExportFactory = settingsExportFactory;
+            this.updateChecker = updateChecker;
             buildCache.CacheUpdated += (sender, args) => { TrayIcon = buildCache.CurrentIcon; };
 
             Initialize();
@@ -34,6 +35,8 @@ namespace BuildsAppReborn.Client.ViewModels
         #endregion
 
         #region Public Properties
+
+        public ICommand CheckUpdateCommand { get; private set; }
 
         public ICommand ExitApplicationCommand { get; private set; }
 
@@ -112,6 +115,8 @@ namespace BuildsAppReborn.Client.ViewModels
             ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
 
             ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
+
+            CheckUpdateCommand = new DelegateCommand(() => this.updateChecker.UpdateCheck(true));
         }
 
         #endregion
@@ -122,6 +127,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private readonly ExportFactory<ISettingsView> settingsExportFactory;
         private String trayIcon;
+        private readonly UpdateChecker updateChecker;
 
         #endregion
     }

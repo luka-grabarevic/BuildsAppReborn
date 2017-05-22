@@ -6,6 +6,7 @@
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
         <MenuItem Command="{Binding ShowWindowCommand}" Header="Show Window" />
         <MenuItem Command="{Binding ShowSettingsWindowCommand}" Header="Show Settings" />
+        <MenuItem Command="{Binding CheckUpdateCommand}" Header="Check for updates" />
         <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
     </ContextMenu>

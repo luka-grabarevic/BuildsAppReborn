@@ -2,11 +2,9 @@
 using System.ComponentModel.Composition;
 using System.Text;
 using System.Windows;
-
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
-
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
@@ -24,11 +22,11 @@ namespace BuildsAppReborn.Access.UI.Notifications
         public DefaultNotificationProvider()
         {
             this.notifier = new Notifier(cfg =>
-                                             {
-                                                 cfg.PositionProvider = new PrimaryScreenPositionProvider(Corner.BottomRight, 10, 50);
-                                                 cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(TimeSpan.FromSeconds(10), MaximumNotificationCount.FromCount(3));
-                                                 cfg.Dispatcher = Application.Current.Dispatcher;
-                                             });
+                                         {
+                                             cfg.PositionProvider = new PrimaryScreenPositionProvider(Corner.BottomRight, 10, 50);
+                                             cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(TimeSpan.FromSeconds(10), MaximumNotificationCount.FromCount(3));
+                                             cfg.Dispatcher = Application.Current.Dispatcher;
+                                         });
         }
 
         #endregion
@@ -43,11 +41,14 @@ namespace BuildsAppReborn.Access.UI.Notifications
             sb.AppendLine($"{build.Definition.Project.Name} - {build.Definition.Name}");
             sb.AppendLine(build.Status.ToString());
             sb.AppendLine(build.Requester.DisplayName);
-            var displayOptions = new MessageOptions { NotificationClickAction = n =>
-                                                                                    {
-                                                                                        notificationClickAction?.Invoke(build);
-                                                                                        n.Close();
-                                                                                    } };
+            var displayOptions = new MessageOptions
+                                 {
+                                     NotificationClickAction = n =>
+                                                               {
+                                                                   notificationClickAction?.Invoke(build);
+                                                                   n.Close();
+                                                               }
+                                 };
 
             switch (build.Status)
             {
@@ -74,10 +75,31 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
         public void ShowMessage(String title, String message)
         {
+            ShowMessage(title, message, null);
+        }
+
+        public void ShowMessage(String title, String message, Action clickAction)
+        {
             var sb = new StringBuilder();
             sb.AppendLine(title);
             sb.AppendLine(message);
-            this.notifier.ShowInformation(sb.ToString());
+
+            if (clickAction == null)
+            {
+                this.notifier.ShowInformation(sb.ToString());
+            }
+            else
+            {
+                var displayOptions = new MessageOptions
+                                     {
+                                         NotificationClickAction = n =>
+                                                                   {
+                                                                       clickAction.Invoke();
+                                                                       n.Close();
+                                                                   }
+                                     };
+                this.notifier.ShowInformation(sb.ToString(), displayOptions);
+            }
         }
 
         public Boolean IsSupported => true;

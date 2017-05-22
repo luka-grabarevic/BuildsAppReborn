@@ -44,7 +44,7 @@ namespace BuildsAppReborn.Client
 
             this.updateChecker = compositionContainer.GetExportedValue<UpdateChecker>();
             this.updateChecker.Start();
-            this.updateChecker.UpdateCheck();
+            this.updateChecker.UpdateCheck(false);
             this.globalSettingsContainer = compositionContainer.GetExportedValue<GlobalSettingsContainer>();
 
             this.buildMonitor = compositionContainer.GetExportedValue<IBuildMonitorAdvanced>();
@@ -106,7 +106,7 @@ namespace BuildsAppReborn.Client
                 var key =
                     Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
-                var fileName = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
+                var fileName = Path.GetFileName(Assembly.GetEntryAssembly().Location);
                 key?.SetValue(Consts.ApplicationName, $"\"{Path.Combine(Consts.InstallationFolder, fileName)}\"");
             }
         }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-
 using Windows.UI.Notifications;
-
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
@@ -37,13 +35,18 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
-            toast.Activated += (sender, args) => { notificationClickAction?.Invoke(build); };
+            if (notificationClickAction != null) toast.Activated += (sender, args) => { notificationClickAction.Invoke(build); };
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
         }
 
         public void ShowMessage(String title, String message)
+        {
+            ShowMessage(title, message, null);
+        }
+
+        public void ShowMessage(String title, String message, Action clickAction)
         {
             // Get a toast XML template
             var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
@@ -57,6 +60,7 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
+            if (clickAction != null) toast.Activated += (sender, args) => { clickAction.Invoke(); };
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);

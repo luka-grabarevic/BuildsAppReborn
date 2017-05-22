@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -11,7 +11,6 @@ using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 using BuildsAppReborn.Infrastructure;
-
 using log4net;
 using Squirrel;
 
@@ -52,9 +51,9 @@ namespace BuildsAppReborn.Client
             this.timer.Stop();
         }
 
-        public async void UpdateCheck()
+        public async void UpdateCheck(Boolean manualCheck)
         {
-            await UpdateCheckInternal();
+            await UpdateCheckInternal(manualCheck);
         }
 
         #endregion
@@ -69,10 +68,10 @@ namespace BuildsAppReborn.Client
 
         private async void TimerOnElapsed(Object sender, ElapsedEventArgs elapsedEventArgs)
         {
-            await UpdateCheckInternal();
+            await UpdateCheckInternal(false);
         }
 
-        private async Task UpdateCheckInternal()
+        private async Task UpdateCheckInternal(Boolean manualCheck)
         {
 #if DEBUG
             return;
@@ -88,29 +87,42 @@ namespace BuildsAppReborn.Client
                 {
                     using (var updateManager = await updateMgrTask)
                     {
-                        if (!GeneralSettings.AutoInstall)
+                        var updateInfo = await updateManager.CheckForUpdate();
+                        if (updateInfo.ReleasesToApply.Any())
                         {
-                            var updateInfo = await updateManager.CheckForUpdate();
-                            if (GeneralSettings.NotifyOnNewUpdate)
+                            this.logger.Info("New Update found!");
+                            if (!GeneralSettings.AutoInstall)
                             {
-                                // ToDo: show if new update available
-                            }
-                            // ToDo: implement update when user accepts
-                        }
-                        else
-                        {
-                            var result = await updateManager.UpdateApp();
-                            if (result != null)
-                            {
-                                this.logger.Info("New Update found!");
                                 if (GeneralSettings.NotifyOnNewUpdate)
                                 {
-                                    this.notificationProvider?.ShowMessage($"{this.version.ProductName} New update found!", "Update will be installed automatically on next start.");
+                                    // ToDo: show if new update available
                                 }
+                                // ToDo: implement update when user accepts
                             }
                             else
                             {
-                                this.logger.Info("No Update found!");
+                                this.logger.Debug("Auto installing update...");
+                                await updateManager.DownloadReleases(updateInfo.ReleasesToApply);
+                                var path = await updateManager.ApplyReleases(updateInfo);
+                                if (path != null)
+                                {
+                                    this.logger.Debug("Update install finished.");
+                                    if (GeneralSettings.NotifyOnNewUpdate)
+                                    {
+                                        this.notificationProvider?.ShowMessage($"{this.version.ProductName} - Update check finished!",
+                                            "New Updates installed. Click here to restart.",
+                                            () => UpdateManager.RestartApp(Path.Combine(path, Path.GetFileName(entryAssembly.Location))));
+                                    }
+                                }
+                                else this.logger.Debug("Update install failed.");
+                            }
+                        }
+                        else
+                        {
+                            this.logger.Info("No Update found!");
+                            if (manualCheck)
+                            {
+                                this.notificationProvider?.ShowMessage($"{this.version.ProductName} - Update check finished!", "No updates found!");
                             }
                         }
                     }
@@ -134,8 +146,10 @@ namespace BuildsAppReborn.Client
         private ILog logger = LogManager.GetLogger(typeof(UpdateChecker));
         private INotificationProvider notificationProvider;
         private Timer timer = new Timer();
-        private FileVersionInfo version = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+        private FileVersionInfo version = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
 
         #endregion
+
+        private static Assembly entryAssembly = Assembly.GetEntryAssembly();
     }
 }
