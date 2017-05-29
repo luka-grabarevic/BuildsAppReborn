@@ -100,7 +100,15 @@ namespace BuildsAppReborn.Access.Models
         internal String SourceBranch { get; private set; }
 
         [JsonProperty("sourceVersion")]
-        internal String SourceVersionInternal { get; private set; }
+        internal String SourceVersionInternal
+        {
+            get
+            {
+                // when it was a gated check in somehow the source version contains a C at the beginning
+                return this.sourceVersionInternal.TrimStart('C');
+            }
+            private set { this.sourceVersionInternal = value; }
+        }
 
         #endregion
 
@@ -108,6 +116,8 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("result")]
         private String result;
+
+        private String sourceVersionInternal;
 
         [JsonProperty("status")]
         private String status;
