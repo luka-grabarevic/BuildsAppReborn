@@ -111,7 +111,7 @@ namespace BuildsAppReborn.Contracts.UI
 
         #region Private Properties
 
-        private Boolean RequesterIsCommitter => Build.SourceVersion.Author.Name == Build?.Requester?.DisplayName;
+        private Boolean RequesterIsCommitter => Build?.SourceVersion?.Author?.Name == Build?.Requester?.DisplayName;
 
         #endregion
     }
