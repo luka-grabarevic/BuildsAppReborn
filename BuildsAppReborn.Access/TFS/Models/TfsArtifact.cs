@@ -14,6 +14,9 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("id")]
         public Int32 Id { get; protected set; }
 
+        [JsonProperty("name")]
+        public String Name { get; protected set; }
+
         public String Type => this.resource?.Type;
 
         #endregion

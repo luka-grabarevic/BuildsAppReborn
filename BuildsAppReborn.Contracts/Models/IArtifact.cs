@@ -10,6 +10,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         Int32 Id { get; }
 
+        String Name { get; }
+
         String Type { get; }
 
         #endregion
