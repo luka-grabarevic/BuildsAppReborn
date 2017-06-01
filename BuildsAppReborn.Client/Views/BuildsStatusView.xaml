@@ -97,6 +97,21 @@
                                                 <Button Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
                                                         Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
                                                         CommandParameter="{Binding}">
+                                                    <Button.ContextMenu>
+                                                        <ContextMenu ItemsSource="{Binding Build.Artifacts}">
+                                                            <ContextMenu.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock Text="{Binding Name}" />
+                                                                </DataTemplate>
+                                                            </ContextMenu.ItemTemplate>
+                                                            <ContextMenu.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem">
+                                                                    <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.OpenArtifactCommand}" />
+                                                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                                                </Style>
+                                                            </ContextMenu.ItemContainerStyle>
+                                                        </ContextMenu>
+                                                    </Button.ContextMenu>
                                                     <Button.Template>
                                                         <ControlTemplate>
                                                             <Grid Width="12"
@@ -207,7 +222,7 @@
                                                         </Setter>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding CurrentBuild.BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
-                                                                <Setter Property="Text" Value="{Binding StringFormat='{}(ran for {0})', Converter={StaticResource TimeSpanToNiceStringConverter}, Path=CurrentBuild.BuildDuration}" />
+                                                                <Setter Property="Text" Value="{Binding StringFormat='{}for {0}', Converter={StaticResource TimeSpanToNiceStringConverter}, Path=CurrentBuild.BuildDuration}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>

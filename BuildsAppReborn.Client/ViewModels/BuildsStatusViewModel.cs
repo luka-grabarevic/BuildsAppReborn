@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Timers;
 using BuildsAppReborn.Client.Interfaces;
+using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
+using log4net;
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
@@ -24,6 +26,7 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
             HistoryClickCommand = new DelegateCommand<BuildItem>(OnHistoryClickCommand);
+            OpenArtifactCommand = new DelegateCommand<IArtifact>(OnOpenArtifactCommand);
         }
 
         #endregion
@@ -46,6 +49,8 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public DelegateCommand<BuildItem> HistoryClickCommand { get; set; }
 
+        public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
+
         #endregion
 
         #region Private Methods
@@ -54,26 +59,40 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.timer?.Stop();
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
-            {
                 buildStatus.CurrentBuild.Refresh();
-            }
             this.timer?.Start();
         }
 
         private void OnHistoryClickCommand(BuildItem item)
         {
-            var url = item?.Build?.PortalUrl;
+            StartProcess(item?.Build?.PortalUrl);
+        }
+
+        private void OnOpenArtifactCommand(IArtifact artifact)
+        {
+            StartProcess(artifact?.DownloadUrl);
+        }
+
+        private void StartProcess(String url)
+        {
             if (!String.IsNullOrWhiteSpace(url))
-            {
-                Process.Start(url);
-            }
+                try
+                {
+                    Process.Start(url);
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Warn("Exception on StartProcess", exception);
+                }
         }
 
         #endregion
 
         #region Private Fields
 
-        private Timer timer;
+        private readonly ILog logger = LogManager.GetLogger(typeof(BuildsStatusViewModel));
+
+        private readonly Timer timer;
 
         #endregion
     }
