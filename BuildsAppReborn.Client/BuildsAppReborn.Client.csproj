@@ -258,6 +258,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Icons\PNG\ic_folder_open_black_24dp_1x.png" />
+    <Resource Include="Resources\Icons\PNG\ic_archive_black_24dp_1x.png" />
+    <Resource Include="Resources\Icons\PNG\ic_folder_black_24dp_1x.png" />
     <Resource Include="Resources\Icons\PNG\failure.png" />
     <Resource Include="Resources\Icons\PNG\loading.png" />
     <Resource Include="Resources\Icons\PNG\partially_exclamation.png" />

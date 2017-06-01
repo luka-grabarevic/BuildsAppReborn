@@ -100,6 +100,10 @@
                                                         CommandParameter="{Binding}">
                                                     <Button.ContextMenu>
                                                         <ContextMenu ItemsSource="{Binding Build.Artifacts}" Visibility="{Binding Build.Artifacts, Converter={StaticResource CountToVisibilityConverter}}">
+                                                            <ContextMenu.Resources>
+                                                                <Image x:Key="FilePathIcon" Source="../Resources/Icons/PNG/ic_folder_black_24dp_1x.png" x:Shared="False"/>
+                                                                <Image x:Key="ContainerIcon" Source="../Resources/Icons/PNG/ic_archive_black_24dp_1x.png" x:Shared="False"/>
+                                                            </ContextMenu.Resources>
                                                             <ContextMenu.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <TextBlock Text="{Binding Name}" />
@@ -109,6 +113,14 @@
                                                                 <Style TargetType="MenuItem">
                                                                     <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.OpenArtifactCommand}" />
                                                                     <Setter Property="CommandParameter" Value="{Binding}" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Path=Type}" Value="FilePath">
+                                                                            <Setter Property="Icon" Value="{StaticResource FilePathIcon}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Path=Type}" Value="Container">
+                                                                            <Setter Property="Icon" Value="{StaticResource ContainerIcon}" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
                                                                 </Style>
                                                             </ContextMenu.ItemContainerStyle>
                                                         </ContextMenu>
