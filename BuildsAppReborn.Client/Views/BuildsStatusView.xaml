@@ -29,6 +29,7 @@
             <converter:BuildTimeToElapsedTimeConverter x:Key="BuildTimeToElapsedTimeConverter" />
             <converter:BuildItemToRelativeMarginConverter x:Key="BuildItemToRelativeMarginConverter" />
             <converter:TimeSpanToNiceStringConverter x:Key="TimeSpanToNiceStringConverter" />
+            <converter:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <Window.Icon>
@@ -98,7 +99,7 @@
                                                         Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
                                                         CommandParameter="{Binding}">
                                                     <Button.ContextMenu>
-                                                        <ContextMenu ItemsSource="{Binding Build.Artifacts}">
+                                                        <ContextMenu ItemsSource="{Binding Build.Artifacts}" Visibility="{Binding Build.Artifacts, Converter={StaticResource CountToVisibilityConverter}}">
                                                             <ContextMenu.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <TextBlock Text="{Binding Name}" />
