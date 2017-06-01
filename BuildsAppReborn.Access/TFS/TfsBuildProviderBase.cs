@@ -16,8 +16,12 @@ using Newtonsoft.Json.Linq;
 
 namespace BuildsAppReborn.Access
 {
-    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser, TSourceVersion> : TfsBuildProviderBase, IBuildProvider
-        where TBuild : TfsBuild, new() where TBuildDefinition : TfsBuildDefinition, new() where TUser : TfsUser, new() where TSourceVersion : TfsSourceVersion, new()
+    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser, TSourceVersion, TArtifact> : TfsBuildProviderBase, IBuildProvider
+        where TBuild : TfsBuild, new() 
+        where TBuildDefinition : TfsBuildDefinition, new() 
+        where TUser : TfsUser, new() 
+        where TSourceVersion : TfsSourceVersion, new()
+        where TArtifact : TfsArtifact, new()
     {
         #region Implementation of IBuildProvider
 
@@ -73,6 +77,7 @@ namespace BuildsAppReborn.Access
                     data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
 
                     await ResolveSourceVersion(data, projectUrl, settings);
+                    await ResolveArtifacts(data, projectUrl, settings);
 
                     return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
                 }
@@ -81,6 +86,8 @@ namespace BuildsAppReborn.Access
 
             throw new Exception($"Error while processing method!");
         }
+
+
 
         #endregion
 
@@ -137,6 +144,21 @@ namespace BuildsAppReborn.Access
             }
 
             return null;
+        }
+
+        private async Task ResolveArtifacts(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        {
+            foreach (var build in builds)
+            {
+                var requestUrl = $"{projectUrl}/_apis/build/builds/{build.Id}/artifacts?api-version={ApiVersion}";
+
+                var requestResponse = await GetRequestResponse(requestUrl, settings);
+                if (requestResponse.IsSuccessStatusCode)
+                {
+                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    build.Artifacts = JsonConvert.DeserializeObject<IEnumerable<TArtifact>>(JObject.Parse(result)["value"].ToString());
+                }
+            }
         }
 
         private async Task ResolveSourceVersion(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)

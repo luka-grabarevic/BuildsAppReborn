@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BuildsAppReborn.Contracts.Models
 {
     public interface IBuild
     {
         #region Public Properties
+
+        IEnumerable<IArtifact> Artifacts { get; }
 
         String BuildNumber { get; }
 

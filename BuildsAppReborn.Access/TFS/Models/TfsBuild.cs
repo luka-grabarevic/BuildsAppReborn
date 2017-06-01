@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BuildsAppReborn.Access.Models.Internal;
 using BuildsAppReborn.Contracts.Models;
 using Newtonsoft.Json;
@@ -12,7 +14,19 @@ namespace BuildsAppReborn.Access.Models
     // ReSharper disable once ClassNeverInstantiated.Global
     internal abstract class TfsBuild : LinksContainer, IBuild
     {
+        #region Constructors
+
+        public TfsBuild()
+        {
+            Artifacts = Enumerable.Empty<IArtifact>();
+        }
+
+        #endregion
+
         #region Implementation of IBuild
+
+        [JsonIgnore]
+        public IEnumerable<IArtifact> Artifacts { get; internal set; }
 
         [JsonProperty("buildNumber")]
         public String BuildNumber { get; private set; }

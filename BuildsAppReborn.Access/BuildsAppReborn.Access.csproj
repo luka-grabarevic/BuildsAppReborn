@@ -56,6 +56,7 @@
     <Compile Include="BuildMonitor.cs" />
     <Compile Include="GitHub\GitHubCommit.cs" />
     <Compile Include="GitHub\GitHubSourceVersion.cs" />
+    <Compile Include="TFS2017\Models\Tfs2017Artifact.cs" />
     <Compile Include="TFS2017\Models\Tfs2017Build.cs" />
     <Compile Include="TFS2017\Models\Tfs2017BuildDefinition.cs" />
     <Compile Include="TFS2017\Models\Tfs2017Project.cs" />
@@ -65,13 +66,16 @@
     <Compile Include="TFS\Models\Internal\LinksContainer.cs" />
     <Compile Include="TFS\Models\Internal\Repository.cs" />
     <Compile Include="TFS\Models\Internal\RepositoryType.cs" />
+    <Compile Include="TFS\Models\Internal\Resource.cs" />
     <Compile Include="TFS\Models\TfsBuild.cs" />
     <Compile Include="TFS\Models\TfsBuildDefinition.cs" />
     <Compile Include="TFS\Models\TfsProject.cs" />
     <Compile Include="TFS\Models\TfsSourceVersion.cs" />
     <Compile Include="TFS\Models\TfsUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TFS\Models\TfsArtifact.cs" />
     <Compile Include="TFS\TfsBuildProviderBase.cs" />
+    <Compile Include="VSTS\Models\VstsArtifact.cs" />
     <Compile Include="VSTS\Models\VstsBuild.cs" />
     <Compile Include="VSTS\Models\VstsBuildDefinition.cs" />
     <Compile Include="VSTS\Models\VstsProject.cs" />
