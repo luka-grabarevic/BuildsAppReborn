@@ -6,6 +6,8 @@ namespace BuildsAppReborn.Contracts.Models
     {
         #region Public Properties
 
+        String Data { get; }
+
         String DownloadUrl { get; }
 
         Int32 Id { get; }

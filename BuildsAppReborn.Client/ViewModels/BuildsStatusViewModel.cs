@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Timers;
 using BuildsAppReborn.Client.Interfaces;
@@ -70,20 +71,46 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private void OnOpenArtifactCommand(IArtifact artifact)
         {
-            StartProcess(artifact?.DownloadUrl);
+            if (artifact != null)
+            {
+                // when it is a drop location folder, tries to be jump into the sub folder if possible
+                // ToDo: extract the artifact types in enums etc, as this is too TFS specific
+                if (artifact.Type == "FilePath" &&
+                    !String.IsNullOrWhiteSpace(artifact.Data) &&
+                    !String.IsNullOrWhiteSpace(artifact.Name))
+                {
+                    var combinedPath = Path.Combine(artifact.Data, artifact.Name);
+                    if (Directory.Exists(combinedPath))
+                    {
+                        if (StartProcess(combinedPath))
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                // fallback option to start the provided download URL
+                StartProcess(artifact.DownloadUrl);
+            }
         }
 
-        private void StartProcess(String url)
+        private Boolean StartProcess(String url)
         {
             if (!String.IsNullOrWhiteSpace(url))
+            {
                 try
                 {
                     Process.Start(url);
+                    return true;
                 }
                 catch (Exception exception)
                 {
                     this.logger.Warn("Exception on StartProcess", exception);
+                    return false;
                 }
+            }
+
+            return false;
         }
 
         #endregion

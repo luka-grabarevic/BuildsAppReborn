@@ -9,6 +9,7 @@ namespace BuildsAppReborn.Access.Models
     {
         #region Implementation of IArtifact
 
+        [JsonIgnore]
         public String DownloadUrl => this.resource?.DownloadUrl;
 
         [JsonProperty("id")]
@@ -18,6 +19,9 @@ namespace BuildsAppReborn.Access.Models
         public String Name { get; protected set; }
 
         public String Type => this.resource?.Type;
+
+        [JsonIgnore]
+        public String Data => this.resource?.Data;
 
         #endregion
 
