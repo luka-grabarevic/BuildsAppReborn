@@ -3,11 +3,13 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
+using BuildsAppReborn.Infrastructure.Wpf;
 using log4net;
 using Prism.Commands;
 
@@ -26,8 +28,8 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
             this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
-            HistoryClickCommand = new DelegateCommand<BuildItem>(OnHistoryClickCommand);
-            OpenArtifactCommand = new DelegateCommand<IArtifact>(OnOpenArtifactCommand);
+            HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => OnHistoryClickCommand(a)));
+            OpenArtifactCommand = new DelegateCommand<IArtifact>(a => Task.Run(() => OnOpenArtifactCommand(a)));
         }
 
         #endregion
@@ -66,51 +68,60 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private void OnHistoryClickCommand(BuildItem item)
         {
-            StartProcess(item?.Build?.PortalUrl);
+            using (new WaitingIndicator())
+            {
+                StartProcess(item?.Build?.PortalUrl);
+            }
         }
 
         private void OnOpenArtifactCommand(IArtifact artifact)
         {
             if (artifact != null)
             {
-                // when it is a drop location folder, tries to be jump into the sub folder if possible
-                // ToDo: extract the artifact types in enums etc, as this is too TFS specific
-                if (artifact.Type == "FilePath" &&
-                    !String.IsNullOrWhiteSpace(artifact.Data) &&
-                    !String.IsNullOrWhiteSpace(artifact.Name))
+                using (new WaitingIndicator())
                 {
-                    var combinedPath = Path.Combine(artifact.Data, artifact.Name);
-                    if (Directory.Exists(combinedPath))
+                    // when it is a drop location folder, tries to be jump into the sub folder if possible
+                    // ToDo: extract the artifact types in enums etc, as this is too TFS specific
+                    if (artifact.Type == "FilePath" &&
+                        !String.IsNullOrWhiteSpace(artifact.Data) &&
+                        !String.IsNullOrWhiteSpace(artifact.Name))
                     {
-                        if (StartProcess(combinedPath))
+                        var combinedPath = Path.Combine(artifact.Data, artifact.Name);
+                        if (Directory.Exists(combinedPath))
                         {
-                            return;
+                            if (StartProcess(combinedPath))
+                            {
+                                return;
+                            }
                         }
                     }
-                }
 
-                // fallback option to start the provided download URL
-                StartProcess(artifact.DownloadUrl);
+                    // fallback option to start the provided download URL
+                    StartProcess(artifact.DownloadUrl);
+                }
             }
         }
 
         private Boolean StartProcess(String url)
         {
-            if (!String.IsNullOrWhiteSpace(url))
+            using (new WaitingIndicator())
             {
-                try
+                if (!String.IsNullOrWhiteSpace(url))
                 {
-                    Process.Start(url);
-                    return true;
+                    try
+                    {
+                        Process.Start(url);
+                        return true;
+                    }
+                    catch (Exception exception)
+                    {
+                        this.logger.Warn("Exception on StartProcess", exception);
+                        return false;
+                    }
                 }
-                catch (Exception exception)
-                {
-                    this.logger.Warn("Exception on StartProcess", exception);
-                    return false;
-                }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         #endregion

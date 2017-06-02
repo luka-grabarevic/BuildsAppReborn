@@ -39,12 +39,14 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BuildsAppReborn.Client\Properties\GlobalAssemblyInfo.cs">
@@ -64,6 +66,7 @@
     <Compile Include="UrlValidator.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="Wpf\InverseBooleanConverter.cs" />
+    <Compile Include="Wpf\WaitingIndicator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
