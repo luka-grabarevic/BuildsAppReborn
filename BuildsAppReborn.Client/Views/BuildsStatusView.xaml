@@ -257,7 +257,13 @@
                                                    VerticalAlignment="Center"
                                                    Text="{Binding CurrentBuild.Comment}"
                                                    TextTrimming="CharacterEllipsis"
-                                                   TextWrapping="Wrap" />
+                                                   TextWrapping="Wrap">
+                                            <TextBlock.ToolTip>
+                                                <TextBlock MaxWidth="800"
+                                                           Text="{Binding CurrentBuild.Comment}"
+                                                           TextWrapping="Wrap" />
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                     </Grid>
                                 </Grid>
