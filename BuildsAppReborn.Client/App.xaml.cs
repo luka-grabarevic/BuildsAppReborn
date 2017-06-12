@@ -92,12 +92,14 @@ namespace BuildsAppReborn.Client
 
         private void EnsureOnlyOneInstance()
         {
+#if !DEBUG
             var currentProcess = Process.GetCurrentProcess();
             var count = Process.GetProcesses().Count(p => p.ProcessName == currentProcess.ProcessName);
             if (count > 1)
             {
                 Current.Shutdown(-1);
             }
+#endif
         }
 
         private void RegisterToWindowsStartUp()
