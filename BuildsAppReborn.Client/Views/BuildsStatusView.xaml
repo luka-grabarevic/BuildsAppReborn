@@ -203,13 +203,21 @@
                                             <RowDefinition Height="20" />
                                         </Grid.RowDefinitions>
 
-                                        <TextBlock Grid.Row="0"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="14"
-                                                   FontWeight="Bold"
-                                                   Text="{Binding CurrentBuild.Description}"
-                                                   TextTrimming="CharacterEllipsis" />
-
+                                        <Button Grid.Row="0" VerticalAlignment="Center" 
+                                                Foreground="{StaticResource MaterialDesignBody}"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
+                                                CommandParameter="{Binding CurrentBuild}">
+                                            <Button.Template>
+                                                <ControlTemplate>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="14"
+                                                               FontWeight="Bold"
+                                                               Text="{Binding CurrentBuild.Description}"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                
                                         <Grid Grid.Row="1">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
