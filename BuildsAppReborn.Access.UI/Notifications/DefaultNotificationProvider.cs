@@ -38,9 +38,9 @@ namespace BuildsAppReborn.Access.UI.Notifications
             if (build == null) return;
 
             var sb = new StringBuilder();
-            sb.AppendLine($"{build.Definition.Project.Name} - {build.Definition.Name}");
-            sb.AppendLine(build.Status.ToString());
-            sb.AppendLine(build.Requester.DisplayName);
+            sb.AppendLine(build.GenerateTitle());
+            sb.AppendLine(build.GenerateStatus());
+            sb.AppendLine(build.GenerateUsername());
             var displayOptions = new MessageOptions
                                  {
                                      NotificationClickAction = n =>

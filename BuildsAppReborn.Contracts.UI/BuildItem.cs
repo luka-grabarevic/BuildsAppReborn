@@ -85,9 +85,12 @@ namespace BuildsAppReborn.Contracts.UI
                 {
                     return !RequesterIsCommitter ? $"{Build.SourceVersion.Author.Name}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
                 }
+
                 return "-";
             }
         }
+
+        public String Description => $"{Build.Definition.Name} - {Build.BuildNumber}";
 
         public Byte[] RequesterImage => Build?.Requester?.ImageData;
 

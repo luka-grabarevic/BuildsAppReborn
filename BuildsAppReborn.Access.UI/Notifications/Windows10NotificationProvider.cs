@@ -22,9 +22,9 @@ namespace BuildsAppReborn.Access.UI.Notifications
             // Fill in the text elements
             var stringElements = toastXml.GetElementsByTagName("text");
 
-            stringElements[0].AppendChild(toastXml.CreateTextNode($"{build.Definition.Project.Name} - {build.Definition.Name}"));
-            stringElements[1].AppendChild(toastXml.CreateTextNode(build.Status.ToString()));
-            stringElements[2].AppendChild(toastXml.CreateTextNode(build.Requester.DisplayName));
+            stringElements[0].AppendChild(toastXml.CreateTextNode(build.GenerateTitle()));
+            stringElements[1].AppendChild(toastXml.CreateTextNode(build.GenerateStatus()));
+            stringElements[2].AppendChild(toastXml.CreateTextNode(build.GenerateUsername()));
 
             // Specify the absolute path to an image
             var imagePath = "file:///" + Path.GetFullPath(iconProvider.Invoke(build));

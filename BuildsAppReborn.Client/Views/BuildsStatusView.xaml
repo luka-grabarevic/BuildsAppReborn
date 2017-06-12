@@ -136,12 +136,13 @@
                                                                             <Style TargetType="TextBlock">
                                                                                 <Setter Property="Text">
                                                                                     <Setter.Value>
-                                                                                        <MultiBinding StringFormat="{}{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
+                                                                                        <MultiBinding StringFormat="{}{5}&#x0d;&#x0a;{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
                                                                                             <Binding Path="RequesterText" />
                                                                                             <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
                                                                                             <Binding Path="Comment" />
                                                                                             <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
                                                                                             <Binding Path="BuildStatus" />
+                                                                                            <Binding Path="Description" />
                                                                                         </MultiBinding>
                                                                                     </Setter.Value>
                                                                                 </Setter>
@@ -149,11 +150,12 @@
                                                                                     <DataTrigger Binding="{Binding BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
                                                                                         <Setter Property="Text">
                                                                                             <Setter.Value>
-                                                                                                <MultiBinding StringFormat="{}{0} ({3} for {2})&#x0d;&#x0a;{1}">
+                                                                                                <MultiBinding StringFormat="{}{4}&#x0d;&#x0a;{0} ({3} for {2})&#x0d;&#x0a;{1}">
                                                                                                     <Binding Path="RequesterText" />
                                                                                                     <Binding Path="Comment" />
                                                                                                     <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
                                                                                                     <Binding Path="BuildStatus" />
+                                                                                                    <Binding Path="Description" />
                                                                                                 </MultiBinding>
                                                                                             </Setter.Value>
                                                                                         </Setter>
@@ -205,7 +207,7 @@
                                                    VerticalAlignment="Center"
                                                    FontSize="14"
                                                    FontWeight="Bold"
-                                                   Text="{Binding BuildDefinition.Name}"
+                                                   Text="{Binding CurrentBuild.Description}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <Grid Grid.Row="1">
