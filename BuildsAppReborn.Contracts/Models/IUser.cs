@@ -1,8 +1,9 @@
 ﻿using System;
+using BuildsAppReborn.Contracts.Models.Base;
 
 namespace BuildsAppReborn.Contracts.Models
 {
-    public interface IUser
+    public interface IUser : IObjectItem
     {
         #region Public Properties
 
@@ -15,8 +16,6 @@ namespace BuildsAppReborn.Contracts.Models
         String ImageUrl { get; }
 
         String UniqueName { get; }
-
-        String Url { get; }
 
         #endregion
     }

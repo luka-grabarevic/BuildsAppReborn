@@ -70,7 +70,7 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             using (new WaitingIndicator())
             {
-                StartProcess(item?.Build?.PortalUrl);
+                StartProcess(item?.Build?.WebUrl);
             }
         }
 
