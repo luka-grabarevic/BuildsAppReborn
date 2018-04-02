@@ -19,10 +19,13 @@ namespace BuildsAppReborn.Access.Models
         public Int32 Id { get; private set; }
 
         [JsonProperty("incompleteTests")]
-        public Int32 IncompleteTests { get; private set; }
+        public Int32 FailedTests { get; private set; }
 
         [JsonProperty("name")]
         public String Name { get; private set; }
+
+        [JsonProperty("notApplicableTests")]
+        public Int32 InconclusiveTests { get; private set; }
 
         [JsonProperty("passedTests")]
         public Int32 PassedTests { get; private set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -90,6 +91,8 @@ namespace BuildsAppReborn.Contracts.UI
             }
         }
 
+        public ITestRun CurrentTestRun => Build?.TestRuns?.FirstOrDefault();
+
         public String Description => $"{Build.Definition.Name} - {Build.BuildNumber}";
 
         public Byte[] RequesterImage => Build?.Requester?.ImageData;
@@ -108,6 +111,7 @@ namespace BuildsAppReborn.Contracts.UI
             OnPropertyChanged(nameof(BuildStateTime));
             OnPropertyChanged(nameof(BuildDuration));
             OnPropertyChanged(nameof(BuildStatus));
+            OnPropertyChanged(nameof(CurrentTestRun));
         }
 
         #endregion
