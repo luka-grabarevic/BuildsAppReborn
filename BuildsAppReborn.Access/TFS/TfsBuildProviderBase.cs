@@ -217,8 +217,7 @@ namespace BuildsAppReborn.Access
                 if (requestResponse.IsSuccessStatusCode)
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
-                    var value = JObject.Parse(result)["value"].ToString();
-                    build.TestRun = JsonConvert.DeserializeObject<TTestRun>(value);
+                    build.TestRuns = JsonConvert.DeserializeObject<IEnumerable<TTestRun>>(JObject.Parse(result)["value"].ToString());
                 }
             }
         }

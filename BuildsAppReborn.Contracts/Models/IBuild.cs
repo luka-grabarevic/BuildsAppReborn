@@ -28,7 +28,7 @@ namespace BuildsAppReborn.Contracts.Models
 
         BuildStatus Status { get; }
 
-        ITestRun TestRun { get; }
+        IEnumerable<ITestRun> TestRuns { get; }
 
         #endregion
     }

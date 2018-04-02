@@ -83,7 +83,7 @@ namespace BuildsAppReborn.Access.Models
         }
 
         [JsonIgnore]
-        public ITestRun TestRun { get; internal set; }
+        public IEnumerable<ITestRun> TestRuns { get; internal set; }
 
         [JsonProperty("finishTime")]
         public DateTime FinishDateTime { get; private set; }
@@ -134,11 +134,13 @@ namespace BuildsAppReborn.Access.Models
 
         #region Private Fields
 
-        [JsonProperty("result")] private String result;
+        [JsonProperty("result")]
+        private String result;
 
         private String sourceVersionInternal;
 
-        [JsonProperty("status")] private String status;
+        [JsonProperty("status")]
+        private String status;
 
         #endregion
     }
