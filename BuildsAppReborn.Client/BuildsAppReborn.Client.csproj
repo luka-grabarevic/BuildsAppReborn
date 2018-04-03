@@ -149,6 +149,7 @@
     <Compile Include="Controls\StackedBarGraph.xaml.cs">
       <DependentUpon>StackedBarGraph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\StackedBarGraphHeightConverter.cs" />
     <Compile Include="Controls\StackedItem.cs" />
     <Compile Include="Controls\StackedItemCollection.cs" />
     <Compile Include="Converter\BuildItemToRelativeMarginConverter.cs" />

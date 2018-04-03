@@ -194,8 +194,12 @@
 
                                     <!-- test count -->
                                     <localControls:StackedBarGraph Grid.Column="2" 
+                                                                   Title="Test Run"
+                                                                   ClickCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.TestRunClickCommand}"
+                                                                   ClickCommandParameter="{Binding CurrentBuild.CurrentTestRun}"
+                                                                   Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
                                                                    Items="{Binding CurrentBuild.CurrentTestRun, Converter={StaticResource TestRunToStackedItemsConverter}}"
-                                                                   Visibility="{Binding CurrentBuild.CurrentTestRun, Converter={StaticResource NullVisibilityConverter}}"/>
+                                                                   Visibility="{Binding CurrentBuild.CurrentTestRun, Converter={StaticResource NullVisibilityConverter}}" />
 
                                     <!--
                                         Rows with details:
