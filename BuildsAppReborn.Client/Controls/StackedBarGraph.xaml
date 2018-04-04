@@ -14,7 +14,52 @@
         <local:StackedBarGraphHeightConverter x:Key="StackedBarGraphHeightConverter" />
         <converter:NullVisibilityConverter x:Key="NullVisibilityConverter" />
     </UserControl.Resources>
-    <Grid>
+    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid.ToolTip>
+            <Grid Visibility="{Binding Items.Visibility}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock FontWeight="Bold">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1}">
+                            <Binding Path="Items.TotalCount" />
+                            <Binding Path="Items.Title" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Visibility="{Binding Visibility}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Image
+                                    Width="16"
+                                    Height="16"
+                                    Source="{Binding Icon}" />
+                                <TextBlock Grid.Column="1">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="Value" />
+                                            <Binding Path="Title" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Grid.ToolTip>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />

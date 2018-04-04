@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace BuildsAppReborn.Client.Controls
@@ -12,6 +13,10 @@ namespace BuildsAppReborn.Client.Controls
         public String Title { get; set; }
 
         public Int32 Value { get; set; }
+
+        public Visibility Visibility => Value > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        public string Icon { get; set; }
 
         #endregion
     }
