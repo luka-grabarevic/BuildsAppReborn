@@ -19,7 +19,7 @@ namespace BuildsAppReborn.Client.Controls
                 return 0;
             }
 
-            var factor = count / maxCount;
+            var factor = (Double)count / maxCount;
 
             return maxHeight * factor;
         }
