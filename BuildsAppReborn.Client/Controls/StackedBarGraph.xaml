@@ -45,6 +45,7 @@
                                 <Image
                                     Width="16"
                                     Height="16"
+                                    Margin="0,0,5,0"
                                     Source="{Binding Icon}" />
                                 <TextBlock Grid.Column="1">
                                     <TextBlock.Text>
@@ -103,7 +104,7 @@
                                         <MultiBinding Converter="{StaticResource StackedBarGraphHeightConverter}">
                                             <Binding Path="Height" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                                             <Binding Path="Value" />
-                                            <Binding Path="Items.TotalCount" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            <Binding Path="Items" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                                         </MultiBinding>
                                     </Grid.Height>
                                 </Grid>

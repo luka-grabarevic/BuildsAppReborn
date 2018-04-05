@@ -12,16 +12,16 @@ namespace BuildsAppReborn.Client.Controls
         {
             var maxHeight = (Double) values[0];
             var count = (Int32) values[1];
-            var maxCount = (Int32) values[2];
+            var items = values[2] as StackedItemCollection;
 
-            if (maxCount == 0)
+            if (items == null || items.Count == 0)
             {
                 return 0;
             }
 
-            var factor = (Double)count / maxCount;
+            var excessiveHeight = GetExcessiveHeight(items, maxHeight);
 
-            return maxHeight * factor;
+            return GetNormalizedHeight(count, items.TotalCount, maxHeight, excessiveHeight);
         }
 
         public Object[] ConvertBack(Object value, Type[] targetTypes, Object parameter, CultureInfo culture)
@@ -30,5 +30,57 @@ namespace BuildsAppReborn.Client.Controls
         }
 
         #endregion
+
+        #region Private Static Methods
+
+        private static Double GetFactor(Int32 count, Int32 totalCount)
+        {
+            var factor = (Double) count / totalCount;
+            return factor;
+        }
+
+        private static Double GetHeight(Int32 count, Int32 totalCount, Double maxHeight)
+        {
+            var factor = GetFactor(count, totalCount);
+
+            return maxHeight * factor;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private Double GetExcessiveHeight(StackedItemCollection items, Double maxHeight)
+        {
+            var excessive = 0d;
+
+            foreach (var item in items)
+            {
+                var height = GetHeight(item.Value, items.TotalCount, maxHeight);
+                if (height < MinHeight)
+                {
+                    excessive += MinHeight - height;
+                }
+            }
+
+            return excessive;
+        }
+
+        private Double GetNormalizedHeight(Int32 count, Int32 totalCount, Double maxHeight, Double excessiveHeight)
+        {
+            var factor = GetFactor(count, totalCount);
+
+            var height = maxHeight * factor;
+            if (height < MinHeight)
+            {
+                return MinHeight;
+            }
+
+            return (maxHeight - excessiveHeight) * factor;
+        }
+
+        #endregion
+
+        private const Int32 MinHeight = 5;
     }
 }
