@@ -56,6 +56,11 @@ namespace BuildsAppReborn.Client.Controls
 
             foreach (var item in items)
             {
+                if (item.Value == 0)
+                {
+                    continue;
+                }
+
                 var height = GetHeight(item.Value, items.TotalCount, maxHeight);
                 if (height < MinHeight)
                 {
@@ -68,6 +73,11 @@ namespace BuildsAppReborn.Client.Controls
 
         private Double GetNormalizedHeight(Int32 count, Int32 totalCount, Double maxHeight, Double excessiveHeight)
         {
+            if (count == 0)
+            {
+                return 0;
+            }
+
             var factor = GetFactor(count, totalCount);
 
             var height = maxHeight * factor;
