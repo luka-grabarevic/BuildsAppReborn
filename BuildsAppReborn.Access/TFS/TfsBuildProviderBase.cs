@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,6 +13,7 @@ using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Svg;
 
 namespace BuildsAppReborn.Access
 {
@@ -20,7 +23,7 @@ namespace BuildsAppReborn.Access
         where TUser : TfsUser, new()
         where TSourceVersion : TfsSourceVersion, new()
         where TArtifact : TfsArtifact, new()
-        where TTestRun :  TfsTestRun, new()
+        where TTestRun : TfsTestRun, new()
     {
         #region Implementation of IBuildProvider
 
@@ -101,10 +104,33 @@ namespace BuildsAppReborn.Access
 
         private static async Task<Byte[]> GetImageData(BuildMonitorSettings settings, IUser user)
         {
-            var response = await GetRequestResponse(user.ImageUrl, settings);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return await response.Content.ReadAsByteArrayAsync();
+                var response = await GetRequestResponse(user.ImageUrl, settings);
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.Content.Headers.ContentType.MediaType == "image/png")
+                    {
+                        return await response.Content.ReadAsByteArrayAsync();
+                    }
+
+                    if (response.Content.Headers.ContentType.MediaType == "image/svg+xml")
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await response.Content.CopyToAsync(memoryStream);
+                            memoryStream.Position = 0;
+                            var svgDoc = SvgDocument.Open<SvgDocument>(memoryStream);
+
+                            var converter = new ImageConverter();
+                            return (Byte[]) converter.ConvertTo(svgDoc.Draw(128, 128), typeof(Byte[]));
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
             }
 
             return null;
