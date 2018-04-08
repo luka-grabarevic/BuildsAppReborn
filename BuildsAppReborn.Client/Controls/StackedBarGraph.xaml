@@ -84,8 +84,8 @@
         </Grid>
         <Button
             Grid.Column="1"
-            Width="20"
-            Height="{Binding Height, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Width="{Binding BarWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Background="Transparent"
             Command="{Binding ClickCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
             CommandParameter="{Binding ClickCommandParameter, RelativeSource={RelativeSource AncestorType=UserControl}}">
@@ -102,7 +102,7 @@
                                 <Grid Background="{Binding Color}">
                                     <Grid.Height>
                                         <MultiBinding Converter="{StaticResource StackedBarGraphHeightConverter}">
-                                            <Binding Path="Height" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            <Binding Path="Height" RelativeSource="{RelativeSource AncestorType=Button}" />
                                             <Binding Path="Value" />
                                             <Binding Path="Items" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                                         </MultiBinding>

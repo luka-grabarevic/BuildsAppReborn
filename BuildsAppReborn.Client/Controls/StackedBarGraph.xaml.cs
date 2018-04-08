@@ -18,6 +18,12 @@ namespace BuildsAppReborn.Client.Controls
 
         #region Public Properties
 
+        public Double BarWidth
+        {
+            get { return (Double) GetValue(BarWidthProperty); }
+            set { SetValue(BarWidthProperty, value); }
+        }
+
         public ICommand ClickCommand
         {
             get { return (ICommand) GetValue(ClickCommandProperty); }
@@ -43,6 +49,9 @@ namespace BuildsAppReborn.Client.Controls
         }
 
         #endregion
+
+        public static readonly DependencyProperty BarWidthProperty = DependencyProperty.Register(
+            "BarWidth", typeof(Double), typeof(StackedBarGraph), new PropertyMetadata(20d));
 
 
         public static readonly DependencyProperty ClickCommandParameterProperty = DependencyProperty.Register(
