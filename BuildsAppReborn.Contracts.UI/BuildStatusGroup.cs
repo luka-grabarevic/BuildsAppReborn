@@ -1,24 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BuildsAppReborn.Contracts.Models;
+using BuildsAppReborn.Infrastructure;
 
 namespace BuildsAppReborn.Contracts.UI
 {
-    public class BuildStatusGroup
+    public class BuildStatusGroup : ViewModelBase
     {
+        #region Constructors
+
+        public BuildStatusGroup(IBuildDefinition buildDefinition, IEnumerable<BuildItem> buildItems)
+        {
+            BuildDefinition = buildDefinition;
+
+            AllBuildItems = buildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
+        }
+
+        #endregion
+
         #region Public Properties
 
-        public List<BuildItem> AllBuildItems
+        public Boolean AdditionalInformationShown
         {
-            get { return this.allBuildItems; }
+            get { return this.additionalInformationShown; }
             set
             {
-                this.allBuildItems = value;
-                this.allBuildItems = this.allBuildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
+                this.additionalInformationShown = value;
+                OnPropertyChanged();
             }
         }
 
-        public IBuildDefinition BuildDefinition { get; set; }
+        public IEnumerable<BuildItem> AllBuildItems { get; }
+
+        public IBuildDefinition BuildDefinition { get; }
 
         public BuildItem CurrentBuild => AllBuildItems.Last();
 
@@ -28,7 +43,7 @@ namespace BuildsAppReborn.Contracts.UI
 
         #region Private Fields
 
-        private List<BuildItem> allBuildItems;
+        private Boolean additionalInformationShown;
 
         #endregion
     }
