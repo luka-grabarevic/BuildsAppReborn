@@ -21,6 +21,8 @@ namespace BuildsAppReborn.Contracts.UI
 
         #region Public Properties
 
+        public Boolean AdditionalInformationAvailable => AllBuildItems.Any(a => a.CurrentTestRun != null);
+
         public Boolean AdditionalInformationShown
         {
             get { return this.additionalInformationShown; }

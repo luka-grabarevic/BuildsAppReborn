@@ -303,9 +303,15 @@
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                <Expander Background="Transparent" Grid.Row="1" Padding="0" Margin="0" IsExpanded="{Binding AdditionalInformationShown}">
+                                <Expander Grid.Row="1"
+                                    Background="Transparent" 
+                                    Padding="0" 
+                                    Margin="0" 
+                                    IsExpanded="{Binding AdditionalInformationShown}" 
+                                    Visibility="{Binding AdditionalInformationAvailable, 
+                                        Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Expander.Header>
-                                        <TextBlock Text="Additional Infomation" />
+                                        <TextBlock Text="Additional Information" />
                                     </Expander.Header>
                                     <Expander.Content>
                                         <Grid Height="80">
