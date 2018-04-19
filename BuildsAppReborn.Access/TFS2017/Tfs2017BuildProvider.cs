@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Access
 {
     [BuildProviderExport(typeof(IBuildProvider), Id, Name, AuthenticationModes.Default | AuthenticationModes.AccessToken)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class Tfs2017BuildProvider : TfsBuildProviderBase<Tfs2017Build, Tfs2017BuildDefinition, Tfs2017User, Tfs2017SourceVersion, Tfs2017Artifact>
+    internal class Tfs2017BuildProvider : TfsBuildProviderBase<Tfs2017Build, Tfs2017BuildDefinition, Tfs2017User, Tfs2017SourceVersion, Tfs2017Artifact, Tfs2017TestRun>
     {
         #region Overrides of Base
 

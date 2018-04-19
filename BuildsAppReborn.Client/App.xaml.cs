@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using BuildsAppReborn.Client.ViewModels;
 using BuildsAppReborn.Contracts;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -33,6 +34,9 @@ namespace BuildsAppReborn.Client
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            ToolTipService.ShowDurationProperty.OverrideMetadata(
+                typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
 
             RegisterToWindowsStartUp();
 

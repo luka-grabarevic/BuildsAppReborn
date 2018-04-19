@@ -14,6 +14,7 @@ namespace BuildsAppReborn.Access.Models
         [JsonConverter(typeof(InterfaceTypeConverter<VstsUser, IUser>))]
         public override IUser Requester { get; protected set; }
 
+
         #endregion
     }
 }

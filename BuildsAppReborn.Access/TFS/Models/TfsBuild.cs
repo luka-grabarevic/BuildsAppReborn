@@ -82,6 +82,9 @@ namespace BuildsAppReborn.Access.Models
             }
         }
 
+        [JsonIgnore]
+        public IEnumerable<ITestRun> TestRuns { get; internal set; }
+
         [JsonProperty("finishTime")]
         public DateTime FinishDateTime { get; private set; }
 
@@ -98,7 +101,7 @@ namespace BuildsAppReborn.Access.Models
         public String Url { get; private set; }
 
         [JsonIgnore]
-        public String PortalUrl => base.WebLink;
+        public String WebUrl => base.WebLink;
 
         [JsonIgnore]
         public ISourceVersion SourceVersion { get; internal set; }
@@ -123,6 +126,9 @@ namespace BuildsAppReborn.Access.Models
             }
             private set { this.sourceVersionInternal = value; }
         }
+
+        [JsonProperty("uri")]
+        internal String Uri { get; private set; }
 
         #endregion
 

@@ -146,12 +146,20 @@
     <Compile Include="Cache\BuildCache.cs" />
     <Compile Include="Cache\BuildCacheStatus.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="Controls\StackedBarGraph.xaml.cs">
+      <DependentUpon>StackedBarGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\StackedBarGraphHeightConverter.cs" />
+    <Compile Include="Controls\StackedItem.cs" />
+    <Compile Include="Controls\StackedItemCollection.cs" />
     <Compile Include="Converter\BuildItemToRelativeMarginConverter.cs" />
     <Compile Include="Converter\BuildStatusToImageConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushForegroundConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushBackgroundConverter.cs" />
     <Compile Include="Converter\CountToVisibilityConverter.cs" />
+    <Compile Include="Converter\NullVisibilityConverter.cs" />
     <Compile Include="Converter\MinutesToTimeSpanConverter.cs" />
+    <Compile Include="Converter\TestRunToStackedItemsConverter.cs" />
     <Compile Include="Converter\TimeSpanToNiceStringConverter.cs" />
     <Compile Include="Interfaces\ISaveable.cs" />
     <Compile Include="Interfaces\IHasDataContext.cs" />
@@ -174,6 +182,10 @@
     <Compile Include="ViewModels\BuildsStatusViewModel.cs" />
     <Compile Include="ViewModels\NotifyIconViewModel.cs" />
     <Compile Include="ViewModels\Settings\ServerSettingsViewModel.cs" />
+    <Page Include="Controls\StackedBarGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\BuildsStatusView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

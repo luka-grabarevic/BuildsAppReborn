@@ -60,17 +60,20 @@
     <Compile Include="IBuildMonitorAdvanced.cs" />
     <Compile Include="IBuildMonitorBasic.cs" />
     <Compile Include="IBuildProvider.cs" />
+    <Compile Include="Models\Base\IWebItem.cs" />
     <Compile Include="Models\BuildMonitorSettings.cs" />
     <Compile Include="Models\BuildStatus.cs" />
     <Compile Include="Models\AuthenticationModes.cs" />
     <Compile Include="Models\DataResponse.cs" />
     <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IArtifact.cs" />
+    <Compile Include="Models\Base\IObjectItem.cs" />
     <Compile Include="Models\IBuild.cs" />
     <Compile Include="Models\IBuildDefinition.cs" />
     <Compile Include="Models\INamedObject.cs" />
     <Compile Include="Models\IProject.cs" />
     <Compile Include="Models\ISourceVersion.cs" />
+    <Compile Include="Models\ITestRun.cs" />
     <Compile Include="Models\IUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

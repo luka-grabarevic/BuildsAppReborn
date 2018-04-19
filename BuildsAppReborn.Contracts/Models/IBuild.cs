@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using BuildsAppReborn.Contracts.Models.Base;
 
 namespace BuildsAppReborn.Contracts.Models
 {
-    public interface IBuild
+    public interface IBuild : IObjectItem, IWebItem
     {
         #region Public Properties
 
@@ -17,8 +18,6 @@ namespace BuildsAppReborn.Contracts.Models
 
         Int32 Id { get; }
 
-        String PortalUrl { get; }
-
         DateTime QueueDateTime { get; }
 
         IUser Requester { get; }
@@ -29,7 +28,7 @@ namespace BuildsAppReborn.Contracts.Models
 
         BuildStatus Status { get; }
 
-        String Url { get; }
+        IEnumerable<ITestRun> TestRuns { get; }
 
         #endregion
     }

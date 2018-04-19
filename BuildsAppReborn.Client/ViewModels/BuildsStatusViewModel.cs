@@ -28,8 +28,9 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
             this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
-            HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => OnHistoryClickCommand(a)));
+            HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => StartProcess(a?.Build?.WebUrl)));
             OpenArtifactCommand = new DelegateCommand<IArtifact>(a => Task.Run(() => OnOpenArtifactCommand(a)));
+            TestRunClickCommand = new DelegateCommand<ITestRun>(a => Task.Run(() => StartProcess(a?.WebUrl)));
         }
 
         #endregion
@@ -54,6 +55,8 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
 
+        public DelegateCommand<ITestRun> TestRunClickCommand { get; set; }
+
         #endregion
 
         #region Private Methods
@@ -64,14 +67,6 @@ namespace BuildsAppReborn.Client.ViewModels
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
                 buildStatus.CurrentBuild.Refresh();
             this.timer?.Start();
-        }
-
-        private void OnHistoryClickCommand(BuildItem item)
-        {
-            using (new WaitingIndicator())
-            {
-                StartProcess(item?.Build?.PortalUrl);
-            }
         }
 
         private void OnOpenArtifactCommand(IArtifact artifact)

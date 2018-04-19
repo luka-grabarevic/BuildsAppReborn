@@ -64,6 +64,14 @@ namespace BuildsAppReborn.Client.Resources
 
         public static String SettingsIcon => $"{IconsPath}{IcoPrefix}/settings.ico";
 
+        public static String FailIcon => $"{IconsPath}{IcoPrefix}/failure.ico";
+
+        public static String SuccessIcon => $"{IconsPath}{IcoPrefix}/succeeded.ico";
+
+        public static String WarningIcon => $"{IconsPath}{IcoPrefix}/partially_exclamation.ico";
+
+        public static String UnknownIcon => $"{IconsPath}{IcoPrefix}/partially_question.ico";
+
         #endregion
 
         #region Public Static Methods

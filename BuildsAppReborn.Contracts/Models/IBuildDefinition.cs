@@ -1,8 +1,9 @@
 ﻿using System;
+using BuildsAppReborn.Contracts.Models.Base;
 
 namespace BuildsAppReborn.Contracts.Models
 {
-    public interface IBuildDefinition
+    public interface IBuildDefinition : IObjectItem
     {
         #region Public Properties
 
@@ -15,8 +16,6 @@ namespace BuildsAppReborn.Contracts.Models
         IProject Project { get; }
 
         String Type { get; }
-
-        String Url { get; }
 
         #endregion
     }

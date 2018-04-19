@@ -38,9 +38,13 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Svg, Version=2.2.1.39233, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.2.3.0\lib\net35\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -62,6 +66,7 @@
     <Compile Include="TFS2017\Models\Tfs2017Project.cs" />
     <Compile Include="TFS2017\Models\Tfs2017SourceVersion.cs" />
     <Compile Include="TFS2017\Models\Tfs2017User.cs" />
+    <Compile Include="TFS2017\Models\TfsTestRun.cs" />
     <Compile Include="TFS2017\Tfs2017BuildProvider.cs" />
     <Compile Include="TFS\Models\Internal\LinksContainer.cs" />
     <Compile Include="TFS\Models\Internal\Repository.cs" />
@@ -71,10 +76,12 @@
     <Compile Include="TFS\Models\TfsBuildDefinition.cs" />
     <Compile Include="TFS\Models\TfsProject.cs" />
     <Compile Include="TFS\Models\TfsSourceVersion.cs" />
+    <Compile Include="TFS\Models\TfsTestRun.cs" />
     <Compile Include="TFS\Models\TfsUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TFS\Models\TfsArtifact.cs" />
     <Compile Include="TFS\TfsBuildProviderBase.cs" />
+    <Compile Include="VSTS\Models\VstsTestRun.cs" />
     <Compile Include="VSTS\Models\VstsArtifact.cs" />
     <Compile Include="VSTS\Models\VstsBuild.cs" />
     <Compile Include="VSTS\Models\VstsBuildDefinition.cs" />

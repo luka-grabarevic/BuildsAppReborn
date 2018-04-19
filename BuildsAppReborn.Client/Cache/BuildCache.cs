@@ -90,10 +90,15 @@ namespace BuildsAppReborn.Client
             var groupByDefinition = builds.GroupBy(a => a.Definition, build => build, this.buildDefinitionEqualityComparer);
             foreach (var grp in groupByDefinition)
             {
-                var newStatus = new BuildStatusGroup();
+                var oldStatus = BuildsStatus.SingleOrDefault(a => this.buildDefinitionEqualityComparer.Equals(grp.Key, a.BuildDefinition));
+                var newStatus = new BuildStatusGroup(grp.Key, grp.Select(a => new BuildItem(a)).ToList());
 
-                newStatus.BuildDefinition = grp.Key;
-                newStatus.AllBuildItems = grp.Select(a => new BuildItem(a)).ToList();
+                if (oldStatus != null)
+                {
+                    // ToDo: implement proper update of bound viewmodel objects instead of creating new ones everytime
+                    newStatus.AdditionalInformationShown = oldStatus.AdditionalInformationShown;
+                }
+
                 buildStatusGroups.Add(newStatus);
             }
             Application.Current.Dispatcher.Invoke(() =>
