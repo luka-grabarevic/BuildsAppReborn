@@ -85,6 +85,6 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
         // Code partially from: https://www.whitebyte.info/programming/c/how-to-make-a-notification-from-a-c-desktop-application-in-windows-10
 
-        private const String AppId = "BuildsAppReborn";
+        private const String AppId = "com.squirrel.BuildsAppReborn.BuildsAppReborn.Client";
     }
 }
