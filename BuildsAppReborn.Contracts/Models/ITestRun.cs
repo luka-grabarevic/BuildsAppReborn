@@ -7,9 +7,11 @@ namespace BuildsAppReborn.Contracts.Models
     {
         #region Public Properties
 
-        Int32 IncompleteTests { get; }
+        Int32 FailedTests { get; }
 
         Int32 Id { get; }
+
+        Int32 IncompleteTests { get; }
 
         String Name { get; }
 
@@ -20,8 +22,6 @@ namespace BuildsAppReborn.Contracts.Models
         String State { get; }
 
         Int32 TotalTests { get; }
-
-        Int32 UnanalyzedTests { get; }
 
         #endregion
     }

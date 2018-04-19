@@ -36,7 +36,7 @@ namespace BuildsAppReborn.Access.Models
         public Int32 TotalTests { get; private set; }
 
         [JsonProperty("unanalyzedTests")]
-        public Int32 UnanalyzedTests { get; private set; }
+        public Int32 FailedTests { get; private set; }
 
         #endregion
     }
