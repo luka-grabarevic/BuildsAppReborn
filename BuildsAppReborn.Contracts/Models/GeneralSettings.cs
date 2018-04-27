@@ -31,6 +31,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         public TimeSpan UpdateCheckInterval { get; set; }
 
+        public BuildViewStyle ViewStyle { get; set; }
+
         #endregion
     }
 }

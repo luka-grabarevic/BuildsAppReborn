@@ -156,6 +156,7 @@
     <Compile Include="Converter\BuildStatusToImageConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushForegroundConverter.cs" />
     <Compile Include="Converter\BuildStatusToSolidColorBrushBackgroundConverter.cs" />
+    <Compile Include="Converter\EnumDescriptionConverter.cs" />
     <Compile Include="Converter\CountToVisibilityConverter.cs" />
     <Compile Include="Converter\NullVisibilityConverter.cs" />
     <Compile Include="Converter\MinutesToTimeSpanConverter.cs" />
