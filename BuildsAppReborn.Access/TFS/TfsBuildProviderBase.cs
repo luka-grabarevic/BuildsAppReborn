@@ -17,13 +17,14 @@ using Svg;
 
 namespace BuildsAppReborn.Access
 {
-    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser, TSourceVersion, TArtifact, TTestRun> : TfsBuildProviderBase, IBuildProvider
+    internal abstract class TfsBuildProviderBase<TBuild, TBuildDefinition, TUser, TSourceVersion, TArtifact, TTestRun, TPullRequest> : TfsBuildProviderBase, IBuildProvider
         where TBuild : TfsBuild, new()
         where TBuildDefinition : TfsBuildDefinition, new()
         where TUser : TfsUser, new()
         where TSourceVersion : TfsSourceVersion, new()
         where TArtifact : TfsArtifact, new()
         where TTestRun : TfsTestRun, new()
+        where TPullRequest : TfsPullRequest, new()
     {
         #region Implementation of IBuildProvider
 
@@ -89,6 +90,52 @@ namespace BuildsAppReborn.Access
                 return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
             }
 
+            throw new Exception($"Error while processing method!");
+        }
+
+        public virtual async Task<DataResponse<IReadOnlyDictionary<IPullRequest, IEnumerable<IBuild>>>> GetBuildsByPullRequests(BuildMonitorSettings settings)
+        {
+            var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
+
+            var requestUrl = $"{projectUrl}/_apis/git/pullrequests?api-version={ApiVersion}";
+            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var dict = new Dictionary<IPullRequest, IEnumerable<IBuild>>();
+
+                var result = await requestResponse.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<List<TPullRequest>>(JObject.Parse(result)["value"].ToString());
+
+                foreach (var pullRequest in data)
+                {
+                    var builds = await GetBuildsOfPullRequest(pullRequest, settings);
+                    dict.Add(pullRequest, builds.Data);
+                    
+                }
+
+                return new DataResponse < IReadOnlyDictionary < IPullRequest, IEnumerable < IBuild >>> { Data = dict, StatusCode = requestResponse.StatusCode };
+            }
+
+            throw new Exception($"Error while processing method!");
+        }
+
+        private async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsOfPullRequest(IPullRequest pullRequest, BuildMonitorSettings settings)
+        {
+            var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
+            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
+
+            // use fallback value when no value was defined via settings
+            if (!maxBuilds.HasValue) maxBuilds = 5;
+
+            var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
+            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var result = await requestResponse.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+
+                return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
+            }
             throw new Exception($"Error while processing method!");
         }
 

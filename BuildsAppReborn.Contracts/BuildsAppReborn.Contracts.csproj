@@ -72,6 +72,7 @@
     <Compile Include="Models\IBuildDefinition.cs" />
     <Compile Include="Models\INamedObject.cs" />
     <Compile Include="Models\IProject.cs" />
+    <Compile Include="Models\IPullRequest.cs" />
     <Compile Include="Models\ISourceVersion.cs" />
     <Compile Include="Models\ITestRun.cs" />
     <Compile Include="Models\IUser.cs" />
