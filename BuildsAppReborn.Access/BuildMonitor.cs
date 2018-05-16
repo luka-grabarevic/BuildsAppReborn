@@ -4,13 +4,11 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 using BuildsAppReborn.Infrastructure;
-
 using log4net;
 
 namespace BuildsAppReborn.Access
@@ -37,17 +35,17 @@ namespace BuildsAppReborn.Access
 
         #region Implementation of IBuildMonitorAdvanced
 
-        public void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSetting, TimeSpan pollingInterval)
+        public void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettingsParam)
         {
             Stop();
 
             Initialize(settings);
 
-            this.generalSetting = generalSetting;
+            this.generalSettings = generalSettingsParam;
 
             if (this.providerSettingsGroup.Any())
             {
-                this.timer.Interval = pollingInterval.TotalMilliseconds;
+                this.timer.Interval = this.generalSettings.PollingInterval.TotalMilliseconds;
                 this.timer.Start();
             }
 
@@ -58,7 +56,7 @@ namespace BuildsAppReborn.Access
         {
             this.timer.Stop();
             this.providerSettingsGroup.Clear();
-            this.generalSetting = null;
+            this.generalSettings = null;
 
             OnMonitorStopped();
         }
@@ -124,11 +122,10 @@ namespace BuildsAppReborn.Access
 
         private async Task<IEnumerable<IBuild>> PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
         {
-
             try
             {
                 var builds = new DataResponse<IEnumerable<IBuild>>();
-                if (this.generalSetting?.ViewStyle == BuildViewStyle.GroupByPullRequest)
+                if (this.generalSettings?.ViewStyle == BuildViewStyle.GroupByPullRequest)
                 {
                     var prBuilds = await provider.GetBuildsByPullRequests(settings);
                     prBuilds.ThrowIfUnsuccessful();
@@ -145,12 +142,9 @@ namespace BuildsAppReborn.Access
 
                     return prBuilds.Data;
                 }
-                else
-                {
-                    builds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
-                    builds.ThrowIfUnsuccessful();
-                }
 
+                builds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                builds.ThrowIfUnsuccessful();
 
                 return builds.Data;
             }
@@ -172,8 +166,10 @@ namespace BuildsAppReborn.Access
 
         #region Private Fields
 
-        private readonly LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders;
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
+
+        private readonly LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders;
+        private GeneralSettings generalSettings;
 
         private Boolean isPolling;
 
@@ -184,7 +180,6 @@ namespace BuildsAppReborn.Access
         private readonly Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>> providerSettingsGroup = new Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>>();
 
         private readonly Timer timer = new Timer();
-        private GeneralSettings generalSetting;
 
         #endregion
     }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 
 using BuildsAppReborn.Client.Interfaces;
+using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -18,11 +19,12 @@ namespace BuildsAppReborn.Client.ViewModels
         #region Constructors
 
         [ImportingConstructor]
-        internal GeneralSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, UpdateChecker updateChecker)
+        internal GeneralSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, UpdateChecker updateChecker, IBuildMonitorAdvanced buildMonitor)
         {
             this.globalSettingsContainer = globalSettingsContainer;
             this.GeneralSettings = this.globalSettingsContainer.GeneralSettings.Clone();
             this.updateChecker = updateChecker;
+            this.buildMonitor = buildMonitor;
             SaveCommand = new DelegateCommand(OnSave);
         }
 
@@ -45,6 +47,10 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
             this.globalSettingsContainer.Save();
+
+            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
+            this.buildMonitor.BeginPollingBuilds();
+
             this.updateChecker.Start();
         }
 
@@ -76,6 +82,7 @@ namespace BuildsAppReborn.Client.ViewModels
         private readonly GlobalSettingsContainer globalSettingsContainer;
 
         private readonly UpdateChecker updateChecker;
+        private readonly IBuildMonitorAdvanced buildMonitor;
 
         #endregion
     }

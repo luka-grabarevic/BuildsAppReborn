@@ -15,6 +15,7 @@ namespace BuildsAppReborn.Contracts.Models
             IncludePreReleases = true;
 
             UpdateCheckInterval = TimeSpan.FromHours(1);
+            PollingInterval = TimeSpan.FromMinutes(1);
         }
 
         #endregion
@@ -32,6 +33,8 @@ namespace BuildsAppReborn.Contracts.Models
         public TimeSpan UpdateCheckInterval { get; set; }
 
         public BuildViewStyle ViewStyle { get; set; }
+
+        public TimeSpan PollingInterval { get; set; }
 
         #endregion
     }
