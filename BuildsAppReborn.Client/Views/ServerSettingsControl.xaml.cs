@@ -22,7 +22,7 @@ namespace BuildsAppReborn.Client.Views
 
         public String Title => "Server Settings";
 
-        public UInt32 Order => 0;
+        public UInt32 Order => 1;
 
         #endregion
 
