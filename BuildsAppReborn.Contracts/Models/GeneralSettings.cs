@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BuildsAppReborn.Contracts.Models
 {
@@ -16,6 +17,11 @@ namespace BuildsAppReborn.Contracts.Models
 
             UpdateCheckInterval = TimeSpan.FromHours(1);
             PollingInterval = TimeSpan.FromMinutes(1);
+
+            if (WindowSettings == null)
+            {
+                WindowSettings = new List<WindowSetting>();
+            }
         }
 
         #endregion
@@ -30,11 +36,13 @@ namespace BuildsAppReborn.Contracts.Models
 
         public Boolean NotifyOnNewUpdate { get; set; }
 
+        public TimeSpan PollingInterval { get; set; }
+
         public TimeSpan UpdateCheckInterval { get; set; }
 
         public BuildViewStyle ViewStyle { get; set; }
 
-        public TimeSpan PollingInterval { get; set; }
+        public List<WindowSetting> WindowSettings { get; set; }
 
         #endregion
     }
