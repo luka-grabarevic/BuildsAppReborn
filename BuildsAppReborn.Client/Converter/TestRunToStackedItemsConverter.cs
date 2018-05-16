@@ -24,7 +24,7 @@ namespace BuildsAppReborn.Client.Converter
             var stackedItems = new List<StackedItem>();
 
             stackedItems.Add(new StackedItem {Value = testRun.FailedTests, Title = "Failed Tests", Color = Brushes.Red, Icon = IconProvider.FailIcon});
-            stackedItems.Add(new StackedItem {Value = testRun.NotApplicableTests, Title = "Not Applicable Tests", Color = Brushes.Yellow, Icon = IconProvider.UnknownIcon});
+            stackedItems.Add(new StackedItem {Value = testRun.NotApplicableTests, Title = "Not Executed Tests", Color = Brushes.Yellow, Icon = IconProvider.UnknownIcon});
             stackedItems.Add(new StackedItem {Value = testRun.PassedTests, Title = "Passed Tests", Color = Brushes.Green, Icon = IconProvider.SuccessIcon});
             stackedItems.Add(new StackedItem {Value = testRun.IncompleteTests, Title = "Incomplete Tests", Color = Brushes.Blue, Icon = IconProvider.LoadingIcon});
 
