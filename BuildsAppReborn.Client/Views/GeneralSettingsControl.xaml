@@ -33,6 +33,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -67,13 +68,14 @@
                    Grid.Column="0"
                    VerticalAlignment="Bottom"
                    Text="Check interval (minutes)" />
+        <!-- ToDo: make numeric only text box! -->
         <TextBox Grid.Row="4"
                  Grid.Column="2"
                  Margin="0 -15 0 0"
                  VerticalAlignment="Bottom"
                  IsEnabled="False"
                  Text="{Binding GeneralSettings.UpdateCheckInterval,
-                                Converter={StaticResource MinutesToTimeSpanConverter}}" />
+                                Converter={StaticResource MinutesToTimeSpanConverter}, UpdateSourceTrigger=PropertyChanged}" />
         <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    VerticalAlignment="Bottom"
@@ -118,5 +120,18 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <TextBlock Grid.Row="9"
+                   Grid.Column="0"
+                   VerticalAlignment="Bottom"
+                   Text="Polling interval (minutes)" />
+        <!-- ToDo: make numeric only text box! -->
+        <TextBox Grid.Row="9"
+                 Grid.Column="2"
+                 Margin="0 -15 0 0"
+                 IsEnabled="False"
+                 VerticalAlignment="Bottom"
+                 Text="{Binding GeneralSettings.PollingInterval,
+                                Converter={StaticResource MinutesToTimeSpanConverter}, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>
