@@ -54,6 +54,7 @@
     <Compile Include="Composition\BuildProviderExportAttribute.cs" />
     <Compile Include="Composition\IBuildProviderMetadata.cs" />
     <Compile Include="Composition\IIdentifierMetadata.cs" />
+    <Compile Include="Extensions\PullRequestEqualityComparer.cs" />
     <Compile Include="Extensions\BuildDefinitionEqualityComparer.cs" />
     <Compile Include="Extensions\BuildEqualityComparer.cs" />
     <Compile Include="Extensions\BuildProviderSettingsExtensions.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Models\AuthenticationModes.cs" />
     <Compile Include="Models\DataResponse.cs" />
     <Compile Include="Models\BuildViewStyle.cs" />
+    <Compile Include="Models\DataResponseUnsuccessfulException.cs" />
     <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IArtifact.cs" />
     <Compile Include="Models\Base\IObjectItem.cs" />

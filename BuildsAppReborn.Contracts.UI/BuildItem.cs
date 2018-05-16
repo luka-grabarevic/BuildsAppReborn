@@ -10,8 +10,9 @@ namespace BuildsAppReborn.Contracts.UI
     {
         #region Constructors
 
-        public BuildItem(IBuild build)
+        public BuildItem(IBuild build, BuildViewStyle viewStyle)
         {
+            this.viewStyle = viewStyle;
             Build = build;
         }
 
@@ -93,7 +94,18 @@ namespace BuildsAppReborn.Contracts.UI
 
         public ITestRun CurrentTestRun => Build?.TestRuns?.FirstOrDefault();
 
-        public String Description => $"{Build.Definition.Name} - {Build.BuildNumber}";
+        public String Description
+        {
+            get
+            {
+                if (this.viewStyle == BuildViewStyle.GroupByPullRequest)
+                {
+                    return $"{Build.PullRequest.Title} - {Build.BuildNumber}";
+                }
+
+                return $"{Build.Definition.Name} - {Build.BuildNumber}";
+            }
+        }
 
         public Byte[] RequesterImage => Build?.Requester?.ImageData;
 
@@ -119,6 +131,12 @@ namespace BuildsAppReborn.Contracts.UI
         #region Private Properties
 
         private Boolean RequesterIsCommitter => Build?.SourceVersion?.Author?.Name == Build?.Requester?.DisplayName;
+
+        #endregion
+
+        #region Private Fields
+
+        private readonly BuildViewStyle viewStyle;
 
         #endregion
     }

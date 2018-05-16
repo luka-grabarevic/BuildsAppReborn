@@ -52,7 +52,7 @@ namespace BuildsAppReborn.Client
             this.globalSettingsContainer = compositionContainer.GetExportedValue<GlobalSettingsContainer>();
 
             this.buildMonitor = compositionContainer.GetExportedValue<IBuildMonitorAdvanced>();
-            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, TimeSpan.FromMinutes(1));
+            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings, TimeSpan.FromMinutes(1));
 
             this.notifyIcon = (TaskbarIcon) FindResource("NotifyIcon");
             if (this.notifyIcon != null)

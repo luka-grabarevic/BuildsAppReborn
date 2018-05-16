@@ -15,11 +15,24 @@ namespace BuildsAppReborn.Contracts.Models
             {
                 if (StatusCode >= HttpStatusCode.OK)
                     return StatusCode <= (HttpStatusCode) 299;
+
                 return false;
             }
         }
 
         public HttpStatusCode StatusCode { get; set; }
+
+        #endregion
+
+        #region Public Methods
+
+        public void ThrowIfUnsuccessful()
+        {
+            if (!IsSuccessStatusCode)
+            {
+                throw new DataResponseUnsuccessfulException(StatusCode);
+            }
+        }
 
         #endregion
     }

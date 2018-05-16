@@ -10,11 +10,19 @@ namespace BuildsAppReborn.Contracts.UI
     {
         #region Constructors
 
-        public BuildStatusGroup(IBuildDefinition buildDefinition, IEnumerable<BuildItem> buildItems)
+        private BuildStatusGroup(IEnumerable<BuildItem> buildItems)
+        {
+            AllBuildItems = buildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
+        }
+
+        public BuildStatusGroup(IPullRequest pullRequest, IEnumerable<BuildItem> buildItems) : this(buildItems)
+        {
+            PullRequest = pullRequest;
+        }
+
+        public BuildStatusGroup(IBuildDefinition buildDefinition, IEnumerable<BuildItem> buildItems) : this(buildItems)
         {
             BuildDefinition = buildDefinition;
-
-            AllBuildItems = buildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
         }
 
         #endregion
@@ -40,6 +48,8 @@ namespace BuildsAppReborn.Contracts.UI
         public BuildItem CurrentBuild => AllBuildItems.Last();
 
         public List<BuildItem> PreviousBuilds => AllBuildItems.Where(a => a != CurrentBuild).ToList();
+
+        public IPullRequest PullRequest { get; }
 
         #endregion
 

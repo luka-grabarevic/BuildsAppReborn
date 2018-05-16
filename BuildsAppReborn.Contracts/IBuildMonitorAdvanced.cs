@@ -12,7 +12,7 @@ namespace BuildsAppReborn.Contracts
     {
         #region Public Methods
 
-        void Start(IEnumerable<BuildMonitorSettings> settings, TimeSpan pollingInterval);
+        void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettings, TimeSpan pollingInterval);
 
         void Stop();
 

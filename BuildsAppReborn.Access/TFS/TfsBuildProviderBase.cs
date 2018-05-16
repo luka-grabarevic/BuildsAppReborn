@@ -77,12 +77,7 @@ namespace BuildsAppReborn.Access
                 {
                     var result = await requestResponse.Content.ReadAsStringAsync();
                     var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
-                    data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
-                    data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
-
-                    await ResolveSourceVersion(data, projectUrl, settings);
-                    await ResolveArtifacts(data, projectUrl, settings);
-                    await ResolveTestRuns(data, projectUrl, settings);
+                    await ResolveAddtionalBuildData(settings, data, projectUrl);
 
                     return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
@@ -119,7 +114,6 @@ namespace BuildsAppReborn.Access
                     }
                 }
 
-
                 // sets the relation of the PR to the build object
                 foreach (var keyValuePair in dict)
                 {
@@ -129,7 +123,7 @@ namespace BuildsAppReborn.Access
                     }
                 }
 
-                return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a =>a).ToList(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a => a).ToList(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
@@ -211,6 +205,8 @@ namespace BuildsAppReborn.Access
                 var result = await requestResponse.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
 
+                await ResolveAddtionalBuildData(settings, data, projectUrl);
+
                 return new DataResponse<IEnumerable<TBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
             }
 
@@ -235,6 +231,16 @@ namespace BuildsAppReborn.Access
             }
 
             return null;
+        }
+
+        private async Task ResolveAddtionalBuildData(BuildMonitorSettings settings, List<TBuild> data, String projectUrl)
+        {
+            data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
+            data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
+
+            await ResolveSourceVersion(data, projectUrl, settings);
+            await ResolveArtifacts(data, projectUrl, settings);
+            await ResolveTestRuns(data, projectUrl, settings);
         }
 
         private async Task ResolveArtifacts(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
