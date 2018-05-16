@@ -59,7 +59,7 @@ namespace BuildsAppReborn.Access
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
             {
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = HttpStatusCode.NoContent};
+                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<TBuild>(), StatusCode = HttpStatusCode.NoContent};
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -87,13 +87,13 @@ namespace BuildsAppReborn.Access
                     return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
 
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<IBuild>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<TBuild>(), StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception($"Error while processing method!");
         }
 
-        public virtual async Task<DataResponse<IReadOnlyDictionary<IPullRequest, IEnumerable<IBuild>>>> GetBuildsByPullRequests(BuildMonitorSettings settings)
+        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsByPullRequests(BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
 
@@ -101,41 +101,37 @@ namespace BuildsAppReborn.Access
             var requestResponse = await GetRequestResponse(requestUrl, settings);
             if (requestResponse.IsSuccessStatusCode)
             {
-                var dict = new Dictionary<IPullRequest, IEnumerable<IBuild>>();
+                var dict = new Dictionary<IPullRequest, IEnumerable<TBuild>>();
 
                 var result = await requestResponse.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<List<TPullRequest>>(JObject.Parse(result)["value"].ToString());
 
                 foreach (var pullRequest in data)
                 {
-                    var builds = await GetBuildsOfPullRequest(pullRequest, settings);
-                    dict.Add(pullRequest, builds.Data);
-                    
+                    var buildsResponse = await GetBuildsOfPullRequest(pullRequest, settings);
+                    if (buildsResponse.IsSuccessStatusCode)
+                    {
+                        dict.Add(pullRequest, buildsResponse.Data);
+                    }
+                    else
+                    {
+                        throw new Exception($"Error while processing method!");
+                    }
                 }
 
-                return new DataResponse < IReadOnlyDictionary < IPullRequest, IEnumerable < IBuild >>> { Data = dict, StatusCode = requestResponse.StatusCode };
+
+                // sets the relation of the PR to the build object
+                foreach (var keyValuePair in dict)
+                {
+                    foreach (var build in keyValuePair.Value)
+                    {
+                        build.PullRequest = keyValuePair.Key;
+                    }
+                }
+
+                return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a =>a).ToList(), StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception($"Error while processing method!");
-        }
-
-        private async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsOfPullRequest(IPullRequest pullRequest, BuildMonitorSettings settings)
-        {
-            var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
-            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
-
-            // use fallback value when no value was defined via settings
-            if (!maxBuilds.HasValue) maxBuilds = 5;
-
-            var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
-            var requestResponse = await GetRequestResponse(requestUrl, settings);
-            if (requestResponse.IsSuccessStatusCode)
-            {
-                var result = await requestResponse.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
-
-                return new DataResponse<IEnumerable<IBuild>> { Data = data, StatusCode = requestResponse.StatusCode };
-            }
             throw new Exception($"Error while processing method!");
         }
 
@@ -199,6 +195,27 @@ namespace BuildsAppReborn.Access
         #endregion
 
         #region Private Methods
+
+        private async Task<DataResponse<IEnumerable<TBuild>>> GetBuildsOfPullRequest(IPullRequest pullRequest, BuildMonitorSettings settings)
+        {
+            var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
+            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
+
+            // use fallback value when no value was defined via settings
+            if (!maxBuilds.HasValue) maxBuilds = 5;
+
+            var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
+            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var result = await requestResponse.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+
+                return new DataResponse<IEnumerable<TBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
+            }
+
+            throw new Exception($"Error while processing method!");
+        }
 
         private Tuple<String, String> GetGitOwnerAndRepo(String gitHubRepoUrl)
         {

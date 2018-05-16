@@ -18,6 +18,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         Int32 Id { get; }
 
+        IPullRequest PullRequest { get; }
+
         DateTime QueueDateTime { get; }
 
         IUser Requester { get; }

@@ -38,6 +38,9 @@ namespace BuildsAppReborn.Access.Models
         public Int32 Id { get; private set; }
 
         [JsonIgnore]
+        public IPullRequest PullRequest { get; internal set; }
+
+        [JsonIgnore]
         public BuildStatus Status
         {
             /*

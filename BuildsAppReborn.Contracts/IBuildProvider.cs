@@ -12,7 +12,7 @@ namespace BuildsAppReborn.Contracts
 
         Task<DataResponse<IEnumerable<IBuild>>> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings);
 
-        Task<DataResponse<IReadOnlyDictionary<IPullRequest, IEnumerable<IBuild>>>> GetBuildsByPullRequests(BuildMonitorSettings settings);
+        Task<DataResponse<IEnumerable<IBuild>>> GetBuildsByPullRequests(BuildMonitorSettings settings);
 
         #endregion
     }
