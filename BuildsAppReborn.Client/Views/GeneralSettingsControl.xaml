@@ -5,17 +5,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:models="clr-namespace:BuildsAppReborn.Contracts.Models;assembly=BuildsAppReborn.Contracts"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ui="clr-namespace:BuildsAppReborn.Contracts.UI;assembly=BuildsAppReborn.Contracts.UI"
              d:DataContext="{d:DesignInstance Type=viewModels:GeneralSettingsViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
     <UserControl.Resources>
+        <converter:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
         <converter:MinutesToTimeSpanConverter x:Key="MinutesToTimeSpanConverter" />
+        <ObjectDataProvider MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}"
+                            x:Key="BuildViewStyleEnum">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:BuildViewStyle" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="0" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
@@ -56,13 +70,14 @@
                    Grid.Column="0"
                    VerticalAlignment="Bottom"
                    Text="Check interval (minutes)" />
+        <!-- ToDo: make numeric only text box! -->
         <TextBox Grid.Row="4"
                  Grid.Column="2"
                  Margin="0 -15 0 0"
                  VerticalAlignment="Bottom"
                  IsEnabled="False"
                  Text="{Binding GeneralSettings.UpdateCheckInterval,
-                                Converter={StaticResource MinutesToTimeSpanConverter}}" />
+                                Converter={StaticResource MinutesToTimeSpanConverter}, UpdateSourceTrigger=PropertyChanged}" />
         <TextBlock Grid.Row="5"
                    Grid.Column="0"
                    VerticalAlignment="Bottom"
@@ -90,5 +105,38 @@
                   VerticalAlignment="Bottom"
                   IsChecked="{Binding GeneralSettings.IncludePreReleases}"
                   IsEnabled="False" />
+
+        <TextBlock Grid.Row="8"
+                   Grid.Column="0"
+                   VerticalAlignment="Bottom"
+                   Text="Build Status View Style" />
+        <ListBox Grid.Row="8"
+                 Grid.Column="2"
+                 SelectionMode="Single" Style="{DynamicResource MaterialDesignToolToggleFlatListBox}"
+                 ItemsSource="{Binding Source={StaticResource BuildViewStyleEnum}}"
+                 SelectedItem="{Binding GeneralSettings.ViewStyle, UpdateSourceTrigger=PropertyChanged}"
+                 VerticalAlignment="Bottom">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <i:Interaction.Behaviors>
+                <ui:DeselectionPreventionBehavior />
+            </i:Interaction.Behaviors>
+        </ListBox>
+
+        <TextBlock Grid.Row="9"
+                   Grid.Column="0"
+                   VerticalAlignment="Bottom"
+                   Text="Polling interval (minutes)" />
+        <!-- ToDo: make numeric only text box! -->
+        <TextBox Grid.Row="9"
+                 Grid.Column="2"
+                 Margin="0 -15 0 0"
+                 IsEnabled="False"
+                 VerticalAlignment="Bottom"
+                 Text="{Binding GeneralSettings.PollingInterval,
+                                Converter={StaticResource MinutesToTimeSpanConverter}, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

@@ -4,13 +4,11 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 using BuildsAppReborn.Infrastructure;
-
 using log4net;
 
 namespace BuildsAppReborn.Access
@@ -23,9 +21,10 @@ namespace BuildsAppReborn.Access
         #region Constructors
 
         [ImportingConstructor]
-        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders, LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders)
+        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders, LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders, IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
         {
             this.buildProviders = buildProviders;
+            this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
 #pragma warning disable 4014
             this.timer.Elapsed += (sender, args) => BeginPollingBuilds();
@@ -36,15 +35,17 @@ namespace BuildsAppReborn.Access
 
         #region Implementation of IBuildMonitorAdvanced
 
-        public void Start(IEnumerable<BuildMonitorSettings> settings, TimeSpan pollingInterval)
+        public void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettingsParam)
         {
             Stop();
 
             Initialize(settings);
 
+            this.generalSettings = generalSettingsParam;
+
             if (this.providerSettingsGroup.Any())
             {
-                this.timer.Interval = pollingInterval.TotalMilliseconds;
+                this.timer.Interval = this.generalSettings.PollingInterval.TotalMilliseconds;
                 this.timer.Start();
             }
 
@@ -55,6 +56,7 @@ namespace BuildsAppReborn.Access
         {
             this.timer.Stop();
             this.providerSettingsGroup.Clear();
+            this.generalSettings = null;
 
             OnMonitorStopped();
         }
@@ -122,17 +124,34 @@ namespace BuildsAppReborn.Access
         {
             try
             {
-                var builds = await Task.Run(() => provider.GetBuilds(settings.SelectedBuildDefinitions, settings));
+                var builds = new DataResponse<IEnumerable<IBuild>>();
+                if (this.generalSettings?.ViewStyle == BuildViewStyle.GroupByPullRequest)
+                {
+                    var prBuilds = await provider.GetBuildsByPullRequests(settings);
+                    prBuilds.ThrowIfUnsuccessful();
 
-                if (!builds.IsSuccessStatusCode)
-                {
-                    this.logger.Warn($"Http status code {builds.StatusCode} returned while polling for builds!");
-                    this.notificationProvider?.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. StatusCode was '{builds.StatusCode}'. See log for more details.");
+                    var definitionsInUse = prBuilds.Data.GroupBy(a => a.Definition, build => build, this.buildDefinitionEqualityComparer).Select(a => a.Key);
+                    var unusedDefinitions = settings.SelectedBuildDefinitions.Except(definitionsInUse, this.buildDefinitionEqualityComparer).ToList();
+                    if (unusedDefinitions.Any())
+                    {
+                        var defBuilds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                        defBuilds.ThrowIfUnsuccessful();
+
+                        return prBuilds.Data.Concat(defBuilds.Data);
+                    }
+
+                    return prBuilds.Data;
                 }
-                else
-                {
-                    return builds.Data;
-                }
+
+                builds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                builds.ThrowIfUnsuccessful();
+
+                return builds.Data;
+            }
+            catch (DataResponseUnsuccessfulException ex)
+            {
+                this.logger.Warn($"Http status code {ex.StatusCode} returned while polling for builds!");
+                this.notificationProvider?.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. StatusCode was '{ex.StatusCode}'. See log for more details.");
             }
             catch (Exception exception)
             {
@@ -147,7 +166,10 @@ namespace BuildsAppReborn.Access
 
         #region Private Fields
 
+        private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
+
         private readonly LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders;
+        private GeneralSettings generalSettings;
 
         private Boolean isPolling;
 

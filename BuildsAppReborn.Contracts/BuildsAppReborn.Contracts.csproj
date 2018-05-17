@@ -34,9 +34,13 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,6 +58,7 @@
     <Compile Include="Composition\BuildProviderExportAttribute.cs" />
     <Compile Include="Composition\IBuildProviderMetadata.cs" />
     <Compile Include="Composition\IIdentifierMetadata.cs" />
+    <Compile Include="Extensions\PullRequestEqualityComparer.cs" />
     <Compile Include="Extensions\BuildDefinitionEqualityComparer.cs" />
     <Compile Include="Extensions\BuildEqualityComparer.cs" />
     <Compile Include="Extensions\BuildProviderSettingsExtensions.cs" />
@@ -65,6 +70,8 @@
     <Compile Include="Models\BuildStatus.cs" />
     <Compile Include="Models\AuthenticationModes.cs" />
     <Compile Include="Models\DataResponse.cs" />
+    <Compile Include="Models\BuildViewStyle.cs" />
+    <Compile Include="Models\DataResponseUnsuccessfulException.cs" />
     <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\IArtifact.cs" />
     <Compile Include="Models\Base\IObjectItem.cs" />
@@ -72,9 +79,11 @@
     <Compile Include="Models\IBuildDefinition.cs" />
     <Compile Include="Models\INamedObject.cs" />
     <Compile Include="Models\IProject.cs" />
+    <Compile Include="Models\IPullRequest.cs" />
     <Compile Include="Models\ISourceVersion.cs" />
     <Compile Include="Models\ITestRun.cs" />
     <Compile Include="Models\IUser.cs" />
+    <Compile Include="Models\WindowSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

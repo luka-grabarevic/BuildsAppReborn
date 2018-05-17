@@ -19,10 +19,12 @@ namespace BuildsAppReborn.Client
         #region Constructors
 
         [ImportingConstructor]
-        public BuildCache(IBuildMonitorBasic buildMonitor, IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
+        internal BuildCache(IBuildMonitorBasic buildMonitor, IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer, IEqualityComparer<IPullRequest> pullRequstEqualityComparer, GlobalSettingsContainer globalSettingsContainer)
         {
             BuildsStatus = new RangeObservableCollection<BuildStatusGroup>();
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
+            this.pullRequstEqualityComparer = pullRequstEqualityComparer;
+            this.globalSettingsContainer = globalSettingsContainer;
             buildMonitor.BuildsUpdated += OnBuildsUpdated;
             buildMonitor.MonitorStopped += (sender, args) => CacheStatus = BuildCacheStatus.NotConfigured;
             buildMonitor.MonitorStarted += (sender, args) => CacheStatus = BuildCacheStatus.Loading;
@@ -82,25 +84,76 @@ namespace BuildsAppReborn.Client
 
         #region Private Methods
 
-        private void OnBuildsUpdated(ICollection<IBuild> builds)
+        private List<BuildStatusGroup> GroupBuildsByDefinition(IEnumerable<IBuild> builds, ICollection<BuildStatusGroup> currentBuildsStatus)
         {
-            if (!builds.Any()) return;
+            currentBuildsStatus = currentBuildsStatus.Where(a => a.BuildDefinition != null).OrderBy(a => a.BuildDefinition.Name).ToList();
 
             var buildStatusGroups = new List<BuildStatusGroup>();
             var groupByDefinition = builds.GroupBy(a => a.Definition, build => build, this.buildDefinitionEqualityComparer);
             foreach (var grp in groupByDefinition)
             {
-                var oldStatus = BuildsStatus.SingleOrDefault(a => this.buildDefinitionEqualityComparer.Equals(grp.Key, a.BuildDefinition));
-                var newStatus = new BuildStatusGroup(grp.Key, grp.Select(a => new BuildItem(a)).ToList());
+                var oldStatus = currentBuildsStatus.SingleOrDefault(a => this.buildDefinitionEqualityComparer.Equals(grp.Key, a.BuildDefinition));
+                var newStatus = new BuildStatusGroup(grp.Key, grp.Select(a => new BuildItem(a, BuildViewStyle.GroupByBuildDefinition)).ToList());
 
-                if (oldStatus != null)
-                {
-                    // ToDo: implement proper update of bound viewmodel objects instead of creating new ones everytime
-                    newStatus.AdditionalInformationShown = oldStatus.AdditionalInformationShown;
-                }
+                OnBuildStatusChanged(oldStatus, newStatus);
 
                 buildStatusGroups.Add(newStatus);
             }
+
+            return buildStatusGroups;
+        }
+
+        private List<BuildStatusGroup> GroupBuildsByPullRequest(List<IBuild> builds, ICollection<BuildStatusGroup> currentBuildsStatus)
+        {
+            currentBuildsStatus = currentBuildsStatus.Where(a => a.PullRequest != null).OrderBy(a => a.PullRequest.Title).ToList();
+
+            var buildStatusGroups = new List<BuildStatusGroup>();
+            var groupByPr = builds.GroupBy(a => a.PullRequest, build => build, this.pullRequstEqualityComparer);
+            foreach (var grp in groupByPr)
+            {
+                var oldStatus = currentBuildsStatus.SingleOrDefault(a => this.pullRequstEqualityComparer.Equals(grp.Key, a.PullRequest));
+                var newStatus = new BuildStatusGroup(grp.Key, grp.Select(a => new BuildItem(a, BuildViewStyle.GroupByPullRequest)).ToList());
+
+                OnBuildStatusChanged(oldStatus, newStatus);
+
+                buildStatusGroups.Add(newStatus);
+            }
+
+            return buildStatusGroups;
+        }
+
+        private void OnBuildStatusChanged(BuildStatusGroup oldStatus, BuildStatusGroup newStatus)
+        {
+            if (oldStatus != null)
+            {
+                // ToDo: implement proper update of bound viewmodel objects instead of creating new ones everytime
+                newStatus.AdditionalInformationShown = oldStatus.AdditionalInformationShown;
+            }
+        }
+
+        private void OnBuildsUpdated(ICollection<IBuild> builds)
+        {
+            if (!builds.Any()) return;
+
+            var buildStatusGroups = new List<BuildStatusGroup>();
+
+            if (this.globalSettingsContainer.GeneralSettings.ViewStyle == BuildViewStyle.GroupByBuildDefinition)
+            {
+                buildStatusGroups.AddRange(GroupBuildsByDefinition(builds, BuildsStatus));
+            }
+            else if (this.globalSettingsContainer.GeneralSettings.ViewStyle == BuildViewStyle.GroupByPullRequest)
+            {
+                var prBuilds = builds.Where(a => a.PullRequest != null).ToList();
+
+                var groupedBuildsByPullRequest = GroupBuildsByPullRequest(prBuilds, BuildsStatus);
+                var groupedBuildsByDefinition = GroupBuildsByDefinition(builds.Except(prBuilds), BuildsStatus);
+
+                buildStatusGroups.AddRange(groupedBuildsByPullRequest);
+                buildStatusGroups.AddRange(groupedBuildsByDefinition);
+            }
+
+            //buildStatusGroups = buildStatusGroups.OrderByDescending(a => a.CurrentBuild.BuildStartTime).ToList();
+
             Application.Current.Dispatcher.Invoke(() =>
                                                   {
                                                       BuildsStatus.Clear();
@@ -161,6 +214,8 @@ namespace BuildsAppReborn.Client
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
         private BuildCacheStatus cacheStatus;
         private String currentIcon;
+        private readonly GlobalSettingsContainer globalSettingsContainer;
+        private readonly IEqualityComparer<IPullRequest> pullRequstEqualityComparer;
 
         #endregion
 
