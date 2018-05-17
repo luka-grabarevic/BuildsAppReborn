@@ -12,8 +12,16 @@ namespace BuildsAppReborn.Access.UI.Notifications
             return build.Status.ToString();
         }
 
-        public static String GenerateTitle(this IBuild build)
+        public static String GenerateTitle(this IBuild build, BuildViewStyle viewStyle)
         {
+            if (viewStyle == BuildViewStyle.GroupByPullRequest)
+            {
+                if (build.PullRequest != null)
+                {
+                    return $"{build.Definition.Project.Name} - {build.PullRequest.Title} - {build.BuildNumber}";
+                }
+            }
+
             return $"{build.Definition.Project.Name} - {build.Definition.Name} - {build.BuildNumber}";
         }
 

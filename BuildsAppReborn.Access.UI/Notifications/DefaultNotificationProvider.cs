@@ -15,11 +15,12 @@ namespace BuildsAppReborn.Access.UI.Notifications
 {
     [PriorityExport(typeof(INotificationProvider), -1)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class DefaultNotificationProvider : INotificationProvider
+    internal class DefaultNotificationProvider : NotificationProviderBase, INotificationProvider
     {
         #region Constructors
 
-        public DefaultNotificationProvider()
+        [ImportingConstructor]
+        public DefaultNotificationProvider(GeneralSettings generalSettings) : base(generalSettings)
         {
             this.notifier = new Notifier(cfg =>
                                          {
@@ -38,7 +39,7 @@ namespace BuildsAppReborn.Access.UI.Notifications
             if (build == null) return;
 
             var sb = new StringBuilder();
-            sb.AppendLine(build.GenerateTitle());
+            sb.AppendLine(GetTitle(build));
             sb.AppendLine(build.GenerateStatus());
             sb.AppendLine(build.GenerateUsername());
             var displayOptions = new MessageOptions

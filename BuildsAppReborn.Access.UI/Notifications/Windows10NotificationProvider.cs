@@ -10,8 +10,17 @@ namespace BuildsAppReborn.Access.UI.Notifications
 {
     [PriorityExport(typeof(INotificationProvider), 100)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    internal class Windows10NotificationProvider : INotificationProvider
+    internal class Windows10NotificationProvider : NotificationProviderBase, INotificationProvider
     {
+        #region Constructors
+
+        [ImportingConstructor]
+        public Windows10NotificationProvider(GeneralSettings generalSettings) : base(generalSettings)
+        {
+        }
+
+        #endregion
+
         #region Implementation of INotificationProvider
 
         public void ShowBuild(IBuild build, Func<IBuild, String> iconProvider, Action<IBuild> notificationClickAction)
@@ -22,7 +31,7 @@ namespace BuildsAppReborn.Access.UI.Notifications
             // Fill in the text elements
             var stringElements = toastXml.GetElementsByTagName("text");
 
-            stringElements[0].AppendChild(toastXml.CreateTextNode(build.GenerateTitle()));
+            stringElements[0].AppendChild(toastXml.CreateTextNode(GetTitle(build)));
             stringElements[1].AppendChild(toastXml.CreateTextNode(build.GenerateStatus()));
             stringElements[2].AppendChild(toastXml.CreateTextNode(build.GenerateUsername()));
 

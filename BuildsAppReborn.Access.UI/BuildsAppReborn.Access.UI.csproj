@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="Base\View\BuildProviderViewBase.cs" />
     <Compile Include="Notifications\NotificationHelper.cs" />
+    <Compile Include="Notifications\NotificationProviderBase.cs" />
     <Compile Include="Notifications\Windows10NotificationProvider.cs" />
     <Compile Include="Notifications\DefaultNotificationProvider.cs" />
     <Compile Include="Resources\Resource.Designer.cs">

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 
 namespace BuildsAppReborn.Contracts.Models
 {
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class GeneralSettings
     {
         #region Constructors
