@@ -15,10 +15,8 @@ namespace BuildsAppReborn.Infrastructure
     public sealed class LazyContainer<TInterface, TMetaData> : IEnumerable<TInterface>, IEnumerator<TInterface>, IReadOnlyDictionary<TMetaData, TInterface>
         where TInterface : class where TMetaData : class
     {
-        #region Constructors
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="LazyContainer{TInterface, TMetaData}"/> class.
+        /// Initializes a new instance of the <see cref="LazyContainer{TInterface, TMetaData}" /> class.
         /// </summary>
         /// <param name="lazies">The lazies.</param>
         [ImportingConstructor]
@@ -28,48 +26,15 @@ namespace BuildsAppReborn.Infrastructure
             {
                 throw new ArgumentNullException(nameof(lazies));
             }
+
             this.lazyArray = lazies;
         }
 
-        #endregion
-
-        #region Implementation of IEnumerable<TInterface>
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<TInterface> GetEnumerator()
-        {
-            return Values.GetEnumerator();
-        }
-
-        #endregion
-
-        #region Implementation of IEnumerator<TInterface>
-
-        public void Dispose()
-        {
-        }
-
-        public Boolean MoveNext()
-        {
-            return GetEnumerator().MoveNext();
-        }
-
-        public void Reset()
-        {
-            GetEnumerator().Reset();
-        }
-
-        Object IEnumerator.Current => GetEnumerator().Current;
+        public Int32 Count => this.lazyArray.Count();
 
         public TInterface Current => GetEnumerator().Current;
 
-        #endregion
-
-        #region Implementation of IReadOnlyDictionary<TMetaData,TInterface>
+        public IEnumerable<TMetaData> Keys => this.lazyArray.Select(a => a.Metadata);
 
         /// <summary>
         /// Gets the values.
@@ -79,43 +44,19 @@ namespace BuildsAppReborn.Infrastructure
         /// </value>
         public IEnumerable<TInterface> Values => this.lazyArray.Select(a => a.Value);
 
-        IEnumerator<KeyValuePair<TMetaData, TInterface>> IEnumerable<KeyValuePair<TMetaData, TInterface>>.GetEnumerator()
-        {
-            return new LazyContainerDictionaryEnumerator(this.lazyArray.GetEnumerator());
-        }
-
         public Boolean ContainsKey(TMetaData key)
         {
             return this.lazyArray.Any(a => a.Metadata == key);
         }
 
-        public Boolean TryGetValue(TMetaData key, out TInterface value)
+        public void Dispose()
         {
-            if (ContainsKey(key))
-            {
-                value = GetSingleOrDefault(data => data == key);
-                return true;
-            }
-
-            value = null;
-            return false;
         }
 
-        TInterface IReadOnlyDictionary<TMetaData, TInterface>.this[TMetaData key]
+        public IEnumerator<TInterface> GetEnumerator()
         {
-            get
-            {
-                return GetSingleOrDefault(data => data == key);
-            }
+            return Values.GetEnumerator();
         }
-
-        public IEnumerable<TMetaData> Keys => this.lazyArray.Select(a => a.Metadata);
-
-        public Int32 Count => this.lazyArray.Count();
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Gets the many.
@@ -137,26 +78,56 @@ namespace BuildsAppReborn.Infrastructure
             return GetMany(searchExpression).SingleOrDefault();
         }
 
-        #endregion
+        public Boolean MoveNext()
+        {
+            return GetEnumerator().MoveNext();
+        }
 
-        #region Private Fields
+        public void Reset()
+        {
+            GetEnumerator().Reset();
+        }
+
+        public Boolean TryGetValue(TMetaData key, out TInterface value)
+        {
+            if (ContainsKey(key))
+            {
+                value = GetSingleOrDefault(data => data == key);
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+
+        Object IEnumerator.Current => GetEnumerator().Current;
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        IEnumerator<KeyValuePair<TMetaData, TInterface>> IEnumerable<KeyValuePair<TMetaData, TInterface>>.GetEnumerator()
+        {
+            return new LazyContainerDictionaryEnumerator(this.lazyArray.GetEnumerator());
+        }
 
         private readonly IEnumerable<Lazy<TInterface, TMetaData>> lazyArray;
 
-        #endregion
+        TInterface IReadOnlyDictionary<TMetaData, TInterface>.this[TMetaData key]
+        {
+            get { return GetSingleOrDefault(data => data == key); }
+        }
 
         private class LazyContainerDictionaryEnumerator : IEnumerator<KeyValuePair<TMetaData, TInterface>>
         {
-            #region Constructors
-
             public LazyContainerDictionaryEnumerator(IEnumerator<Lazy<TInterface, TMetaData>> innerEnumerator)
             {
                 this.innerEnumerator = innerEnumerator;
             }
 
-            #endregion
-
-            #region Implementation of IEnumerator<KeyValuePair<TMetaData,TInterface>>
+            public KeyValuePair<TMetaData, TInterface> Current =>
+                new KeyValuePair<TMetaData, TInterface>(this.innerEnumerator.Current.Metadata, this.innerEnumerator.Current.Value);
 
             public void Dispose()
             {
@@ -172,23 +143,12 @@ namespace BuildsAppReborn.Infrastructure
                 this.innerEnumerator.Reset();
             }
 
-            public KeyValuePair<TMetaData, TInterface> Current => new KeyValuePair<TMetaData, TInterface>(this.innerEnumerator.Current.Metadata, this.innerEnumerator.Current.Value);
-
             Object IEnumerator.Current
             {
-                get
-                {
-                    return Current;
-                }
+                get { return Current; }
             }
 
-            #endregion
-
-            #region Private Fields
-
             private readonly IEnumerator<Lazy<TInterface, TMetaData>> innerEnumerator;
-
-            #endregion
         }
     }
 }

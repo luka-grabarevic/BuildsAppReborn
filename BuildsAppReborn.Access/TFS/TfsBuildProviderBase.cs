@@ -26,8 +26,6 @@ namespace BuildsAppReborn.Access
         where TTestRun : TfsTestRun, new()
         where TPullRequest : TfsPullRequest, new()
     {
-        #region Implementation of IBuildProvider
-
         public virtual async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -66,7 +64,10 @@ namespace BuildsAppReborn.Access
             var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
 
             // use fallback value when no value was defined via settings
-            if (!maxBuilds.HasValue) maxBuilds = 5;
+            if (!maxBuilds.HasValue)
+            {
+                maxBuilds = 5;
+            }
 
             if (!String.IsNullOrWhiteSpace(projectUrl))
             {
@@ -129,15 +130,7 @@ namespace BuildsAppReborn.Access
             throw new Exception($"Error while processing method!");
         }
 
-        #endregion
-
-        #region Protected Properties
-
         protected abstract String ApiVersion { get; }
-
-        #endregion
-
-        #region Private Static Methods
 
         private static async Task<Byte[]> GetImageData(BuildMonitorSettings settings, IUser user)
         {
@@ -186,17 +179,16 @@ namespace BuildsAppReborn.Access
             return await HttpRequestHelper.GetRequestResponse(requestUrl, credentials);
         }
 
-        #endregion
-
-        #region Private Methods
-
         private async Task<DataResponse<IEnumerable<TBuild>>> GetBuildsOfPullRequest(IPullRequest pullRequest, BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
             var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
 
             // use fallback value when no value was defined via settings
-            if (!maxBuilds.HasValue) maxBuilds = 5;
+            if (!maxBuilds.HasValue)
+            {
+                maxBuilds = 5;
+            }
 
             var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
             var requestResponse = await GetRequestResponse(requestUrl, settings);
@@ -327,8 +319,6 @@ namespace BuildsAppReborn.Access
                 build.SourceVersion = JsonConvert.DeserializeObject<TInnerSourceVersion>(result);
             }
         }
-
-        #endregion
     }
 
     internal abstract class TfsBuildProviderBase

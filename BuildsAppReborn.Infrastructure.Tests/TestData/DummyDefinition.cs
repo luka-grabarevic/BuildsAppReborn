@@ -5,7 +5,7 @@ namespace BuildsAppReborn.Infrastructure.Tests.TestData
 {
     public class DummyDefinition : IBuildDefinition
     {
-        #region Implementation of IBuildDefinition
+        public String BuildSettingsId { get; }
 
         public Int32 Id { get; set; }
 
@@ -16,9 +16,5 @@ namespace BuildsAppReborn.Infrastructure.Tests.TestData
         public String Type { get; set; }
 
         public String Url { get; }
-
-        public String BuildSettingsId { get; }
-
-        #endregion
     }
 }

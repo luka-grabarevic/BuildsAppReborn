@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface IBuildDefinition : IObjectItem
     {
-        #region Public Properties
-
         String BuildSettingsId { get; }
 
         Int32 Id { get; }
@@ -16,7 +14,5 @@ namespace BuildsAppReborn.Contracts.Models
         IProject Project { get; }
 
         String Type { get; }
-
-        #endregion
     }
 }

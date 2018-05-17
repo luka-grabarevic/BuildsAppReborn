@@ -2,12 +2,10 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reflection;
-
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
-
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
@@ -16,47 +14,15 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GeneralSettingsViewModel : ViewModelBase, ICloseable, ISaveable
     {
-        #region Constructors
-
         [ImportingConstructor]
         internal GeneralSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, UpdateChecker updateChecker, IBuildMonitorAdvanced buildMonitor)
         {
             this.globalSettingsContainer = globalSettingsContainer;
-            this.GeneralSettings = this.globalSettingsContainer.GeneralSettings.Clone();
+            GeneralSettings = this.globalSettingsContainer.GeneralSettings.Clone();
             this.updateChecker = updateChecker;
             this.buildMonitor = buildMonitor;
             SaveCommand = new DelegateCommand(OnSave);
         }
-
-        #endregion
-
-        #region Implementation of ICloseable
-
-        public void OnClose()
-        {
-            this.GeneralSettings = null;
-        }
-
-        #endregion
-
-        #region Implementation of ISaveable
-
-        public DelegateCommand SaveCommand { get; }
-
-        public void OnSave()
-        {
-            this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
-            this.globalSettingsContainer.Save();
-
-            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
-            this.buildMonitor.BeginPollingBuilds();
-
-            this.updateChecker.Start();
-        }
-
-        #endregion
-
-        #region Public Properties
 
         public String CurrentAppVersion
         {
@@ -69,21 +35,35 @@ namespace BuildsAppReborn.Client.ViewModels
                     var version = fileVersionInfo.ProductVersion;
                     return version;
                 }
+
                 return assembly.GetName().Version.ToString();
             }
         }
 
         public GeneralSettings GeneralSettings { get; private set; }
 
-        #endregion
+        public DelegateCommand SaveCommand { get; }
 
-        #region Private Fields
+        public void OnClose()
+        {
+            GeneralSettings = null;
+        }
+
+        public void OnSave()
+        {
+            this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
+            this.globalSettingsContainer.Save();
+
+            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
+            this.buildMonitor.BeginPollingBuilds();
+
+            this.updateChecker.Start();
+        }
+
+        private readonly IBuildMonitorAdvanced buildMonitor;
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
 
         private readonly UpdateChecker updateChecker;
-        private readonly IBuildMonitorAdvanced buildMonitor;
-
-        #endregion
     }
 }

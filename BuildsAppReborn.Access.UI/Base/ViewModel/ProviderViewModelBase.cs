@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Windows.Input;
-
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
@@ -14,26 +12,28 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 {
     internal abstract class ProviderViewModelBase : ViewModelBase, IBuildProviderViewModel, IPartImportsSatisfiedNotification
     {
-        #region Implementation of IBuildProviderViewModel
+        public abstract String DisplayName { get; protected set; }
 
         public BuildMonitorSettings MonitorSettings { get; private set; }
 
-        public virtual void Initialize(BuildMonitorSettings settings)
-        {
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
-            MonitorSettings = settings;
-            OnInitialized();
-        }
-
-        public abstract String DisplayName { get; protected set; }
-
         public abstract IEnumerable<IBuildDefinition> SelectedBuildDefinitions { get; }
+
+        public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
+
+        public Boolean SupportsPersonalAccessToken => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.AccessToken);
 
         public abstract String Url { get; }
 
-        #endregion
+        public virtual void Initialize(BuildMonitorSettings settings)
+        {
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
 
-        #region Implementation of IPartImportsSatisfiedNotification
+            MonitorSettings = settings;
+            OnInitialized();
+        }
 
         public virtual void OnImportsSatisfied()
         {
@@ -57,40 +57,18 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
-
-        public Boolean SupportsPersonalAccessToken => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.AccessToken);
-
-        #endregion
-
-        #region Protected Properties
-
         protected IBuildProvider BuildProvider { get; private set; }
 
         protected IBuildProviderMetadata BuildProviderMetaData { get; private set; }
 
-        #endregion
-
-        #region Protected Methods
-
         protected virtual void OnInitialized()
         {
         }
-
-        #endregion
-
-        #region Private Fields
 
         [ImportMany]
 #pragma warning disable 649
         private Lazy<IBuildProvider, IBuildProviderMetadata>[] buildProviders;
 
 #pragma warning restore 649
-
-        #endregion
     }
 }

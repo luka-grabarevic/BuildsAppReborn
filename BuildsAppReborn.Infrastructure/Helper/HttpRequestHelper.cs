@@ -9,8 +9,6 @@ namespace BuildsAppReborn.Infrastructure
 {
     public static class HttpRequestHelper
     {
-        #region Public Static Methods
-
         public static async Task<HttpResponseMessage> GetRequestResponse(String url, ICredentials credentials)
         {
             using (var handler = new HttpClientHandler())
@@ -43,10 +41,6 @@ namespace BuildsAppReborn.Infrastructure
             }
         }
 
-        #endregion
-
-        #region Private Static Methods
-
         private static void AddAccessTokenToHeader(String personalAccessToken, HttpClient client)
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -58,7 +52,5 @@ namespace BuildsAppReborn.Infrastructure
             // fix for issue with GitHub - https://stackoverflow.com/questions/2482715#comment64584330_22134980
             client.DefaultRequestHeaders.Add("User-Agent", "Anything");
         }
-
-        #endregion
     }
 }

@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Infrastructure
     // https://stackoverflow.com/a/22755077
     public class TolerantEnumConverter : JsonConverter
     {
-        #region Overrides of Base
-
         public override Boolean CanConvert(Type objectType)
         {
             var type = IsNullableType(objectType) ? Nullable.GetUnderlyingType(objectType) : objectType;
@@ -66,15 +64,9 @@ namespace BuildsAppReborn.Infrastructure
             writer.WriteValue(value.ToString());
         }
 
-        #endregion
-
-        #region Private Methods
-
         private Boolean IsNullableType(Type t)
         {
-            return (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
+            return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
-
-        #endregion
     }
 }

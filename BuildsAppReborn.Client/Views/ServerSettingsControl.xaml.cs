@@ -9,31 +9,19 @@ namespace BuildsAppReborn.Client.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class ServerSettingsControl : ISubSettingsControl
     {
-        #region Constructors
-
         public ServerSettingsControl()
         {
             InitializeComponent();
         }
 
-        #endregion
-
-        #region Implementation of ISubSettingsControl
-
-        public String Title => "Server Settings";
-
         public UInt32 Order => 1;
 
-        #endregion
-
-        #region Private Properties
+        public String Title => "Server Settings";
 
         [Import]
         private ServerSettingsViewModel ViewModel
         {
             set { SetValue(DataContextProperty, value); }
         }
-
-        #endregion
     }
 }

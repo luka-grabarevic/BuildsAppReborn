@@ -9,7 +9,8 @@ namespace BuildsAppReborn.Access.Models
     // ReSharper disable once ClassNeverInstantiated.Global
     internal abstract class TfsBuildDefinition : IBuildDefinition
     {
-        #region Implementation of IBuildDefinition
+        [JsonIgnore]
+        public String BuildSettingsId { get; internal set; }
 
         [JsonProperty("id")]
         public Int32 Id { get; private set; }
@@ -17,18 +18,13 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("name")]
         public String Name { get; private set; }
 
-        [JsonProperty("type")]
-        public String Type { get; private set; }
-
         [JsonProperty("project")]
         public abstract IProject Project { get; protected set; }
 
+        [JsonProperty("type")]
+        public String Type { get; private set; }
+
         [JsonProperty("url")]
         public String Url { get; private set; }
-
-        [JsonIgnore]
-        public String BuildSettingsId { get; internal set; }
-
-        #endregion
     }
 }

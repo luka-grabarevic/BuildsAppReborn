@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Client.Controls
 {
     internal class StackedBarGraphHeightConverter : IMultiValueConverter
     {
-        #region Implementation of IMultiValueConverter
-
         public Object Convert(Object[] values, Type targetType, Object parameter, CultureInfo culture)
         {
             var maxHeight = (Double) values[0];
@@ -29,10 +27,6 @@ namespace BuildsAppReborn.Client.Controls
             throw new NotSupportedException();
         }
 
-        #endregion
-
-        #region Private Static Methods
-
         private static Double GetFactor(Int32 count, Int32 totalCount)
         {
             var factor = (Double) count / totalCount;
@@ -45,10 +39,6 @@ namespace BuildsAppReborn.Client.Controls
 
             return maxHeight * factor;
         }
-
-        #endregion
-
-        #region Private Methods
 
         private Double GetExcessiveHeight(StackedItemCollection items, Double maxHeight)
         {
@@ -88,8 +78,6 @@ namespace BuildsAppReborn.Client.Controls
 
             return (maxHeight - excessiveHeight) * factor;
         }
-
-        #endregion
 
         private const Int32 MinHeight = 5;
     }

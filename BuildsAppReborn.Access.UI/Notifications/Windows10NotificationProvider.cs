@@ -12,7 +12,20 @@ namespace BuildsAppReborn.Access.UI.Notifications
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal class Windows10NotificationProvider : INotificationProvider
     {
-        #region Implementation of INotificationProvider
+        public Boolean IsSupported
+        {
+            get
+            {
+                // somehow windows version is not correctly provided when in debug, but release works
+#if !DEBUG
+                var os = Environment.OSVersion;
+                return os.Version.Major >= 10;
+#endif
+#if DEBUG
+                return true;
+#endif
+            }
+        }
 
         public void ShowBuild(IBuild build, Func<IBuild, String> iconProvider, Action<IBuild> notificationClickAction)
         {
@@ -31,11 +44,17 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             var imageElements = toastXml.GetElementsByTagName("image");
             var src = imageElements[0].Attributes.GetNamedItem("src");
-            if (src != null) src.NodeValue = imagePath;
+            if (src != null)
+            {
+                src.NodeValue = imagePath;
+            }
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
-            if (notificationClickAction != null) toast.Activated += (sender, args) => { notificationClickAction.Invoke(build); };
+            if (notificationClickAction != null)
+            {
+                toast.Activated += (sender, args) => { notificationClickAction.Invoke(build); };
+            }
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
@@ -60,28 +79,14 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
             // Create the toast and attach event listeners
             var toast = new ToastNotification(toastXml);
-            if (clickAction != null) toast.Activated += (sender, args) => { clickAction.Invoke(); };
+            if (clickAction != null)
+            {
+                toast.Activated += (sender, args) => { clickAction.Invoke(); };
+            }
 
             // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
             ToastNotificationManager.CreateToastNotifier(AppId).Show(toast);
         }
-
-        public Boolean IsSupported
-        {
-            get
-            {
-                // somehow windows version is not correctly provided when in debug, but release works
-#if !DEBUG
-                var os = Environment.OSVersion;
-                return os.Version.Major >= 10;
-#endif
-#if DEBUG
-                return true;
-#endif
-            }
-        }
-
-        #endregion
 
         // Code partially from: https://www.whitebyte.info/programming/c/how-to-make-a-notification-from-a-c-desktop-application-in-windows-10
 

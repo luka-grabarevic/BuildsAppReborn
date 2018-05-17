@@ -9,17 +9,11 @@ namespace BuildsAppReborn.Contracts.Extensions
     [Export(typeof(IEqualityComparer<IBuild>))]
     public class BuildEqualityComparer : IEqualityComparer<IBuild>
     {
-        #region Constructors
-
         [ImportingConstructor]
         public BuildEqualityComparer(IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
         {
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
         }
-
-        #endregion
-
-        #region Implementation of IEqualityComparer<IBuild>
 
         public Boolean Equals(IBuild x, IBuild y)
         {
@@ -32,15 +26,10 @@ namespace BuildsAppReborn.Contracts.Extensions
             {
                 return RuntimeHelpers.GetHashCode(null);
             }
+
             return obj.Id.GetHashCode() + this.buildDefinitionEqualityComparer.GetHashCode(obj.Definition);
         }
 
-        #endregion
-
-        #region Private Fields
-
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
-
-        #endregion
     }
 }

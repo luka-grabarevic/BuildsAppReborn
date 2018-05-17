@@ -9,8 +9,6 @@ namespace BuildsAppReborn.Access.Models
     // ReSharper disable once ClassNeverInstantiated.Global
     internal abstract class TfsProject : IProject
     {
-        #region Implementation of IProject
-
         [JsonProperty("description")]
         public String Description { get; private set; }
 
@@ -22,7 +20,5 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("url")]
         public String Url { get; private set; }
-
-        #endregion
     }
 }

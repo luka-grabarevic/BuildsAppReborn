@@ -8,13 +8,6 @@ namespace BuildsAppReborn.Contracts.UI
 {
     public class BuildStatusGroup : ViewModelBase
     {
-        #region Constructors
-
-        private BuildStatusGroup(IEnumerable<BuildItem> buildItems)
-        {
-            AllBuildItems = buildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
-        }
-
         public BuildStatusGroup(IPullRequest pullRequest, IEnumerable<BuildItem> buildItems) : this(buildItems)
         {
             PullRequest = pullRequest;
@@ -25,9 +18,10 @@ namespace BuildsAppReborn.Contracts.UI
             BuildDefinition = buildDefinition;
         }
 
-        #endregion
-
-        #region Public Properties
+        private BuildStatusGroup(IEnumerable<BuildItem> buildItems)
+        {
+            AllBuildItems = buildItems?.OrderBy(a => a.Build?.QueueDateTime).ToList();
+        }
 
         public Boolean AdditionalInformationAvailable => AllBuildItems.Any(a => a.CurrentTestRun != null);
 
@@ -51,12 +45,6 @@ namespace BuildsAppReborn.Contracts.UI
 
         public IPullRequest PullRequest { get; }
 
-        #endregion
-
-        #region Private Fields
-
         private Boolean additionalInformationShown;
-
-        #endregion
     }
 }

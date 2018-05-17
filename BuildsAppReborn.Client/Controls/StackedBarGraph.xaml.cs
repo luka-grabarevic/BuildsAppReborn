@@ -7,16 +7,10 @@ namespace BuildsAppReborn.Client.Controls
 {
     public partial class StackedBarGraph : UserControl
     {
-        #region Constructors
-
         public StackedBarGraph()
         {
             InitializeComponent();
         }
-
-        #endregion
-
-        #region Public Properties
 
         public Double BarWidth
         {
@@ -48,22 +42,34 @@ namespace BuildsAppReborn.Client.Controls
             set { SetValue(TitleProperty, value); }
         }
 
-        #endregion
-
         public static readonly DependencyProperty BarWidthProperty = DependencyProperty.Register(
-            "BarWidth", typeof(Double), typeof(StackedBarGraph), new PropertyMetadata(20d));
-
+            "BarWidth",
+            typeof(Double),
+            typeof(StackedBarGraph),
+            new PropertyMetadata(20d));
 
         public static readonly DependencyProperty ClickCommandParameterProperty = DependencyProperty.Register(
-            "ClickCommandParameter", typeof(Object), typeof(StackedBarGraph), new PropertyMetadata(default(Object)));
+            "ClickCommandParameter",
+            typeof(Object),
+            typeof(StackedBarGraph),
+            new PropertyMetadata(default(Object)));
 
         public static readonly DependencyProperty ClickCommandProperty = DependencyProperty.Register(
-            "ClickCommand", typeof(ICommand), typeof(StackedBarGraph), new PropertyMetadata(default(ICommand)));
-
-        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
-            "Title", typeof(String), typeof(StackedBarGraph), new PropertyMetadata(default(String)));
+            "ClickCommand",
+            typeof(ICommand),
+            typeof(StackedBarGraph),
+            new PropertyMetadata(default(ICommand)));
 
         public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register(
-            "Items", typeof(StackedItemCollection), typeof(StackedBarGraph), new PropertyMetadata(default(StackedItemCollection)));
+            "Items",
+            typeof(StackedItemCollection),
+            typeof(StackedBarGraph),
+            new PropertyMetadata(default(StackedItemCollection)));
+
+        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
+            "Title",
+            typeof(String),
+            typeof(StackedBarGraph),
+            new PropertyMetadata(default(String)));
     }
 }

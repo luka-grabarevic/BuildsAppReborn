@@ -7,14 +7,13 @@ namespace BuildsAppReborn.Infrastructure.Wpf
     [ValueConversion(typeof(Boolean), typeof(Boolean))]
     public class InverseBooleanConverter : IValueConverter
     {
-        #region IValueConverter Members
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             if (value is Boolean)
             {
-                return !(Boolean)value;
+                return !(Boolean) value;
             }
+
             return Binding.DoNothing;
         }
 
@@ -22,7 +21,5 @@ namespace BuildsAppReborn.Infrastructure.Wpf
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

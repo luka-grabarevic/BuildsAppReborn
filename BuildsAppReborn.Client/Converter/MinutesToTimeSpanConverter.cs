@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Client.Converter
 {
     internal class MinutesToTimeSpanConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             if (value is TimeSpan)
@@ -30,7 +28,5 @@ namespace BuildsAppReborn.Client.Converter
 
             return Binding.DoNothing;
         }
-
-        #endregion
     }
 }

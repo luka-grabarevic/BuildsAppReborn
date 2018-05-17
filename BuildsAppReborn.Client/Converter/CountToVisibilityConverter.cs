@@ -8,13 +8,13 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class CountToVisibilityConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             var collection = value as ICollection;
             if (collection != null && collection.Count > 0)
+            {
                 return Visibility.Visible;
+            }
 
             return Visibility.Collapsed;
         }
@@ -23,7 +23,5 @@ namespace BuildsAppReborn.Client.Converter
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

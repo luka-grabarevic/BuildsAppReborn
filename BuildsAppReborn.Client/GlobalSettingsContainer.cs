@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -12,16 +11,10 @@ namespace BuildsAppReborn.Client
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal class GlobalSettingsContainer
     {
-        #region Constructors
-
         public GlobalSettingsContainer()
         {
             Load();
         }
-
-        #endregion
-
-        #region Public Properties
 
         public SettingsContainer<BuildMonitorSettings> BuildMonitorSettingsContainer { get; set; }
 
@@ -33,10 +26,7 @@ namespace BuildsAppReborn.Client
         /// </value>
         public GeneralSettings GeneralSettings
         {
-            get
-            {
-                return this.generalSettingsContainer.Single();
-            }
+            get { return this.generalSettingsContainer.Single(); }
             set
             {
                 this.generalSettingsContainer.Clear();
@@ -44,19 +34,11 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Public Methods
-
         public void Save()
         {
             BuildMonitorSettingsContainer.Save(this.buildMonitorSettingsFilePath);
             this.generalSettingsContainer.Save(this.generalSettingsFilePath);
         }
-
-        #endregion
-
-        #region Private Methods
 
         private void Load()
         {
@@ -80,16 +62,10 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
         private String buildMonitorSettingsFilePath;
 
         private SettingsContainer<GeneralSettings> generalSettingsContainer;
 
         private String generalSettingsFilePath;
-
-        #endregion
     }
 }

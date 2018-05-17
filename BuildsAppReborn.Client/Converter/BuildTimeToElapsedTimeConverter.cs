@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class BuildTimeToElapsedTimeConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             var isTime = value is DateTime;
@@ -27,10 +25,6 @@ namespace BuildsAppReborn.Client.Converter
             throw new NotSupportedException();
         }
 
-        #endregion
-
-        #region Private Methods
-
         private String GetReadableTimespan(TimeSpan elapsedTimeSpan)
         {
             var seconds = elapsedTimeSpan.Seconds;
@@ -43,26 +37,29 @@ namespace BuildsAppReborn.Client.Converter
                 {
                     return $"- {GetReadableTimespan(elapsedTimeSpan.Duration())}";
                 }
+
                 if (hours == 0 && minutes == 0 && seconds > 0)
                 {
                     return seconds > 30 ? $"1m" : "<1m";
                 }
+
                 if (hours == 0 && minutes > 0)
                 {
                     return seconds > 30 ? $"{minutes + 1}m" : $"{minutes}m";
                 }
+
                 if (hours > 0)
                 {
                     return minutes > 30 ? $"{hours + 1}h" : $"{hours}h";
                 }
             }
+
             if (days >= 1)
             {
                 return hours > 12 ? $"{days + 1}d" : $"{days}d";
             }
+
             return "?";
         }
-
-        #endregion
     }
 }

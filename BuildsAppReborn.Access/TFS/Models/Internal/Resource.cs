@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Access.Models.Internal
 {
     internal class Resource
     {
-        #region Public Properties
-
         [JsonProperty("data")]
         public String Data { get; private set; }
 
@@ -18,7 +16,5 @@ namespace BuildsAppReborn.Access.Models.Internal
 
         [JsonProperty("url")]
         public String Url { get; private set; }
-
-        #endregion
     }
 }

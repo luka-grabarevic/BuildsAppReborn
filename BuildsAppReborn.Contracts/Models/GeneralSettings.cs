@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public class GeneralSettings
     {
-        #region Constructors
-
         public GeneralSettings()
         {
             // currently default values
@@ -24,10 +22,6 @@ namespace BuildsAppReborn.Contracts.Models
             }
         }
 
-        #endregion
-
-        #region Public Properties
-
         public Boolean AutoInstall { get; set; }
 
         public Boolean CheckForUpdates { get; set; }
@@ -43,7 +37,5 @@ namespace BuildsAppReborn.Contracts.Models
         public BuildViewStyle ViewStyle { get; set; }
 
         public List<WindowSetting> WindowSettings { get; set; }
-
-        #endregion
     }
 }

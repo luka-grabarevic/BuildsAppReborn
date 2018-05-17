@@ -6,13 +6,8 @@ namespace BuildsAppReborn.Access.Models
 {
     internal abstract class TfsTestRun : ITestRun
     {
-        #region Implementation of ITestRun
-
-        [JsonProperty("url")]
-        public String Url { get; private set; }
-
-        [JsonProperty("webAccessUrl")]
-        public String WebUrl { get; private set; }
+        [JsonProperty("unanalyzedTests")]
+        public Int32 FailedTests { get; private set; }
 
         [JsonProperty("id")]
         public Int32 Id { get; private set; }
@@ -35,9 +30,10 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("totalTests")]
         public Int32 TotalTests { get; private set; }
 
-        [JsonProperty("unanalyzedTests")]
-        public Int32 FailedTests { get; private set; }
+        [JsonProperty("url")]
+        public String Url { get; private set; }
 
-        #endregion
+        [JsonProperty("webAccessUrl")]
+        public String WebUrl { get; private set; }
     }
 }

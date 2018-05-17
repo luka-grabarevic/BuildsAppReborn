@@ -17,38 +17,37 @@ namespace BuildsAppReborn.Access.UI.Notifications
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal class DefaultNotificationProvider : INotificationProvider
     {
-        #region Constructors
-
         public DefaultNotificationProvider()
         {
             this.notifier = new Notifier(cfg =>
-                                         {
-                                             cfg.PositionProvider = new PrimaryScreenPositionProvider(Corner.BottomRight, 10, 50);
-                                             cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(TimeSpan.FromSeconds(10), MaximumNotificationCount.FromCount(3));
-                                             cfg.Dispatcher = Application.Current.Dispatcher;
-                                         });
+            {
+                cfg.PositionProvider = new PrimaryScreenPositionProvider(Corner.BottomRight, 10, 50);
+                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(TimeSpan.FromSeconds(10), MaximumNotificationCount.FromCount(3));
+                cfg.Dispatcher = Application.Current.Dispatcher;
+            });
         }
 
-        #endregion
-
-        #region Implementation of INotificationProvider
+        public Boolean IsSupported => true;
 
         public void ShowBuild(IBuild build, Func<IBuild, String> iconProvider, Action<IBuild> notificationClickAction)
         {
-            if (build == null) return;
+            if (build == null)
+            {
+                return;
+            }
 
             var sb = new StringBuilder();
             sb.AppendLine(build.GenerateTitle());
             sb.AppendLine(build.GenerateStatus());
             sb.AppendLine(build.GenerateUsername());
             var displayOptions = new MessageOptions
-                                 {
-                                     NotificationClickAction = n =>
-                                                               {
-                                                                   notificationClickAction?.Invoke(build);
-                                                                   n.Close();
-                                                               }
-                                 };
+            {
+                NotificationClickAction = n =>
+                {
+                    notificationClickAction?.Invoke(build);
+                    n.Close();
+                }
+            };
 
             switch (build.Status)
             {
@@ -91,25 +90,17 @@ namespace BuildsAppReborn.Access.UI.Notifications
             else
             {
                 var displayOptions = new MessageOptions
-                                     {
-                                         NotificationClickAction = n =>
-                                                                   {
-                                                                       clickAction.Invoke();
-                                                                       n.Close();
-                                                                   }
-                                     };
+                {
+                    NotificationClickAction = n =>
+                    {
+                        clickAction.Invoke();
+                        n.Close();
+                    }
+                };
                 this.notifier.ShowInformation(sb.ToString(), displayOptions);
             }
         }
 
-        public Boolean IsSupported => true;
-
-        #endregion
-
-        #region Private Fields
-
-        private Notifier notifier;
-
-        #endregion
+        private readonly Notifier notifier;
     }
 }

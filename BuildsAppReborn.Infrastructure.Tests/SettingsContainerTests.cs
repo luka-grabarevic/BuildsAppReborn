@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure.Tests.TestData;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BuildsAppReborn.Infrastructure.Tests
@@ -13,8 +12,6 @@ namespace BuildsAppReborn.Infrastructure.Tests
     [TestClass]
     public class SettingsContainerTests
     {
-        #region Public Methods
-
         [TestMethod]
         public void TestIfSavingAndLoadingWorks()
         {
@@ -22,7 +19,7 @@ namespace BuildsAppReborn.Infrastructure.Tests
 
             var settings = new BuildMonitorSettings(Guid.NewGuid().ToString());
             settings.Add("Test1", "02fdb4e0-fa5d-472a-918a-fc02c48b11a8");
-            settings.Add("Test2", new List<String> { "Item1", "Item2" });
+            settings.Add("Test2", new List<String> {"Item1", "Item2"});
             //settings.Add("Test3", new List<IBuildDefinition> { GetTestBuildDefinition(1), GetTestBuildDefinition(2) });
 
             var container = new SettingsContainer<BuildMonitorSettings>();
@@ -60,15 +57,15 @@ namespace BuildsAppReborn.Infrastructure.Tests
             }
         }
 
-        #endregion
-
-        #region Private Methods
-
         private IBuildDefinition GetTestBuildDefinition(Int32 id)
         {
-            return new DummyDefinition { Id = id, Name = Path.GetRandomFileName(), Type = "TestType", Project = new DummyProject { Name = Path.GetRandomFileName(), Description = Path.GetRandomFileName(), Id = Guid.NewGuid().ToString() } };
+            return new DummyDefinition
+            {
+                Id = id,
+                Name = Path.GetRandomFileName(),
+                Type = "TestType",
+                Project = new DummyProject {Name = Path.GetRandomFileName(), Description = Path.GetRandomFileName(), Id = Guid.NewGuid().ToString()}
+            };
         }
-
-        #endregion
     }
 }

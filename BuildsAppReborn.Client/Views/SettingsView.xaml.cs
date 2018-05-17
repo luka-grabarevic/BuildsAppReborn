@@ -13,16 +13,10 @@ namespace BuildsAppReborn.Client.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class SettingsView : ISettingsView
     {
-        #region Constructors
-
         public SettingsView()
         {
             InitializeComponent();
         }
-
-        #endregion
-
-        #region Overrides of Base
 
         protected override void OnClosed(EventArgs e)
         {
@@ -32,19 +26,11 @@ namespace BuildsAppReborn.Client.Views
             base.OnClosed(e);
         }
 
-        #endregion
-
-        #region Private Properties
-
         [Import]
         private SettingsViewModel ViewModel
         {
             set { SetValue(DataContextProperty, value); }
         }
-
-        #endregion
-
-        #region Private Methods
 
         private void UIElement_OnPreviewMouseLeftButtonUp(Object sender, MouseButtonEventArgs e)
         {
@@ -52,13 +38,15 @@ namespace BuildsAppReborn.Client.Views
             var dependencyObject = Mouse.Captured as DependencyObject;
             while (dependencyObject != null)
             {
-                if (dependencyObject is ScrollBar) return;
+                if (dependencyObject is ScrollBar)
+                {
+                    return;
+                }
+
                 dependencyObject = VisualTreeHelper.GetParent(dependencyObject);
             }
 
             this.MenuToggleButton.IsChecked = false;
         }
-
-        #endregion
     }
 }

@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class NullVisibilityConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             return value == null ? Visibility.Collapsed : Visibility.Visible;
@@ -18,7 +16,5 @@ namespace BuildsAppReborn.Client.Converter
         {
             throw new NotImplementedException();
         }
-
-        #endregion
     }
 }

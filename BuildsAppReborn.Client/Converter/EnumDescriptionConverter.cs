@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Reflection;
 using System.Windows.Data;
 
 namespace BuildsAppReborn.Client.Converter
@@ -9,8 +8,6 @@ namespace BuildsAppReborn.Client.Converter
     // https://stackoverflow.com/a/3987099
     public class EnumDescriptionConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         Object IValueConverter.Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             var myEnum = (Enum) value;
@@ -22,10 +19,6 @@ namespace BuildsAppReborn.Client.Converter
         {
             return String.Empty;
         }
-
-        #endregion
-
-        #region Private Methods
 
         private String GetEnumDescription(Enum enumObj)
         {
@@ -41,7 +34,5 @@ namespace BuildsAppReborn.Client.Converter
             var attrib = attribArray[0] as DescriptionAttribute;
             return attrib?.Description;
         }
-
-        #endregion
     }
 }

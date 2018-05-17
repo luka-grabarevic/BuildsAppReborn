@@ -9,16 +9,10 @@ namespace BuildsAppReborn.Client.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class BuildsStatusView : IBuildsStatusView
     {
-        #region Constructors
-
         public BuildsStatusView()
         {
             InitializeComponent();
         }
-
-        #endregion
-
-        #region Overrides of Base
 
         protected override void OnClosed(EventArgs e)
         {
@@ -28,16 +22,10 @@ namespace BuildsAppReborn.Client.Views
             base.OnClosed(e);
         }
 
-        #endregion
-
-        #region Private Properties
-
         [Import]
         private BuildsStatusViewModel ViewModel
         {
             set { SetValue(DataContextProperty, value); }
         }
-
-        #endregion
     }
 }

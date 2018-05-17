@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -8,11 +7,9 @@ namespace BuildsAppReborn.Infrastructure
     public class InterfaceTypeConverter<TClass, TInterface> : JsonConverter
         where TClass : class, TInterface
     {
-        #region Overrides of Base
-
         public override Boolean CanConvert(Type objectType)
         {
-            return (objectType == typeof(TInterface));
+            return objectType == typeof(TInterface);
         }
 
         public override Object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
@@ -25,7 +22,5 @@ namespace BuildsAppReborn.Infrastructure
         {
             serializer.Serialize(writer, value);
         }
-
-        #endregion
     }
 }

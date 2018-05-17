@@ -10,12 +10,12 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class BuildItemToRelativeMarginConverter : IMultiValueConverter
     {
-        #region Implementation of IMultiValueConverter
-
         public Object Convert(Object[] values, Type targetType, Object parameter, CultureInfo culture)
         {
             if (values == null || values.Length < 4)
+            {
                 return default(Thickness);
+            }
 
             var currentBuildItem = values[0] as BuildItem;
             var buildItems = values[1] as List<BuildItem>;
@@ -31,18 +31,17 @@ namespace BuildsAppReborn.Client.Converter
                 {
                     barHeight = 1;
                 }
+
                 var topMargin = height - barHeight;
                 return new Thickness(0, Math.Round(topMargin), 0, 0);
             }
+
             return default(Thickness);
         }
-
 
         public Object[] ConvertBack(Object value, Type[] targetTypes, Object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

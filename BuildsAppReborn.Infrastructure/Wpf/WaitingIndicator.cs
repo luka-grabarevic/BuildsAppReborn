@@ -7,17 +7,11 @@ namespace BuildsAppReborn.Infrastructure.Wpf
 {
     public class WaitingIndicator : IDisposable
     {
-        #region Constructors
-
         public WaitingIndicator()
         {
             Interlocked.Increment(ref count);
             Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = Cursors.Wait);
         }
-
-        #endregion
-
-        #region Implementation of IDisposable
 
         public void Dispose()
         {
@@ -28,8 +22,6 @@ namespace BuildsAppReborn.Infrastructure.Wpf
                 Application.Current.Dispatcher.Invoke(() => Mouse.OverrideCursor = null);
             }
         }
-
-        #endregion
 
         private static Int32 count;
     }

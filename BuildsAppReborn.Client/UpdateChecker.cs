@@ -20,8 +20,6 @@ namespace BuildsAppReborn.Client
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal class UpdateChecker
     {
-        #region Constructors
-
         [ImportingConstructor]
         public UpdateChecker(GlobalSettingsContainer globalSettingsContainer, LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders)
         {
@@ -32,15 +30,14 @@ namespace BuildsAppReborn.Client
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
         }
 
-        #endregion
-
-        #region Public Methods
-
         public void Start()
         {
             Stop();
 
-            if (!GeneralSettings.CheckForUpdates) return;
+            if (!GeneralSettings.CheckForUpdates)
+            {
+                return;
+            }
 
             this.timer.Interval = GeneralSettings.UpdateCheckInterval.TotalMilliseconds;
             this.timer.Start();
@@ -56,15 +53,7 @@ namespace BuildsAppReborn.Client
             await UpdateCheckInternal(manualCheck);
         }
 
-        #endregion
-
-        #region Private Properties
-
         private GeneralSettings GeneralSettings => this.globalSettingsContainer.GeneralSettings;
-
-        #endregion
-
-        #region Private Methods
 
         private async void TimerOnElapsed(Object sender, ElapsedEventArgs elapsedEventArgs)
         {
@@ -77,7 +66,10 @@ namespace BuildsAppReborn.Client
             return;
 #endif
 
-            if (!GeneralSettings.CheckForUpdates) return;
+            if (!GeneralSettings.CheckForUpdates)
+            {
+                return;
+            }
 
             this.logger.Info("Checking for update...");
             try
@@ -97,6 +89,7 @@ namespace BuildsAppReborn.Client
                                 {
                                     // ToDo: show if new update available
                                 }
+
                                 // ToDo: implement update when user accepts
                             }
                             else
@@ -110,11 +103,14 @@ namespace BuildsAppReborn.Client
                                     if (GeneralSettings.NotifyOnNewUpdate)
                                     {
                                         this.notificationProvider?.ShowMessage($"{this.version.ProductName} - Update check finished!",
-                                            "New Updates installed. Click here to restart.",
-                                            () => UpdateManager.RestartApp(Path.Combine(path, Path.GetFileName(entryAssembly.Location))));
+                                                                               "New Updates installed. Click here to restart.",
+                                                                               () => UpdateManager.RestartApp(Path.Combine(path, Path.GetFileName(entryAssembly.Location))));
                                     }
                                 }
-                                else this.logger.Debug("Update install failed.");
+                                else
+                                {
+                                    this.logger.Debug("Update install failed.");
+                                }
                             }
                         }
                         else
@@ -138,18 +134,12 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Private Fields
+        private static readonly Assembly entryAssembly = Assembly.GetEntryAssembly();
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
-        private ILog logger = LogManager.GetLogger(typeof(UpdateChecker));
-        private INotificationProvider notificationProvider;
-        private Timer timer = new Timer();
-        private FileVersionInfo version = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
-
-        #endregion
-
-        private static Assembly entryAssembly = Assembly.GetEntryAssembly();
+        private readonly ILog logger = LogManager.GetLogger(typeof(UpdateChecker));
+        private readonly INotificationProvider notificationProvider;
+        private readonly Timer timer = new Timer();
+        private readonly FileVersionInfo version = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
     }
 }

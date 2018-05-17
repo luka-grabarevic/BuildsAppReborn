@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using BuildsAppReborn.Contracts.Extensions;
-
 using Newtonsoft.Json;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -12,8 +10,6 @@ namespace BuildsAppReborn.Contracts.Models
     [JsonDictionary]
     public class BuildMonitorSettings : Dictionary<String, Object>
     {
-        #region Constructors
-
         // ReSharper disable once MemberCanBePrivate.Global
         public BuildMonitorSettings()
         {
@@ -27,37 +23,21 @@ namespace BuildsAppReborn.Contracts.Models
             UniqueId = Guid.NewGuid().ToString();
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
         /// Don't know how to get JSON to deserialize properties AND dictionary at the same time
         /// </summary>
         [JsonIgnore]
         public String BuildProviderId
         {
-            get
-            {
-                return GetDefaultValueIfNotExists<String>(nameof(BuildProviderId));
-            }
-            private set
-            {
-                this[nameof(BuildProviderId)] = value;
-            }
+            get { return GetDefaultValueIfNotExists<String>(nameof(BuildProviderId)); }
+            private set { this[nameof(BuildProviderId)] = value; }
         }
 
         [JsonIgnore]
         public ICollection<IBuildDefinition> SelectedBuildDefinitions
         {
-            get
-            {
-                return GetValue<ICollection<IBuildDefinition>>(nameof(SelectedBuildDefinitions));
-            }
-            private set
-            {
-                this[nameof(SelectedBuildDefinitions)] = value;
-            }
+            get { return GetValue<ICollection<IBuildDefinition>>(nameof(SelectedBuildDefinitions)); }
+            private set { this[nameof(SelectedBuildDefinitions)] = value; }
         }
 
         /// <summary>
@@ -66,19 +46,9 @@ namespace BuildsAppReborn.Contracts.Models
         [JsonIgnore]
         public String UniqueId
         {
-            get
-            {
-                return GetDefaultValueIfNotExists<String>(nameof(UniqueId));
-            }
-            private set
-            {
-                this[nameof(UniqueId)] = value;
-            }
+            get { return GetDefaultValueIfNotExists<String>(nameof(UniqueId)); }
+            private set { this[nameof(UniqueId)] = value; }
         }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Gets the default value if not exists.
@@ -90,8 +60,9 @@ namespace BuildsAppReborn.Contracts.Models
         {
             if (ContainsKey(key))
             {
-                return (TValue)this[key];
+                return (TValue) this[key];
             }
+
             return default(TValue);
         }
 
@@ -105,7 +76,7 @@ namespace BuildsAppReborn.Contracts.Models
         public TValue GetValue<TValue>(String key)
         {
             this.ThrowIfKeyNotExists(key);
-            return (TValue)this[key];
+            return (TValue) this[key];
         }
 
         /// <summary>
@@ -119,9 +90,7 @@ namespace BuildsAppReborn.Contracts.Models
         public TValue GetValueStrict<TValue>(String key)
         {
             this.ThrowIfKeyNotExistsAndValueEmpty(key);
-            return (TValue)this[key];
+            return (TValue) this[key];
         }
-
-        #endregion
     }
 }

@@ -19,8 +19,6 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class BuildsStatusViewModel : ViewModelBase, ICloseable
     {
-        #region Constructors
-
         [ImportingConstructor]
         public BuildsStatusViewModel(BuildCache buildCache)
         {
@@ -33,9 +31,13 @@ namespace BuildsAppReborn.Client.ViewModels
             TestRunClickCommand = new DelegateCommand<ITestRun>(a => Task.Run(() => StartProcess(a?.WebUrl)));
         }
 
-        #endregion
+        public BuildCache BuildCache { get; }
 
-        #region Implementation of ICloseable
+        public DelegateCommand<BuildItem> HistoryClickCommand { get; set; }
+
+        public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
+
+        public DelegateCommand<ITestRun> TestRunClickCommand { get; set; }
 
         public void OnClose()
         {
@@ -45,27 +47,14 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer?.Dispose();
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public BuildCache BuildCache { get; }
-
-        public DelegateCommand<BuildItem> HistoryClickCommand { get; set; }
-
-        public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
-
-        public DelegateCommand<ITestRun> TestRunClickCommand { get; set; }
-
-        #endregion
-
-        #region Private Methods
-
         private void OnBuildCacheUpdated(Object sender, EventArgs eventArgs)
         {
             this.timer?.Stop();
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
+            {
                 buildStatus.CurrentBuild.Refresh();
+            }
+
             this.timer?.Start();
         }
 
@@ -119,14 +108,8 @@ namespace BuildsAppReborn.Client.ViewModels
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
         private readonly ILog logger = LogManager.GetLogger(typeof(BuildsStatusViewModel));
 
         private readonly Timer timer;
-
-        #endregion
     }
 }
