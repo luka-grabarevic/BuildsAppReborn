@@ -6,9 +6,9 @@ using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI.Notifications;
 using ToastNotifications;
+using ToastNotifications.Core;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
-using ToastNotifications.Messages.Core;
 using ToastNotifications.Position;
 
 namespace BuildsAppReborn.Access.UI.Notifications
