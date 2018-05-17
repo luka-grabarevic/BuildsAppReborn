@@ -48,19 +48,19 @@ namespace BuildsAppReborn.Client
             this.timer.Stop();
         }
 
-        public async void UpdateCheck(Boolean manualCheck)
+        public void UpdateCheck(Boolean manualCheck)
         {
-            await UpdateCheckInternal(manualCheck);
+            Task.Run(() => UpdateCheckInternalAsync(manualCheck));
         }
 
         private GeneralSettings GeneralSettings => this.globalSettingsContainer.GeneralSettings;
 
-        private async void TimerOnElapsed(Object sender, ElapsedEventArgs elapsedEventArgs)
+        private void TimerOnElapsed(Object sender, ElapsedEventArgs elapsedEventArgs)
         {
-            await UpdateCheckInternal(false);
+            Task.Run(() => UpdateCheckInternalAsync(false));
         }
 
-        private async Task UpdateCheckInternal(Boolean manualCheck)
+        private async Task UpdateCheckInternalAsync(Boolean manualCheck)
         {
 #if DEBUG
             return;
@@ -77,9 +77,9 @@ namespace BuildsAppReborn.Client
                 var repo = Settings.Default.UpdateCheckUrl;
                 using (var updateMgrTask = UpdateManager.GitHubUpdateManager(repo, null, null, null, GeneralSettings.IncludePreReleases))
                 {
-                    using (var updateManager = await updateMgrTask)
+                    using (var updateManager = await updateMgrTask.ConfigureAwait(false))
                     {
-                        var updateInfo = await updateManager.CheckForUpdate();
+                        var updateInfo = await updateManager.CheckForUpdate().ConfigureAwait(false);
                         if (updateInfo.ReleasesToApply.Any())
                         {
                             this.logger.Info("New Update found!");
@@ -95,8 +95,8 @@ namespace BuildsAppReborn.Client
                             else
                             {
                                 this.logger.Debug("Auto installing update...");
-                                await updateManager.DownloadReleases(updateInfo.ReleasesToApply);
-                                var path = await updateManager.ApplyReleases(updateInfo);
+                                await updateManager.DownloadReleases(updateInfo.ReleasesToApply).ConfigureAwait(false);
+                                var path = await updateManager.ApplyReleases(updateInfo).ConfigureAwait(false);
                                 if (path != null)
                                 {
                                     this.logger.Debug("Update install finished.");

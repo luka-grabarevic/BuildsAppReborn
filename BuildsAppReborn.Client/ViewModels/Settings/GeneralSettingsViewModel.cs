@@ -55,7 +55,7 @@ namespace BuildsAppReborn.Client.ViewModels
             this.globalSettingsContainer.Save();
 
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
-            this.buildMonitor.BeginPollingBuilds();
+            this.buildMonitor.BeginPollingBuildsAsync();
 
             this.updateChecker.Start();
         }

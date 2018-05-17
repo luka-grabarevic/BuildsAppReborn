@@ -188,7 +188,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
                     BuildDefinitions.Clear();
                 });
 
-                var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitions(MonitorSettings));
+                var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitionsAsync(MonitorSettings)).ConfigureAwait(false);
 
                 if (buildDefinitions.IsSuccessStatusCode)
                 {

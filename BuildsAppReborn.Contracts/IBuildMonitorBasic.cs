@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Contracts
     {
         Boolean IsConfigured { get; }
 
-        Task BeginPollingBuilds();
+        Task BeginPollingBuildsAsync();
 
         event BuildsUpdatedEventHandler BuildsUpdated;
 

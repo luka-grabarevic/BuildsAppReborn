@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Infrastructure
 {
     public static class HttpRequestHelper
     {
-        public static async Task<HttpResponseMessage> GetRequestResponse(String url, ICredentials credentials)
+        public static async Task<HttpResponseMessage> GetRequestResponseAsync(String url, ICredentials credentials)
         {
             using (var handler = new HttpClientHandler())
             {
@@ -17,27 +17,27 @@ namespace BuildsAppReborn.Infrastructure
                 using (var client = new HttpClient(handler))
                 {
                     AddUserAgent(client);
-                    return await client.GetAsync(url);
+                    return await client.GetAsync(url).ConfigureAwait(false);
                 }
             }
         }
 
-        public static async Task<HttpResponseMessage> GetRequestResponse(String url, String personalAccessToken)
+        public static async Task<HttpResponseMessage> GetRequestResponseAsync(String url, String personalAccessToken)
         {
             using (var client = new HttpClient())
             {
                 AddUserAgent(client);
                 AddAccessTokenToHeader(personalAccessToken, client);
-                return await client.GetAsync(url);
+                return await client.GetAsync(url).ConfigureAwait(false);
             }
         }
 
-        public static async Task<HttpResponseMessage> GetRequestResponse(String url)
+        public static async Task<HttpResponseMessage> GetRequestResponseAsync(String url)
         {
             using (var client = new HttpClient())
             {
                 AddUserAgent(client);
-                return await client.GetAsync(url);
+                return await client.GetAsync(url).ConfigureAwait(false);
             }
         }
 

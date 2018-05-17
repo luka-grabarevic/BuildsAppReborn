@@ -27,13 +27,13 @@ namespace BuildsAppReborn.Access
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
 #pragma warning disable 4014
-            this.timer.Elapsed += (sender, args) => BeginPollingBuilds();
+            this.timer.Elapsed += (sender, args) => BeginPollingBuildsAsync();
 #pragma warning restore 4014
         }
 
         public Boolean IsConfigured => this.providerSettingsGroup.Any() && this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any();
 
-        public async Task BeginPollingBuilds()
+        public async Task BeginPollingBuildsAsync()
         {
             if (this.isPolling)
             {
@@ -46,7 +46,7 @@ namespace BuildsAppReborn.Access
             {
                 foreach (var setting in pair.Value)
                 {
-                    builds.AddRange(await PollBuilds(pair.Key, setting));
+                    builds.AddRange(await PollBuildsAsync(pair.Key, setting).ConfigureAwait(false));
                 }
             }
 
@@ -115,21 +115,20 @@ namespace BuildsAppReborn.Access
             MonitorStopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task<IEnumerable<IBuild>> PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
+        private async Task<IEnumerable<IBuild>> PollBuildsAsync(IBuildProvider provider, BuildMonitorSettings settings)
         {
             try
             {
-                var builds = new DataResponse<IEnumerable<IBuild>>();
                 if (this.generalSettings?.ViewStyle == BuildViewStyle.GroupByPullRequest)
                 {
-                    var prBuilds = await provider.GetBuildsByPullRequests(settings);
+                    var prBuilds = await provider.GetBuildsByPullRequestsAsync(settings).ConfigureAwait(false);
                     prBuilds.ThrowIfUnsuccessful();
 
                     var definitionsInUse = prBuilds.Data.GroupBy(a => a.Definition, build => build, this.buildDefinitionEqualityComparer).Select(a => a.Key);
                     var unusedDefinitions = settings.SelectedBuildDefinitions.Except(definitionsInUse, this.buildDefinitionEqualityComparer).ToList();
                     if (unusedDefinitions.Any())
                     {
-                        var defBuilds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                        var defBuilds = await provider.GetBuildsAsync(settings.SelectedBuildDefinitions, settings).ConfigureAwait(false);
                         defBuilds.ThrowIfUnsuccessful();
 
                         return prBuilds.Data.Concat(defBuilds.Data);
@@ -138,7 +137,7 @@ namespace BuildsAppReborn.Access
                     return prBuilds.Data;
                 }
 
-                builds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                var builds = await provider.GetBuildsAsync(settings.SelectedBuildDefinitions, settings).ConfigureAwait(false);
                 builds.ThrowIfUnsuccessful();
 
                 return builds.Data;

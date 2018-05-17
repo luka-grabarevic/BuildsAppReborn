@@ -33,7 +33,7 @@ namespace BuildsAppReborn.Client
             if (buildMonitor.IsConfigured)
             {
                 CacheStatus = BuildCacheStatus.Loading;
-                buildMonitor.BeginPollingBuilds();
+                buildMonitor.BeginPollingBuildsAsync();
             }
             else
             {
