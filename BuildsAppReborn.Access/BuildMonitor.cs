@@ -28,9 +28,7 @@ namespace BuildsAppReborn.Access
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.generalSettings = generalSettings;
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
-#pragma warning disable 4014
-            this.timer.Elapsed += (sender, args) => BeginPollingBuildsAsync();
-#pragma warning restore 4014
+            this.timer.Elapsed += (sender, args) => BeginPollingBuildsAsync().GetAwaiter().GetResult();
         }
 
         public Boolean IsConfigured => this.providerSettingsGroup.Any() && (this.generalSettings.ViewStyle == BuildViewStyle.GroupByPullRequest ||  this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any());
