@@ -20,12 +20,12 @@ namespace BuildsAppReborn.Client
         internal BuildCache(IBuildMonitorBasic buildMonitor,
                             IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer,
                             IEqualityComparer<IPullRequest> pullRequstEqualityComparer,
-                            GlobalSettingsContainer globalSettingsContainer)
+                            GeneralSettings generalSettings)
         {
             BuildsStatus = new RangeObservableCollection<BuildStatusGroup>();
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.pullRequstEqualityComparer = pullRequstEqualityComparer;
-            this.globalSettingsContainer = globalSettingsContainer;
+            this.generalSettings = generalSettings;
             buildMonitor.BuildsUpdated += OnBuildsUpdated;
             buildMonitor.MonitorStopped += (sender, args) => CacheStatus = BuildCacheStatus.NotConfigured;
             buildMonitor.MonitorStarted += (sender, args) => CacheStatus = BuildCacheStatus.Loading;
@@ -131,11 +131,11 @@ namespace BuildsAppReborn.Client
 
             var buildStatusGroups = new List<BuildStatusGroup>();
 
-            if (this.globalSettingsContainer.GeneralSettings.ViewStyle == BuildViewStyle.GroupByBuildDefinition)
+            if (this.generalSettings.ViewStyle == BuildViewStyle.GroupByBuildDefinition)
             {
                 buildStatusGroups.AddRange(GroupBuildsByDefinition(builds, BuildsStatus));
             }
-            else if (this.globalSettingsContainer.GeneralSettings.ViewStyle == BuildViewStyle.GroupByPullRequest)
+            else if (this.generalSettings.ViewStyle == BuildViewStyle.GroupByPullRequest)
             {
                 var prBuilds = builds.Where(a => a.PullRequest != null).ToList();
 
@@ -207,7 +207,7 @@ namespace BuildsAppReborn.Client
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
         private BuildCacheStatus cacheStatus;
         private String currentIcon;
-        private readonly GlobalSettingsContainer globalSettingsContainer;
+        private readonly GeneralSettings generalSettings;
         private readonly IEqualityComparer<IPullRequest> pullRequstEqualityComparer;
     }
 }

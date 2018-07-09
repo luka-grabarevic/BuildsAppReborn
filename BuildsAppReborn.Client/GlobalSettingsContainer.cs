@@ -24,6 +24,7 @@ namespace BuildsAppReborn.Client
         /// <value>
         /// The general settings.
         /// </value>
+        [Export]
         public GeneralSettings GeneralSettings
         {
             get { return this.generalSettingsContainer.Single(); }
