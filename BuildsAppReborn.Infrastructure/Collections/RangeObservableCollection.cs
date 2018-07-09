@@ -6,14 +6,13 @@ namespace BuildsAppReborn.Infrastructure.Collections
 {
     public class RangeObservableCollection<T> : ObservableCollection<T>
     {
-        #region Public Methods
-
         public void AddRange(IEnumerable<T> items)
         {
             foreach (var item in items)
             {
                 Items.Add(item);
             }
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
@@ -23,9 +22,8 @@ namespace BuildsAppReborn.Infrastructure.Collections
             {
                 Items.Remove(item);
             }
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
-
-        #endregion
     }
 }

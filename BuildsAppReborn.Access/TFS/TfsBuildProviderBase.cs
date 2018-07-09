@@ -26,19 +26,17 @@ namespace BuildsAppReborn.Access
         where TTestRun : TfsTestRun, new()
         where TPullRequest : TfsPullRequest, new()
     {
-        #region Implementation of IBuildProvider
-
-        public virtual async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitions(BuildMonitorSettings settings)
+        public virtual async Task<DataResponse<IEnumerable<IBuildDefinition>>> GetBuildDefinitionsAsync(BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
             if (!String.IsNullOrWhiteSpace(projectUrl))
             {
                 var requestUrl = $"{projectUrl}/_apis/build/definitions?api-version={ApiVersion}";
 
-                var requestResponse = await GetRequestResponse(requestUrl, settings);
+                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
                 if (requestResponse.IsSuccessStatusCode)
                 {
-                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                     var data = JsonConvert.DeserializeObject<List<TBuildDefinition>>(JObject.Parse(result)["value"].ToString());
                     foreach (var buildDefinition in data)
                     {
@@ -51,10 +49,10 @@ namespace BuildsAppReborn.Access
                 return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception($"Error while processing method!");
+            throw new Exception("Error while processing method!");
         }
 
-        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuilds(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings)
+        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsAsync(IEnumerable<IBuildDefinition> buildDefinitions, BuildMonitorSettings settings)
         {
             var buildDefinitionsList = buildDefinitions.ToList();
             if (!buildDefinitionsList.Any())
@@ -63,21 +61,20 @@ namespace BuildsAppReborn.Access
             }
 
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
-            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
+            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey) ?? 5;
 
             // use fallback value when no value was defined via settings
-            if (!maxBuilds.HasValue) maxBuilds = 5;
 
             if (!String.IsNullOrWhiteSpace(projectUrl))
             {
                 var buildDefinitionsCommaList = String.Join(",", buildDefinitionsList.Select(a => a.Id));
                 var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&definitions={buildDefinitionsCommaList}&maxBuildsPerDefinition={maxBuilds}";
-                var requestResponse = await GetRequestResponse(requestUrl, settings);
+                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
                 if (requestResponse.IsSuccessStatusCode)
                 {
-                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                     var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
-                    await ResolveAddtionalBuildData(settings, data, projectUrl);
+                    await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
 
                     return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
                 }
@@ -85,32 +82,32 @@ namespace BuildsAppReborn.Access
                 return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<TBuild>(), StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception($"Error while processing method!");
+            throw new Exception("Error while processing method!");
         }
 
-        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsByPullRequests(BuildMonitorSettings settings)
+        public virtual async Task<DataResponse<IEnumerable<IBuild>>> GetBuildsByPullRequestsAsync(BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
 
             var requestUrl = $"{projectUrl}/_apis/git/pullrequests?api-version={ApiVersion}";
-            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
             if (requestResponse.IsSuccessStatusCode)
             {
                 var dict = new Dictionary<IPullRequest, IEnumerable<TBuild>>();
 
-                var result = await requestResponse.Content.ReadAsStringAsync();
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var data = JsonConvert.DeserializeObject<List<TPullRequest>>(JObject.Parse(result)["value"].ToString());
 
                 foreach (var pullRequest in data)
                 {
-                    var buildsResponse = await GetBuildsOfPullRequest(pullRequest, settings);
+                    var buildsResponse = await GetBuildsOfPullRequestAsync(pullRequest, settings).ConfigureAwait(false);
                     if (buildsResponse.IsSuccessStatusCode)
                     {
                         dict.Add(pullRequest, buildsResponse.Data);
                     }
                     else
                     {
-                        throw new Exception($"Error while processing method!");
+                        throw new Exception("Error while processing method!");
                     }
                 }
 
@@ -126,36 +123,28 @@ namespace BuildsAppReborn.Access
                 return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a => a).ToList(), StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception($"Error while processing method!");
+            throw new Exception("Error while processing method!");
         }
-
-        #endregion
-
-        #region Protected Properties
 
         protected abstract String ApiVersion { get; }
 
-        #endregion
-
-        #region Private Static Methods
-
-        private static async Task<Byte[]> GetImageData(BuildMonitorSettings settings, IUser user)
+        private static async Task<Byte[]> GetImageDataAsync(BuildMonitorSettings settings, IUser user)
         {
             try
             {
-                var response = await GetRequestResponse(user.ImageUrl, settings);
+                var response = await GetRequestResponseAsync(user.ImageUrl, settings).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.Content.Headers.ContentType.MediaType == "image/png")
                     {
-                        return await response.Content.ReadAsByteArrayAsync();
+                        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                     }
 
                     if (response.Content.Headers.ContentType.MediaType == "image/svg+xml")
                     {
                         using (var memoryStream = new MemoryStream())
                         {
-                            await response.Content.CopyToAsync(memoryStream);
+                            await response.Content.CopyToAsync(memoryStream).ConfigureAwait(false);
                             memoryStream.Position = 0;
                             var svgDoc = SvgDocument.Open<SvgDocument>(memoryStream);
 
@@ -173,44 +162,39 @@ namespace BuildsAppReborn.Access
             return null;
         }
 
-        private static async Task<HttpResponseMessage> GetRequestResponse(String requestUrl, BuildMonitorSettings settings)
+        private static async Task<HttpResponseMessage> GetRequestResponseAsync(String requestUrl, BuildMonitorSettings settings)
         {
             var credentials = settings.GetValueStrict<ICredentials>(ProjectCredentialsSettingKey);
             var accessToken = settings.GetDefaultValueIfNotExists<String>(PersonalAccessTokenSettingsKey);
 
             if (!String.IsNullOrWhiteSpace(accessToken))
             {
-                return await HttpRequestHelper.GetRequestResponse(requestUrl, accessToken);
+                return await HttpRequestHelper.GetRequestResponseAsync(requestUrl, accessToken).ConfigureAwait(false);
             }
 
-            return await HttpRequestHelper.GetRequestResponse(requestUrl, credentials);
+            return await HttpRequestHelper.GetRequestResponseAsync(requestUrl, credentials).ConfigureAwait(false);
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private async Task<DataResponse<IEnumerable<TBuild>>> GetBuildsOfPullRequest(IPullRequest pullRequest, BuildMonitorSettings settings)
+        private async Task<DataResponse<IEnumerable<TBuild>>> GetBuildsOfPullRequestAsync(IPullRequest pullRequest, BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
-            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey);
+            var maxBuilds = settings.GetDefaultValueIfNotExists<Int32?>(MaxBuildsPerDefinitionSettingsKey) ?? 5;
 
             // use fallback value when no value was defined via settings
-            if (!maxBuilds.HasValue) maxBuilds = 5;
 
             var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
-            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
             if (requestResponse.IsSuccessStatusCode)
             {
-                var result = await requestResponse.Content.ReadAsStringAsync();
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
 
-                await ResolveAddtionalBuildData(settings, data, projectUrl);
+                await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
 
                 return new DataResponse<IEnumerable<TBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception($"Error while processing method!");
+            throw new Exception("Error while processing method!");
         }
 
         private Tuple<String, String> GetGitOwnerAndRepo(String gitHubRepoUrl)
@@ -233,32 +217,32 @@ namespace BuildsAppReborn.Access
             return null;
         }
 
-        private async Task ResolveAddtionalBuildData(BuildMonitorSettings settings, List<TBuild> data, String projectUrl)
+        private async Task ResolveAdditionalBuildDataAsync(BuildMonitorSettings settings, List<TBuild> data, String projectUrl)
         {
             data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
-            data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageData(settings, a));
+            data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageDataAsync(settings, a));
 
-            await ResolveSourceVersion(data, projectUrl, settings);
-            await ResolveArtifacts(data, projectUrl, settings);
-            await ResolveTestRuns(data, projectUrl, settings);
+            await ResolveSourceVersionAsync(data, projectUrl, settings).ConfigureAwait(false);
+            await ResolveArtifactsAsync(data, projectUrl, settings).ConfigureAwait(false);
+            await ResolveTestRunsAsync(data, projectUrl, settings).ConfigureAwait(false);
         }
 
-        private async Task ResolveArtifacts(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        private async Task ResolveArtifactsAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
         {
             foreach (var build in builds)
             {
                 var requestUrl = $"{projectUrl}/_apis/build/builds/{build.Id}/artifacts?api-version={ApiVersion}";
 
-                var requestResponse = await GetRequestResponse(requestUrl, settings);
+                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
                 if (requestResponse.IsSuccessStatusCode)
                 {
-                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                     build.Artifacts = JsonConvert.DeserializeObject<IEnumerable<TArtifact>>(JObject.Parse(result)["value"].ToString());
                 }
             }
         }
 
-        private async Task ResolveSourceVersion(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        private async Task ResolveSourceVersionAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
         {
             var grpByRepoType = builds.GroupBy(a => a.Repository.RepositoryType);
             foreach (var group in grpByRepoType)
@@ -268,7 +252,7 @@ namespace BuildsAppReborn.Access
                     foreach (var build in group)
                     {
                         var requestUrl = $"{projectUrl}/_apis/tfvc/changesets/{build.SourceVersionInternal}?api-version=1.0&includeDetails=true";
-                        await SetSourceVersion<TSourceVersion>(settings, requestUrl, build);
+                        await SetSourceVersionAsync<TSourceVersion>(settings, requestUrl, build).ConfigureAwait(false);
                     }
                 }
                 else if (group.Key == RepositoryType.TfsGit)
@@ -276,7 +260,7 @@ namespace BuildsAppReborn.Access
                     foreach (var build in group)
                     {
                         var requestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{build.SourceVersionInternal}?api-version=1.0";
-                        await SetSourceVersion<TSourceVersion>(settings, requestUrl, build);
+                        await SetSourceVersionAsync<TSourceVersion>(settings, requestUrl, build).ConfigureAwait(false);
                     }
                 }
                 else if (group.Key == RepositoryType.GitHub)
@@ -291,10 +275,10 @@ namespace BuildsAppReborn.Access
                         var ownerAndRepo = GetGitOwnerAndRepo(build.Repository.Id);
                         var requestUrl = $"{GitHubApiPrefix}/repos/{ownerAndRepo.Item1}/{ownerAndRepo.Item2}/commits/{build.SourceVersionInternal}";
 
-                        var requestResponse = await HttpRequestHelper.GetRequestResponse(requestUrl);
+                        var requestResponse = await HttpRequestHelper.GetRequestResponseAsync(requestUrl).ConfigureAwait(false);
                         if (requestResponse.IsSuccessStatusCode)
                         {
-                            var result = await requestResponse.Content.ReadAsStringAsync();
+                            var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                             build.SourceVersion = JsonConvert.DeserializeObject<GitHubSourceVersion>(result);
                         }
                     }
@@ -303,32 +287,30 @@ namespace BuildsAppReborn.Access
             }
         }
 
-        private async Task ResolveTestRuns(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        private static async Task ResolveTestRunsAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
         {
             foreach (var build in builds)
             {
                 var requestUrl = $"{projectUrl}/_apis/test/runs?api-version=1.0&buildUri={build.Uri}";
 
-                var requestResponse = await GetRequestResponse(requestUrl, settings);
+                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
                 if (requestResponse.IsSuccessStatusCode)
                 {
-                    var result = await requestResponse.Content.ReadAsStringAsync();
+                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                     build.TestRuns = JsonConvert.DeserializeObject<IEnumerable<TTestRun>>(JObject.Parse(result)["value"].ToString());
                 }
             }
         }
 
-        private async Task SetSourceVersion<TInnerSourceVersion>(BuildMonitorSettings settings, String requestUrl, TBuild build) where TInnerSourceVersion : ISourceVersion, new()
+        private static async Task SetSourceVersionAsync<TInnerSourceVersion>(BuildMonitorSettings settings, String requestUrl, TBuild build) where TInnerSourceVersion : ISourceVersion, new()
         {
-            var requestResponse = await GetRequestResponse(requestUrl, settings);
+            var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
             if (requestResponse.IsSuccessStatusCode)
             {
-                var result = await requestResponse.Content.ReadAsStringAsync();
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 build.SourceVersion = JsonConvert.DeserializeObject<TInnerSourceVersion>(result);
             }
         }
-
-        #endregion
     }
 
     internal abstract class TfsBuildProviderBase

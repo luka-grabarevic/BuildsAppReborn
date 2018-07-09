@@ -4,8 +4,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface IArtifact
     {
-        #region Public Properties
-
         String Data { get; }
 
         String DownloadUrl { get; }
@@ -15,7 +13,5 @@ namespace BuildsAppReborn.Contracts.Models
         String Name { get; }
 
         String Type { get; }
-
-        #endregion
     }
 }

@@ -14,16 +14,10 @@ namespace BuildsAppReborn.Access.Models
     // ReSharper disable once ClassNeverInstantiated.Global
     internal abstract class TfsBuild : LinksContainer, IBuild
     {
-        #region Constructors
-
         public TfsBuild()
         {
             Artifacts = Enumerable.Empty<IArtifact>();
         }
-
-        #endregion
-
-        #region Implementation of IBuild
 
         [JsonIgnore]
         public IEnumerable<IArtifact> Artifacts { get; internal set; }
@@ -34,11 +28,26 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("definition")]
         public abstract IBuildDefinition Definition { get; protected set; }
 
+        [JsonProperty("finishTime")]
+        public DateTime FinishDateTime { get; private set; }
+
         [JsonProperty("id")]
         public Int32 Id { get; private set; }
 
         [JsonIgnore]
         public IPullRequest PullRequest { get; internal set; }
+
+        [JsonProperty("queueTime")]
+        public DateTime QueueDateTime { get; private set; }
+
+        [JsonProperty("requestedFor")]
+        public abstract IUser Requester { get; protected set; }
+
+        [JsonIgnore]
+        public ISourceVersion SourceVersion { get; internal set; }
+
+        [JsonProperty("startTime")]
+        public DateTime StartDateTime { get; private set; }
 
         [JsonIgnore]
         public BuildStatus Status
@@ -88,30 +97,11 @@ namespace BuildsAppReborn.Access.Models
         [JsonIgnore]
         public IEnumerable<ITestRun> TestRuns { get; internal set; }
 
-        [JsonProperty("finishTime")]
-        public DateTime FinishDateTime { get; private set; }
-
-        [JsonProperty("queueTime")]
-        public DateTime QueueDateTime { get; private set; }
-
-        [JsonProperty("startTime")]
-        public DateTime StartDateTime { get; private set; }
-
-        [JsonProperty("requestedFor")]
-        public abstract IUser Requester { get; protected set; }
-
         [JsonProperty("url")]
         public String Url { get; private set; }
 
         [JsonIgnore]
-        public String WebUrl => base.WebLink;
-
-        [JsonIgnore]
-        public ISourceVersion SourceVersion { get; internal set; }
-
-        #endregion
-
-        #region Internal Properties
+        public String WebUrl => WebLink;
 
         [JsonProperty("repository")]
         internal Repository Repository { get; private set; }
@@ -133,18 +123,10 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("uri")]
         internal String Uri { get; private set; }
 
-        #endregion
-
-        #region Private Fields
-
-        [JsonProperty("result")]
-        private String result;
+        [JsonProperty("result")] private String result;
 
         private String sourceVersionInternal;
 
-        [JsonProperty("status")]
-        private String status;
-
-        #endregion
+        [JsonProperty("status")] private String status;
     }
 }

@@ -7,7 +7,8 @@ namespace BuildsAppReborn.Access.Models
 {
     internal abstract class TfsArtifact : IArtifact
     {
-        #region Implementation of IArtifact
+        [JsonIgnore]
+        public String Data => this.resource?.Data;
 
         [JsonIgnore]
         public String DownloadUrl => this.resource?.DownloadUrl;
@@ -20,16 +21,6 @@ namespace BuildsAppReborn.Access.Models
 
         public String Type => this.resource?.Type;
 
-        [JsonIgnore]
-        public String Data => this.resource?.Data;
-
-        #endregion
-
-        #region Private Fields
-
-        [JsonProperty("resource")]
-        private Resource resource;
-
-        #endregion
+        [JsonProperty("resource")] private Resource resource;
     }
 }

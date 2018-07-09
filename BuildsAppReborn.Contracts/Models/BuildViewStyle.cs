@@ -4,10 +4,8 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public enum BuildViewStyle
     {
-        [Description("Build Definition")]
-        GroupByBuildDefinition,
+        [Description("Build Definition")] GroupByBuildDefinition,
 
-        [Description("Pull Request")]
-        GroupByPullRequest
+        [Description("Pull Request")] GroupByPullRequest
     }
 }

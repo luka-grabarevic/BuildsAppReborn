@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Contracts.Composition
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class IdentifierExportAttribute : ExportAttribute, IIdentifierMetadata
     {
-        #region Constructors
-
         public IdentifierExportAttribute(Type contractType, String guid, String name = "")
             : base(contractType)
         {
@@ -16,14 +14,8 @@ namespace BuildsAppReborn.Contracts.Composition
             Name = name;
         }
 
-        #endregion
-
-        #region Implementation of IIdentifierMetadata
-
         public String Id { get; }
 
         public String Name { get; }
-
-        #endregion
     }
 }

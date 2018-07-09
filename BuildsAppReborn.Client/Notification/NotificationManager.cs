@@ -16,10 +16,11 @@ namespace BuildsAppReborn.Client.Notification
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class NotificationManager
     {
-        #region Constructors
-
         [ImportingConstructor]
-        public NotificationManager(LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders, BuildCache buildCache, IEqualityComparer<IBuild> buildEqualityComparer, ExportFactory<IBuildsStatusView> buildsExportFactory)
+        public NotificationManager(LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders,
+                                   BuildCache buildCache,
+                                   IEqualityComparer<IBuild> buildEqualityComparer,
+                                   ExportFactory<IBuildsStatusView> buildsExportFactory)
         {
             this.buildCache = buildCache;
             this.buildEqualityComparer = buildEqualityComparer;
@@ -28,10 +29,6 @@ namespace BuildsAppReborn.Client.Notification
 
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
         }
-
-        #endregion
-
-        #region Private Methods
 
         // Show only builds that changed since last time to prevent SPAM
         private IEnumerable<IBuild> GetChangedBuilds(IList<IBuild> builds)
@@ -68,20 +65,16 @@ namespace BuildsAppReborn.Client.Notification
             var changedBuilds = GetChangedBuilds(builds);
             foreach (var build in changedBuilds)
             {
-                this.notificationProvider?.ShowBuild(build, b => IconProvider.GetCachedIconPathForBuildStatus(b.Status), b => { Application.Current.Dispatcher.Invoke(() => { NotifyIconViewModel.OpenWindow(this.buildsExportFactory); }); });
+                this.notificationProvider?.ShowBuild(build,
+                                                     b => IconProvider.GetCachedIconPathForBuildStatus(b.Status),
+                                                     b => { Application.Current.Dispatcher.Invoke(() => { NotifyIconViewModel.OpenWindow(this.buildsExportFactory); }); });
             }
         }
-
-        #endregion
-
-        #region Private Fields
 
         private readonly BuildCache buildCache;
         private readonly IEqualityComparer<IBuild> buildEqualityComparer;
         private readonly ExportFactory<IBuildsStatusView> buildsExportFactory;
-        private INotificationProvider notificationProvider;
+        private readonly INotificationProvider notificationProvider;
         private IList<IBuild> oldBuilds;
-
-        #endregion
     }
 }

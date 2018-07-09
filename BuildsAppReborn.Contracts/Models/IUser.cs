@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface IUser : IObjectItem
     {
-        #region Public Properties
-
         String DisplayName { get; }
 
         String Id { get; }
@@ -16,7 +14,5 @@ namespace BuildsAppReborn.Contracts.Models
         String ImageUrl { get; }
 
         String UniqueName { get; }
-
-        #endregion
     }
 }

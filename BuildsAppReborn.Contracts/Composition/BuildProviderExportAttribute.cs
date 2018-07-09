@@ -8,8 +8,6 @@ namespace BuildsAppReborn.Contracts.Composition
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class BuildProviderExportAttribute : ExportAttribute, IBuildProviderMetadata
     {
-        #region Constructors
-
         public BuildProviderExportAttribute(Type contractType, String guid, String name, AuthenticationModes supportedAuthenticationModes)
             : base(contractType)
         {
@@ -18,16 +16,10 @@ namespace BuildsAppReborn.Contracts.Composition
             SupportedAuthenticationModes = supportedAuthenticationModes;
         }
 
-        #endregion
-
-        #region Implementation of IBuildProviderMetadata
+        public String Id { get; }
 
         public String Name { get; }
 
         public AuthenticationModes SupportedAuthenticationModes { get; }
-
-        public String Id { get; }
-
-        #endregion
     }
 }

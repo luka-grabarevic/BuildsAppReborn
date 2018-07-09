@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public class WindowSetting
     {
-        #region Public Properties
-
         public Double Height { get; set; }
 
         public String Id { get; set; }
@@ -17,7 +15,5 @@ namespace BuildsAppReborn.Contracts.Models
         public Double Width { get; set; }
 
         public WindowState WindowState { get; set; }
-
-        #endregion
     }
 }

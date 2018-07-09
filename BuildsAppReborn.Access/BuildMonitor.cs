@@ -18,22 +18,42 @@ namespace BuildsAppReborn.Access
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal sealed class BuildMonitor : IBuildMonitorAdvanced
     {
-        #region Constructors
-
         [ImportingConstructor]
-        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders, LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders, IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
+        public BuildMonitor(LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders,
+                            LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders,
+                            IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer)
         {
             this.buildProviders = buildProviders;
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
 #pragma warning disable 4014
-            this.timer.Elapsed += (sender, args) => BeginPollingBuilds();
+            this.timer.Elapsed += (sender, args) => BeginPollingBuildsAsync();
 #pragma warning restore 4014
         }
 
-        #endregion
+        public Boolean IsConfigured => this.providerSettingsGroup.Any() && this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any();
 
-        #region Implementation of IBuildMonitorAdvanced
+        public async Task BeginPollingBuildsAsync()
+        {
+            if (this.isPolling)
+            {
+                return;
+            }
+
+            var builds = new List<IBuild>();
+            this.isPolling = true;
+            foreach (var pair in this.providerSettingsGroup)
+            {
+                foreach (var setting in pair.Value)
+                {
+                    builds.AddRange(await PollBuildsAsync(pair.Key, setting).ConfigureAwait(false));
+                }
+            }
+
+            OnBuildsUpdated(builds);
+
+            this.isPolling = false;
+        }
 
         public void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettingsParam)
         {
@@ -63,34 +83,9 @@ namespace BuildsAppReborn.Access
 
         public event BuildsUpdatedEventHandler BuildsUpdated;
 
-        public async Task BeginPollingBuilds()
-        {
-            if (this.isPolling) return;
-
-            var builds = new List<IBuild>();
-            this.isPolling = true;
-            foreach (var pair in this.providerSettingsGroup)
-            {
-                foreach (var setting in pair.Value)
-                {
-                    builds.AddRange(await PollBuilds(pair.Key, setting));
-                }
-            }
-
-            OnBuildsUpdated(builds);
-
-            this.isPolling = false;
-        }
-
-        public Boolean IsConfigured => this.providerSettingsGroup.Any() && this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any();
-
-        public event EventHandler MonitorStopped;
-
         public event EventHandler MonitorStarted;
 
-        #endregion
-
-        #region Private Methods
+        public event EventHandler MonitorStopped;
 
         private void Initialize(IEnumerable<BuildMonitorSettings> settings)
         {
@@ -120,21 +115,20 @@ namespace BuildsAppReborn.Access
             MonitorStopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task<IEnumerable<IBuild>> PollBuilds(IBuildProvider provider, BuildMonitorSettings settings)
+        private async Task<IEnumerable<IBuild>> PollBuildsAsync(IBuildProvider provider, BuildMonitorSettings settings)
         {
             try
             {
-                var builds = new DataResponse<IEnumerable<IBuild>>();
                 if (this.generalSettings?.ViewStyle == BuildViewStyle.GroupByPullRequest)
                 {
-                    var prBuilds = await provider.GetBuildsByPullRequests(settings);
+                    var prBuilds = await provider.GetBuildsByPullRequestsAsync(settings).ConfigureAwait(false);
                     prBuilds.ThrowIfUnsuccessful();
 
                     var definitionsInUse = prBuilds.Data.GroupBy(a => a.Definition, build => build, this.buildDefinitionEqualityComparer).Select(a => a.Key);
                     var unusedDefinitions = settings.SelectedBuildDefinitions.Except(definitionsInUse, this.buildDefinitionEqualityComparer).ToList();
                     if (unusedDefinitions.Any())
                     {
-                        var defBuilds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                        var defBuilds = await provider.GetBuildsAsync(settings.SelectedBuildDefinitions, settings).ConfigureAwait(false);
                         defBuilds.ThrowIfUnsuccessful();
 
                         return prBuilds.Data.Concat(defBuilds.Data);
@@ -143,7 +137,7 @@ namespace BuildsAppReborn.Access
                     return prBuilds.Data;
                 }
 
-                builds = await provider.GetBuilds(settings.SelectedBuildDefinitions, settings);
+                var builds = await provider.GetBuildsAsync(settings.SelectedBuildDefinitions, settings).ConfigureAwait(false);
                 builds.ThrowIfUnsuccessful();
 
                 return builds.Data;
@@ -151,20 +145,18 @@ namespace BuildsAppReborn.Access
             catch (DataResponseUnsuccessfulException ex)
             {
                 this.logger.Warn($"Http status code {ex.StatusCode} returned while polling for builds!");
-                this.notificationProvider?.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. StatusCode was '{ex.StatusCode}'. See log for more details.");
+                this.notificationProvider?.ShowMessage("Failure on getting builds",
+                                                       $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. StatusCode was '{ex.StatusCode}'. See log for more details.");
             }
             catch (Exception exception)
             {
                 this.logger.Warn("Failure on polling builds", exception);
-                this.notificationProvider?.ShowMessage("Failure on getting builds", $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. See log for details.");
+                this.notificationProvider?.ShowMessage("Failure on getting builds",
+                                                       $"Please check the connection for project(s) '{String.Join(", ", settings.SelectedBuildDefinitions.Select(b => b.Project.Name).Distinct())}'. See log for details.");
             }
 
             return Enumerable.Empty<IBuild>();
         }
-
-        #endregion
-
-        #region Private Fields
 
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
 
@@ -173,14 +165,12 @@ namespace BuildsAppReborn.Access
 
         private Boolean isPolling;
 
-        private ILog logger = LogManager.GetLogger(typeof(BuildMonitor));
+        private readonly ILog logger = LogManager.GetLogger(typeof(BuildMonitor));
 
-        private INotificationProvider notificationProvider;
+        private readonly INotificationProvider notificationProvider;
 
         private readonly Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>> providerSettingsGroup = new Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>>();
 
         private readonly Timer timer = new Timer();
-
-        #endregion
     }
 }

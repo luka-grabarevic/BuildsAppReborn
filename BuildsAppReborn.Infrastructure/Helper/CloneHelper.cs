@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Infrastructure
     /// </summary>
     public static class CloneHelper
     {
-        #region Public Static Methods
-
         /// <summary>
         /// Clones the specified source.
         /// </summary>
@@ -20,7 +18,5 @@ namespace BuildsAppReborn.Infrastructure
             var serialized = JsonConvert.SerializeObject(source, Consts.JsonSerializerSettings);
             return JsonConvert.DeserializeObject<T>(serialized, Consts.JsonSerializerSettings);
         }
-
-        #endregion
     }
 }

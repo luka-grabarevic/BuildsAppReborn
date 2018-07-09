@@ -19,11 +19,12 @@ namespace BuildsAppReborn.Client
     /// </summary>
     public partial class App
     {
-        #region Overrides of Base
-
         protected override void OnExit(ExitEventArgs e)
         {
-            if (e.ApplicationExitCode == 0) this.globalSettingsContainer.Save();
+            if (e.ApplicationExitCode == 0)
+            {
+                this.globalSettingsContainer.Save();
+            }
 
             this.updateChecker.Stop();
             this.buildMonitor.Stop();
@@ -36,7 +37,8 @@ namespace BuildsAppReborn.Client
             base.OnStartup(e);
 
             ToolTipService.ShowDurationProperty.OverrideMetadata(
-                typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
+                typeof(DependencyObject),
+                new FrameworkPropertyMetadata(Int32.MaxValue));
 
             RegisterToWindowsStartUp();
 
@@ -61,10 +63,6 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Private Static Methods
-
         private static CompositionContainer BuildCompositionContainer()
         {
             var catalog = new AggregateCatalog();
@@ -72,7 +70,9 @@ namespace BuildsAppReborn.Client
             var directoryName = Path.GetDirectoryName(typeof(App).Assembly.Location);
             if (directoryName != null)
             {
-                var assemblies = Directory.GetFiles(directoryName, "*.dll").Union(Directory.GetFiles(directoryName, "*.exe")).Where(a => !String.Equals(Path.GetFileName(a), "NuGet.Squirrel.dll", StringComparison.InvariantCultureIgnoreCase) && !String.Equals(Path.GetFileName(a), "Update.exe", StringComparison.InvariantCultureIgnoreCase));
+                var assemblies = Directory.GetFiles(directoryName, "*.dll").Union(Directory.GetFiles(directoryName, "*.exe")).Where(
+                    a => !String.Equals(Path.GetFileName(a), "NuGet.Squirrel.dll", StringComparison.InvariantCultureIgnoreCase) &&
+                         !String.Equals(Path.GetFileName(a), "Update.exe", StringComparison.InvariantCultureIgnoreCase));
 
                 foreach (var assembly in assemblies)
                 {
@@ -89,10 +89,6 @@ namespace BuildsAppReborn.Client
 
             return new CompositionContainer(catalog, true);
         }
-
-        #endregion
-
-        #region Private Methods
 
         private void EnsureOnlyOneInstance()
         {
@@ -117,10 +113,6 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
         private IBuildMonitorAdvanced buildMonitor;
 
         private GlobalSettingsContainer globalSettingsContainer;
@@ -128,7 +120,5 @@ namespace BuildsAppReborn.Client
         private TaskbarIcon notifyIcon;
 
         private UpdateChecker updateChecker;
-
-        #endregion
     }
 }

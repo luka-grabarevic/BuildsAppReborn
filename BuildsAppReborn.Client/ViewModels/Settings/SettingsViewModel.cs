@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Infrastructure;
 
@@ -11,17 +10,13 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SettingsViewModel : ViewModelBase, ICloseable
     {
-        #region Constructors
-
         [ImportingConstructor]
         internal SettingsViewModel([ImportMany] IEnumerable<ISubSettingsControl> subSettings)
         {
             SubSettings = subSettings.OrderBy(a => a.Order).ToList();
         }
 
-        #endregion
-
-        #region Implementation of ICloseable
+        public IEnumerable<ISubSettingsControl> SubSettings { get; }
 
         public void OnClose()
         {
@@ -30,13 +25,5 @@ namespace BuildsAppReborn.Client.ViewModels
                 closableVm?.OnClose();
             }
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public IEnumerable<ISubSettingsControl> SubSettings { get; }
-
-        #endregion
     }
 }

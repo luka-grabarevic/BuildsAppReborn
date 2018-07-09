@@ -8,17 +8,11 @@ namespace BuildsAppReborn.Contracts.UI
 {
     public class BuildItem : ViewModelBase
     {
-        #region Constructors
-
         public BuildItem(IBuild build, BuildViewStyle viewStyle)
         {
             this.viewStyle = viewStyle;
             Build = build;
         }
-
-        #endregion
-
-        #region Public Properties
 
         public IBuild Build { get; }
 
@@ -111,10 +105,6 @@ namespace BuildsAppReborn.Contracts.UI
 
         public String RequesterText => !RequesterIsCommitter ? $"Requested by: {Build.Requester.DisplayName}" : Build.Requester.DisplayName;
 
-        #endregion
-
-        #region Public Methods
-
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
         public void Refresh()
         {
@@ -126,18 +116,8 @@ namespace BuildsAppReborn.Contracts.UI
             OnPropertyChanged(nameof(CurrentTestRun));
         }
 
-        #endregion
-
-        #region Private Properties
-
         private Boolean RequesterIsCommitter => Build?.SourceVersion?.Author?.Name == Build?.Requester?.DisplayName;
 
-        #endregion
-
-        #region Private Fields
-
         private readonly BuildViewStyle viewStyle;
-
-        #endregion
     }
 }

@@ -16,10 +16,11 @@ namespace BuildsAppReborn.Client
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class BuildCache : ViewModelBase
     {
-        #region Constructors
-
         [ImportingConstructor]
-        internal BuildCache(IBuildMonitorBasic buildMonitor, IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer, IEqualityComparer<IPullRequest> pullRequstEqualityComparer, GeneralSettings generalSettings)
+        internal BuildCache(IBuildMonitorBasic buildMonitor,
+                            IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer,
+                            IEqualityComparer<IPullRequest> pullRequstEqualityComparer,
+                            GeneralSettings generalSettings)
         {
             BuildsStatus = new RangeObservableCollection<BuildStatusGroup>();
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
@@ -32,7 +33,7 @@ namespace BuildsAppReborn.Client
             if (buildMonitor.IsConfigured)
             {
                 CacheStatus = BuildCacheStatus.Loading;
-                buildMonitor.BeginPollingBuilds();
+                buildMonitor.BeginPollingBuildsAsync();
             }
             else
             {
@@ -42,11 +43,7 @@ namespace BuildsAppReborn.Client
             UpdateCurrentIcon();
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public RangeObservableCollection<BuildStatusGroup> BuildsStatus { get; private set; }
+        public RangeObservableCollection<BuildStatusGroup> BuildsStatus { get; }
 
         public BuildCacheStatus CacheStatus
         {
@@ -71,18 +68,12 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Protected Methods
+        public event EventHandler CacheUpdated;
 
         protected virtual void OnCacheUpdated()
         {
             CacheUpdated?.Invoke(this, EventArgs.Empty);
         }
-
-        #endregion
-
-        #region Private Methods
 
         private List<BuildStatusGroup> GroupBuildsByDefinition(IEnumerable<IBuild> builds, ICollection<BuildStatusGroup> currentBuildsStatus)
         {
@@ -133,7 +124,10 @@ namespace BuildsAppReborn.Client
 
         private void OnBuildsUpdated(ICollection<IBuild> builds)
         {
-            if (!builds.Any()) return;
+            if (!builds.Any())
+            {
+                return;
+            }
 
             var buildStatusGroups = new List<BuildStatusGroup>();
 
@@ -155,11 +149,11 @@ namespace BuildsAppReborn.Client
             //buildStatusGroups = buildStatusGroups.OrderByDescending(a => a.CurrentBuild.BuildStartTime).ToList();
 
             Application.Current.Dispatcher.Invoke(() =>
-                                                  {
-                                                      BuildsStatus.Clear();
-                                                      BuildsStatus.AddRange(buildStatusGroups);
-                                                      CacheStatus = BuildCacheStatus.Operational;
-                                                  });
+            {
+                BuildsStatus.Clear();
+                BuildsStatus.AddRange(buildStatusGroups);
+                CacheStatus = BuildCacheStatus.Operational;
+            });
             UpdateCurrentIcon();
             OnCacheUpdated();
         }
@@ -176,7 +170,10 @@ namespace BuildsAppReborn.Client
             }
             else if (CacheStatus == BuildCacheStatus.Operational)
             {
-                if (!BuildsStatus.Any()) return;
+                if (!BuildsStatus.Any())
+                {
+                    return;
+                }
 
                 var relevantBuilds = new List<IBuild>();
                 foreach (var buildStatus in BuildsStatus)
@@ -207,18 +204,10 @@ namespace BuildsAppReborn.Client
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
         private BuildCacheStatus cacheStatus;
         private String currentIcon;
-        private readonly IEqualityComparer<IPullRequest> pullRequstEqualityComparer;
         private readonly GeneralSettings generalSettings;
-
-        #endregion
-
-        public event EventHandler CacheUpdated;
+        private readonly IEqualityComparer<IPullRequest> pullRequstEqualityComparer;
     }
 }

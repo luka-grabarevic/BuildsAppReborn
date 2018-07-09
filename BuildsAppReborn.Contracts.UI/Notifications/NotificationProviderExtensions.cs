@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Infrastructure;
 
@@ -7,8 +6,6 @@ namespace BuildsAppReborn.Contracts.UI.Notifications
 {
     public static class NotificationProviderExtensions
     {
-        #region Public Static Methods
-
         public static INotificationProvider GetSupportedNotificationProvider(this LazyContainer<INotificationProvider, IPriorityMetadata> notificationProviders)
         {
             var orderedKeys = notificationProviders.Keys.OrderByDescending(a => a.Priority);
@@ -23,7 +20,5 @@ namespace BuildsAppReborn.Contracts.UI.Notifications
 
             return null;
         }
-
-        #endregion
     }
 }

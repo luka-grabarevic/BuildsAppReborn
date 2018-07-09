@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class FallBackNullToLoadingConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             return String.IsNullOrWhiteSpace(value?.ToString()) ? IconProvider.LoadingIcon : value;
@@ -18,7 +16,5 @@ namespace BuildsAppReborn.Client.Converter
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

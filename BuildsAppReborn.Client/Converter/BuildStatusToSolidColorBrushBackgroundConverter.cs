@@ -10,8 +10,6 @@ namespace BuildsAppReborn.Client.Converter
     // might want to move this to some sort of configuration ...
     public class BuildStatusToSolidColorBrushBackgroundConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             var color = default(Color);
@@ -40,6 +38,7 @@ namespace BuildsAppReborn.Client.Converter
                     color = Colors.Gray;
                     break;
             }
+
             return new SolidColorBrush(color);
         }
 
@@ -47,7 +46,5 @@ namespace BuildsAppReborn.Client.Converter
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

@@ -93,6 +93,6 @@
       <Output TaskParameter="Assemblies" ItemName="myAssemblyInfo" />
     </GetAssemblyIdentity>
     <Exec Command="nuget pack BuildsAppReborn.nuspec -Version $([System.Version]::Parse(%(myAssemblyInfo.Version)).ToString(3)) -Properties Configuration=Release -OutputDirectory $(OutDir)" />
-    <Exec Command="..\packages\squirrel.windows.1.6.0\tools\squirrel.exe --releasify $(OutDir)BuildsAppReborn.$([System.Version]::Parse(%(myAssemblyInfo.Version)).ToString(3)).nupkg -r $(OutDir)\Setup -g loading.gif -i installer.ico --no-msi --framework-version net461" />
+    <Exec Command="..\packages\squirrel.windows.1.8.0\tools\squirrel.exe --releasify $(OutDir)BuildsAppReborn.$([System.Version]::Parse(%(myAssemblyInfo.Version)).ToString(3)).nupkg -r $(OutDir)\Setup -g loading.gif -i installer.ico --no-msi --framework-version net461" />
   </Target>
 </Project>

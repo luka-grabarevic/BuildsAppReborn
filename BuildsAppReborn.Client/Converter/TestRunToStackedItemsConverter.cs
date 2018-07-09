@@ -11,8 +11,6 @@ namespace BuildsAppReborn.Client.Converter
 {
     public class TestRunToStackedItemsConverter : IValueConverter
     {
-        #region Implementation of IValueConverter
-
         public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             var testRun = value as ITestRun;
@@ -35,7 +33,5 @@ namespace BuildsAppReborn.Client.Converter
         {
             throw new NotSupportedException();
         }
-
-        #endregion
     }
 }

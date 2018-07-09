@@ -7,8 +7,6 @@ namespace BuildsAppReborn.Contracts.UI
 {
     public class DeselectionPreventionBehavior : Behavior<Selector>
     {
-        #region Overrides of Base
-
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -23,10 +21,6 @@ namespace BuildsAppReborn.Contracts.UI
             AssociatedObject.SelectionChanged -= SelectionChanged;
         }
 
-        #endregion
-
-        #region Private Methods
-
         private void SelectionChanged(Object sender, SelectionChangedEventArgs e)
         {
             // when last item is deselected, apply the deselected item again
@@ -35,7 +29,5 @@ namespace BuildsAppReborn.Contracts.UI
                 AssociatedObject.SelectedItem = e.RemovedItems[0];
             }
         }
-
-        #endregion
     }
 }

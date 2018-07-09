@@ -11,11 +11,7 @@ namespace BuildsAppReborn.Access
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal class VstsBuildProvider : TfsBuildProviderBase<VstsBuild, VstsBuildDefinition, VstsUser, VstsSourceVersion, VstsArtifact, VstsTestRun, VstsPullRequest>
     {
-        #region Overrides of Base
-
         protected override String ApiVersion => "2.0";
-
-        #endregion
 
         internal const String Id = "d1d878e8-7658-4eb0-b0bf-e6ab688e0b39";
 

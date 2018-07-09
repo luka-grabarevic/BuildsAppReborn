@@ -9,8 +9,6 @@ namespace BuildsAppReborn.Contracts.Extensions
     [Export(typeof(IEqualityComparer<IBuildDefinition>))]
     public class BuildDefinitionEqualityComparer : IEqualityComparer<IBuildDefinition>
     {
-        #region Implementation of IEqualityComparer<IBuildDefinition>
-
         public Boolean Equals(IBuildDefinition x, IBuildDefinition y)
         {
             return x.Id == y.Id && x.Project.Id == y.Project.Id;
@@ -22,9 +20,8 @@ namespace BuildsAppReborn.Contracts.Extensions
             {
                 return RuntimeHelpers.GetHashCode(null);
             }
+
             return obj.Id.GetHashCode() + obj.Project.Id.GetHashCode();
         }
-
-        #endregion
     }
 }

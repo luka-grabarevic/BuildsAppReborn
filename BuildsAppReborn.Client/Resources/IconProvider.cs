@@ -5,15 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
-
 using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Client.Resources
 {
     internal static class IconProvider
     {
-        #region Constructors
-
         static IconProvider()
         {
             try
@@ -23,6 +20,7 @@ namespace BuildsAppReborn.Client.Resources
                 {
                     Directory.Delete(IconCacheFolder, true);
                 }
+
                 Directory.CreateDirectory(IconCacheFolder);
 
                 foreach (var iconResource in iconResources)
@@ -35,7 +33,7 @@ namespace BuildsAppReborn.Client.Resources
                             var filenamePath = Path.Combine(IconCacheFolder, fileName);
                             using (var resourceStream = iconResource.Item2)
                             {
-                                using (var fileStream = File.Create(filenamePath, (Int32)resourceStream.Length))
+                                using (var fileStream = File.Create(filenamePath, (Int32) resourceStream.Length))
                                 {
                                     var bytesInStream = new Byte[resourceStream.Length];
                                     resourceStream.Read(bytesInStream, 0, bytesInStream.Length);
@@ -56,25 +54,17 @@ namespace BuildsAppReborn.Client.Resources
             }
         }
 
-        #endregion
-
-        #region Public Static Properties
+        public static String FailIcon => $"{IconsPath}{IcoPrefix}/failure.ico";
 
         public static String LoadingIcon => $"{IconsPath}{IcoPrefix}/loading.ico";
 
         public static String SettingsIcon => $"{IconsPath}{IcoPrefix}/settings.ico";
 
-        public static String FailIcon => $"{IconsPath}{IcoPrefix}/failure.ico";
-
         public static String SuccessIcon => $"{IconsPath}{IcoPrefix}/succeeded.ico";
-
-        public static String WarningIcon => $"{IconsPath}{IcoPrefix}/partially_exclamation.ico";
 
         public static String UnknownIcon => $"{IconsPath}{IcoPrefix}/partially_question.ico";
 
-        #endregion
-
-        #region Public Static Methods
+        public static String WarningIcon => $"{IconsPath}{IcoPrefix}/partially_exclamation.ico";
 
         public static String GetCachedIconPathForBuildStatus(BuildStatus status)
         {
@@ -85,10 +75,6 @@ namespace BuildsAppReborn.Client.Resources
         {
             return $"{IconsPath}{IcoPrefix}/{GetIconFilename(status)}";
         }
-
-        #endregion
-
-        #region Private Static Methods
 
         private static String GetIconFilename(BuildStatus status)
         {
@@ -119,15 +105,13 @@ namespace BuildsAppReborn.Client.Resources
                 {
                     using (var reader = new ResourceReader(stream))
                     {
-                        return reader.Cast<DictionaryEntry>().Select(entry => new Tuple<String, Stream>((String)entry.Key, (Stream)entry.Value)).ToArray();
+                        return reader.Cast<DictionaryEntry>().Select(entry => new Tuple<String, Stream>((String) entry.Key, (Stream) entry.Value)).ToArray();
                     }
                 }
             }
 
             return Enumerable.Empty<Tuple<String, Stream>>().ToArray();
         }
-
-        #endregion
 
         private static readonly String IconCacheFolder = Path.Combine(Consts.ApplicationUserProfileFolder, "IconCache");
 

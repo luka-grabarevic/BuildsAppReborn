@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
 using BuildsAppReborn.Client.Interfaces;
 using BuildsAppReborn.Contracts;
 using BuildsAppReborn.Contracts.Composition;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
-
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
@@ -19,10 +17,10 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ServerSettingsViewModel : ViewModelBase, ISaveable, ICloseable
     {
-        #region Constructors
-
         [ImportingConstructor]
-        internal ServerSettingsViewModel(GlobalSettingsContainer globalSettingsContainer, ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> buildProviderViews, IBuildMonitorAdvanced buildMonitor)
+        internal ServerSettingsViewModel(GlobalSettingsContainer globalSettingsContainer,
+                                         ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> buildProviderViews,
+                                         IBuildMonitorAdvanced buildMonitor)
         {
             this.globalSettingsContainer = globalSettingsContainer;
             this.buildMonitor = buildMonitor;
@@ -37,33 +35,6 @@ namespace BuildsAppReborn.Client.ViewModels
             RemoveProviderCommand = new DelegateCommand<IBuildProviderView>(OnRemoveView);
         }
 
-        #endregion
-
-        #region Implementation of ICloseable
-
-        public void OnClose()
-        {
-            this.buildMonitorSettingsContainer = null;
-        }
-
-        #endregion
-
-        #region Implementation of ISaveable
-
-        public DelegateCommand SaveCommand { get; }
-
-        public void OnSave()
-        {
-            this.globalSettingsContainer.BuildMonitorSettingsContainer = this.buildMonitorSettingsContainer.Clone();
-            this.globalSettingsContainer.Save();
-            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
-            this.buildMonitor.BeginPollingBuilds();
-        }
-
-        #endregion
-
-        #region Public Properties
-
         public DelegateCommand<IIdentifierMetadata> AddProviderCommand { get; }
 
         public IEnumerable<IIdentifierMetadata> AvailableProvider => BuildProviderViews.MetaData;
@@ -72,11 +43,22 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public DelegateCommand<IBuildProviderView> RemoveProviderCommand { get; }
 
+        public DelegateCommand SaveCommand { get; }
+
         public ObservableCollection<IBuildProviderView> Views { get; }
 
-        #endregion
+        public void OnClose()
+        {
+            this.buildMonitorSettingsContainer = null;
+        }
 
-        #region Private Methods
+        public void OnSave()
+        {
+            this.globalSettingsContainer.BuildMonitorSettingsContainer = this.buildMonitorSettingsContainer.Clone();
+            this.globalSettingsContainer.Save();
+            this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
+            this.buildMonitor.BeginPollingBuildsAsync();
+        }
 
         private void AddView(String providerid, BuildMonitorSettings buildMonitorSettings)
         {
@@ -123,16 +105,10 @@ namespace BuildsAppReborn.Client.ViewModels
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
         private readonly IBuildMonitorAdvanced buildMonitor;
 
         private SettingsContainer<BuildMonitorSettings> buildMonitorSettingsContainer;
 
         private readonly GlobalSettingsContainer globalSettingsContainer;
-
-        #endregion
     }
 }

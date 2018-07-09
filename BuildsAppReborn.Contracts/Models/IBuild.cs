@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface IBuild : IObjectItem, IWebItem
     {
-        #region Public Properties
-
         IEnumerable<IArtifact> Artifacts { get; }
 
         String BuildNumber { get; }
@@ -31,7 +29,5 @@ namespace BuildsAppReborn.Contracts.Models
         BuildStatus Status { get; }
 
         IEnumerable<ITestRun> TestRuns { get; }
-
-        #endregion
     }
 }

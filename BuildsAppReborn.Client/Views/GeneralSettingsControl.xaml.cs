@@ -9,22 +9,14 @@ namespace BuildsAppReborn.Client.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class GeneralSettingsControl : ISubSettingsControl
     {
-        #region Constructors
-
         public GeneralSettingsControl()
         {
             InitializeComponent();
         }
 
-        #endregion
-
-        #region Implementation of ISubSettingsControl
-
         public UInt32 Order => 0;
 
         public String Title => "General Settings";
-
-        #endregion
 
         [Import]
         private GeneralSettingsViewModel ViewModel

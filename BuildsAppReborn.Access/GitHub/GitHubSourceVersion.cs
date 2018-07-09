@@ -1,7 +1,5 @@
 ﻿using System;
-
 using BuildsAppReborn.Contracts.Models;
-
 using Newtonsoft.Json;
 
 // ReSharper disable UnassignedGetOnlyAutoProperty
@@ -11,8 +9,6 @@ namespace BuildsAppReborn.Access
 {
     internal class GitHubSourceVersion : ISourceVersion
     {
-        #region Implementation of ISourceVersion
-
         [JsonIgnore]
         public INamedObject Author => this.commit?.Author;
 
@@ -22,13 +18,6 @@ namespace BuildsAppReborn.Access
         [JsonProperty("html_url")]
         public String PortalUrl { get; private set; }
 
-        #endregion
-
-        #region Private Fields
-
-        [JsonProperty("commit")]
-        private GitHubCommit commit;
-
-        #endregion
+        [JsonProperty("commit")] private GitHubCommit commit;
     }
 }

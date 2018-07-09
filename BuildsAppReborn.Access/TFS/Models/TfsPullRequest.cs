@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Access.Models
 {
     internal abstract class TfsPullRequest : IPullRequest
     {
-        #region Implementation of IPullRequest
-
         [JsonProperty("createdBy")]
         public virtual IUser CreatedBy { get; protected set; }
 
@@ -21,7 +19,7 @@ namespace BuildsAppReborn.Access.Models
         public String MergeStatus { get; private set; }
 
         [JsonProperty("sourceRefName")]
-        public String Source { get; private  set; }
+        public String Source { get; private set; }
 
         [JsonProperty("status")]
         public String Status { get; private set; }
@@ -31,7 +29,5 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("title")]
         public String Title { get; private set; }
-
-        #endregion
     }
 }

@@ -20,10 +20,13 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class NotifyIconViewModel : ViewModelBase
     {
-        #region Constructors
-
         [ImportingConstructor]
-        internal NotifyIconViewModel(ExportFactory<IBuildsStatusView> buildsExportFactory, ExportFactory<ISettingsView> settingsExportFactory, BuildCache buildCache, NotificationManager notificationManager, UpdateChecker updateChecker, GlobalSettingsContainer settingsContainer)
+        internal NotifyIconViewModel(ExportFactory<IBuildsStatusView> buildsExportFactory,
+                                     ExportFactory<ISettingsView> settingsExportFactory,
+                                     BuildCache buildCache,
+                                     NotificationManager notificationManager,
+                                     UpdateChecker updateChecker,
+                                     GlobalSettingsContainer settingsContainer)
         {
             if (buildCache.CacheStatus == BuildCacheStatus.NotConfigured)
             {
@@ -42,10 +45,6 @@ namespace BuildsAppReborn.Client.ViewModels
 
             Initialize();
         }
-
-        #endregion
-
-        #region Public Properties
 
         public ICommand CheckUpdateCommand { get; private set; }
 
@@ -67,10 +66,6 @@ namespace BuildsAppReborn.Client.ViewModels
                 }
             }
         }
-
-        #endregion
-
-        #region Internal Methods
 
         internal static void OpenWindow<T>(ExportFactory<T> newWindow)
         {
@@ -126,21 +121,6 @@ namespace BuildsAppReborn.Client.ViewModels
 
                 buildStatusWindow.Activate();
             }
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void Initialize()
-        {
-            ShowWindowCommand = new DelegateCommand(() => { OpenWindow<IBuildsStatusView>(this.buildsExportFactory); });
-
-            ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
-
-            ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
-
-            CheckUpdateCommand = new DelegateCommand(() => this.updateChecker.UpdateCheck(true));
         }
 
         private static void RestoreWindowSettings(Window window, List<WindowSetting> windowSettings)
@@ -200,16 +180,22 @@ namespace BuildsAppReborn.Client.ViewModels
             window.Closed -= WindowOnClosed;
         }
 
-        #endregion
+        private void Initialize()
+        {
+            ShowWindowCommand = new DelegateCommand(() => { OpenWindow<IBuildsStatusView>(this.buildsExportFactory); });
 
-        #region Private Fields
+            ShowSettingsWindowCommand = new DelegateCommand(() => { OpenWindow<ISettingsView>(this.settingsExportFactory); });
+
+            ExitApplicationCommand = new DelegateCommand(() => Application.Current.Shutdown());
+
+            CheckUpdateCommand = new DelegateCommand(() => this.updateChecker.UpdateCheck(true));
+        }
+
+        private static GlobalSettingsContainer globalSettingsContainer;
 
         private readonly ExportFactory<IBuildsStatusView> buildsExportFactory;
-        private static GlobalSettingsContainer globalSettingsContainer;
         private readonly ExportFactory<ISettingsView> settingsExportFactory;
         private String trayIcon;
         private readonly UpdateChecker updateChecker;
-
-        #endregion
     }
 }

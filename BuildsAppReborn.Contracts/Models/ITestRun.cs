@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface ITestRun : IObjectItem, IWebItem
     {
-        #region Public Properties
-
         Int32 FailedTests { get; }
 
         Int32 Id { get; }
@@ -22,7 +20,5 @@ namespace BuildsAppReborn.Contracts.Models
         String State { get; }
 
         Int32 TotalTests { get; }
-
-        #endregion
     }
 }

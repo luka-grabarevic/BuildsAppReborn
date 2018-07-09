@@ -4,8 +4,6 @@ namespace BuildsAppReborn.Contracts.Models
 {
     public interface IPullRequest
     {
-        #region Public Properties
-
         IUser CreatedBy { get; }
 
         String Description { get; }
@@ -21,7 +19,5 @@ namespace BuildsAppReborn.Contracts.Models
         String Target { get; }
 
         String Title { get; }
-
-        #endregion
     }
 }

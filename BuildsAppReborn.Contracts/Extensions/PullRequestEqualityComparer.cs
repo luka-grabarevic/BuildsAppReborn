@@ -9,8 +9,6 @@ namespace BuildsAppReborn.Contracts.Extensions
     [Export(typeof(IEqualityComparer<IPullRequest>))]
     public class PullRequestEqualityComparer : IEqualityComparer<IPullRequest>
     {
-        #region Implementation of IEqualityComparer<IPullRequest>
-
         public Boolean Equals(IPullRequest x, IPullRequest y)
         {
             return x.Id == y.Id;
@@ -25,7 +23,5 @@ namespace BuildsAppReborn.Contracts.Extensions
 
             return obj.Id.GetHashCode();
         }
-
-        #endregion
     }
 }

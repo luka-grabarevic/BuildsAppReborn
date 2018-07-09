@@ -5,8 +5,6 @@ namespace BuildsAppReborn.Access.UI.Notifications
 {
     internal static class NotificationHelper
     {
-        #region Public Static Methods
-
         public static String GenerateStatus(this IBuild build)
         {
             return build.Status.ToString();
@@ -29,7 +27,5 @@ namespace BuildsAppReborn.Access.UI.Notifications
         {
             return build.Requester.DisplayName;
         }
-
-        #endregion
     }
 }

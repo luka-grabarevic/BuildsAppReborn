@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.Composition;
-
 using BuildsAppReborn.Access.UI.ViewModel;
 using BuildsAppReborn.Access.UI.Views;
 using BuildsAppReborn.Contracts.Composition;
@@ -11,21 +10,11 @@ namespace BuildsAppReborn.Access.UI.View
     [PartCreationPolicy(CreationPolicy.NonShared)]
     internal class Tfs2017BuildProviderView : TfsBuildProviderViewBase
     {
-        #region Overrides of Base
-
         [Import(typeof(Tfs2017BuildProviderViewModel))]
         public override IBuildProviderViewModel ViewModel
         {
-            get
-            {
-                return base.ViewModel;
-            }
-            protected set
-            {
-                base.ViewModel = value;
-            }
+            get { return base.ViewModel; }
+            protected set { base.ViewModel = value; }
         }
-
-        #endregion
     }
 }

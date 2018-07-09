@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿using System.Collections.Generic;
 using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Contracts
@@ -10,12 +8,8 @@ namespace BuildsAppReborn.Contracts
     /// </summary>
     public interface IBuildMonitorAdvanced : IBuildMonitorBasic
     {
-        #region Public Methods
-
         void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettings);
 
         void Stop();
-
-        #endregion
     }
 }

@@ -6,8 +6,6 @@ namespace BuildsAppReborn.Access.Models.Internal
 {
     internal abstract class LinksContainer
     {
-        #region Public Properties
-
         [JsonIgnore]
         public String WebLink
         {
@@ -21,18 +19,12 @@ namespace BuildsAppReborn.Access.Models.Internal
                         return web[Href];
                     }
                 }
+
                 return String.Empty;
             }
         }
 
-        #endregion
-
-        #region Private Fields
-
-        [JsonProperty("_links")]
-        private Dictionary<String, Dictionary<String, String>> links;
-
-        #endregion
+        [JsonProperty("_links")] private Dictionary<String, Dictionary<String, String>> links;
 
         private const String Web = "web";
 

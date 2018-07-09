@@ -15,10 +15,8 @@ namespace BuildsAppReborn.Infrastructure
         where TInterface : class
         where TMetaData : class
     {
-        #region Constructors
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExportFactoryContainer{TInterface,TMetaData}"/> class.
+        /// Initializes a new instance of the <see cref="ExportFactoryContainer{TInterface,TMetaData}" /> class.
         /// </summary>
         /// <param name="factories">The factories.</param>
         /// <exception cref="System.ArgumentNullException">lazies</exception>
@@ -29,12 +27,9 @@ namespace BuildsAppReborn.Infrastructure
             {
                 throw new ArgumentNullException(nameof(factories));
             }
+
             this.factories = factories;
         }
-
-        #endregion
-
-        #region Public Properties
 
         /// <summary>
         /// Gets the meta data.
@@ -53,15 +48,13 @@ namespace BuildsAppReborn.Infrastructure
                     {
                         list.Add(it.Metadata);
                     }
+
                     this.metadata = list.AsReadOnly();
                 }
+
                 return this.metadata;
             }
         }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Gets the many.
@@ -83,13 +76,7 @@ namespace BuildsAppReborn.Infrastructure
             return GetMany(searchExpression).SingleOrDefault();
         }
 
-        #endregion
-
-        #region Private Fields
-
         private readonly ExportFactory<TInterface, TMetaData>[] factories;
         private IReadOnlyList<TMetaData> metadata;
-
-        #endregion
     }
 }
