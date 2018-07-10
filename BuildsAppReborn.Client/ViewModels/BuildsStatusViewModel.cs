@@ -11,6 +11,7 @@ using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
 using BuildsAppReborn.Infrastructure.Wpf;
 using log4net;
+using MahApps.Metro.Converters;
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
@@ -19,12 +20,25 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class BuildsStatusViewModel : ViewModelBase, ICloseable
     {
+        private readonly GeneralSettings generalSettings;
+
         [ImportingConstructor]
-        public BuildsStatusViewModel(BuildCache buildCache)
+        public BuildsStatusViewModel(BuildCache buildCache, GeneralSettings generalSettings)
         {
+            this.generalSettings = generalSettings;
             BuildCache = buildCache;
-            this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
-            this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
+            this.timeUpdateTimer = new Timer {Interval = TimeSpan.FromMilliseconds(100).TotalMilliseconds, AutoReset = true};
+            this.stopWatch = new Stopwatch();
+            this.timeUpdateTimer.Elapsed += (sender, args) =>
+            {
+                var elapsedMilliseconds = this.stopWatch.ElapsedMilliseconds;
+
+                Progress = ProgressMaximum - elapsedMilliseconds;
+            };
+
+            ProgressMinimum = 0;
+            ProgressMaximum = this.generalSettings.PollingInterval.TotalMilliseconds;
+            Progress = ProgressMaximum;
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
             HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => StartProcess(a?.Build?.WebUrl)));
             OpenArtifactCommand = new DelegateCommand<IArtifact>(a => Task.Run(() => OnOpenArtifactCommand(a)));
@@ -37,25 +51,57 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
 
+        public Double Progress
+        {
+            get { return this.progress; }
+            set
+            {
+                this.progress = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Double ProgressMaximum
+        {
+            get { return this.progressMaximum; }
+            set
+            {
+                this.progressMaximum = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Double ProgressMinimum
+        {
+            get { return this.progressMinimum; }
+            set
+            {
+                this.progressMinimum = value;
+                OnPropertyChanged();
+            }
+        }
+
         public DelegateCommand<ITestRun> TestRunClickCommand { get; set; }
 
         public void OnClose()
         {
             BuildCache.CacheUpdated -= OnBuildCacheUpdated;
-            this.timer?.Stop();
-            this.timer?.Close();
-            this.timer?.Dispose();
+            this.stopWatch?.Stop();
+            this.timeUpdateTimer?.Stop();
         }
 
         private void OnBuildCacheUpdated(Object sender, EventArgs eventArgs)
         {
-            this.timer?.Stop();
+            this.stopWatch?.Stop();
+            this.stopWatch?.Reset();
+            this.timeUpdateTimer?.Stop();
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
             {
                 buildStatus.CurrentBuild.Refresh();
             }
 
-            this.timer?.Start();
+            this.timeUpdateTimer?.Start();
+            this.stopWatch?.Start();
         }
 
         private void OnOpenArtifactCommand(IArtifact artifact)
@@ -109,7 +155,12 @@ namespace BuildsAppReborn.Client.ViewModels
         }
 
         private readonly ILog logger = LogManager.GetLogger(typeof(BuildsStatusViewModel));
+        private Double progress;
+        private readonly Stopwatch stopWatch;
 
-        private readonly Timer timer;
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly Timer timeUpdateTimer;
+        private Double progressMaximum;
+        private Double progressMinimum;
     }
 }

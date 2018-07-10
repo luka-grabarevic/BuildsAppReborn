@@ -40,7 +40,12 @@
     </Window.Icon>
 
     <Grid>
-        <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ProgressBar Grid.Row="0" Value="{Binding Progress}" Maximum="{Binding ProgressMaximum}" Minimum="{Binding ProgressMinimum}" />
+        <Grid Grid.Column="0" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -350,6 +355,7 @@
 
         <!--  in case there are no builds (loaded yet):  -->
         <ProgressBar Grid.Column="0"
+                     Grid.Row="1"
                      Width="128"
                      Height="128"
                      Margin="20"
@@ -368,6 +374,7 @@
             </ProgressBar.Style>
         </ProgressBar>
         <TextBlock Grid.Column="0"
+                   Grid.Row="1"
                    Margin="20"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
