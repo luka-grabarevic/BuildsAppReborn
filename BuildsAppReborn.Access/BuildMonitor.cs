@@ -35,13 +35,7 @@ namespace BuildsAppReborn.Access
 
         public async Task BeginPollingBuildsAsync()
         {
-            if (this.isPolling)
-            {
-                return;
-            }
-
             var builds = new List<IBuild>();
-            this.isPolling = true;
             foreach (var pair in this.providerSettingsGroup)
             {
                 foreach (var setting in pair.Value)
@@ -51,8 +45,6 @@ namespace BuildsAppReborn.Access
             }
 
             OnBuildsUpdated(builds);
-
-            this.isPolling = false;
         }
 
         public void Start(IEnumerable<BuildMonitorSettings> settings, GeneralSettings generalSettingsParam)
@@ -162,8 +154,6 @@ namespace BuildsAppReborn.Access
 
         private readonly LazyContainer<IBuildProvider, IBuildProviderMetadata> buildProviders;
         private GeneralSettings generalSettings;
-
-        private Boolean isPolling;
 
         private readonly ILog logger = LogManager.GetLogger(typeof(BuildMonitor));
 
