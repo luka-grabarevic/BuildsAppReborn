@@ -350,7 +350,7 @@
                                                     <RowDefinition Height="*"/>
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="Testruns:" Grid.Row="0" />
-                                                <ItemsControl ItemsSource="{Binding AllBuildItems}" Grid.Row="2">
+                                                <ItemsControl ItemsSource="{Binding AllBuildItems}" Grid.Row="2"  IsTabStop="False" Focusable="False">
                                                     <ItemsControl.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <VirtualizingStackPanel Orientation="Horizontal" />

@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:BuildsAppReborn.Client.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DataContext="{d:DesignInstance Type=local:StackedBarGraph}"
+    IsTabStop="False" Focusable="False"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -29,7 +30,7 @@
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}" IsTabStop="False" Focusable="False">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Orientation="Vertical" />
@@ -83,6 +84,8 @@
             </TextBlock>
         </Grid>
         <Button
+            IsTabStop="False"
+            Focusable="False"
             Grid.Column="1"
             Width="{Binding BarWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -91,7 +94,7 @@
             CommandParameter="{Binding ClickCommandParameter, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <Button.Template>
                 <ControlTemplate>
-                    <ItemsControl ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                    <ItemsControl ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}"  IsTabStop="False" Focusable="False">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel Orientation="Vertical" />
