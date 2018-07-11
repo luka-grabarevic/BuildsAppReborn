@@ -11,7 +11,6 @@ using BuildsAppReborn.Contracts.UI;
 using BuildsAppReborn.Infrastructure;
 using BuildsAppReborn.Infrastructure.Wpf;
 using log4net;
-using MahApps.Metro.Converters;
 using Prism.Commands;
 
 namespace BuildsAppReborn.Client.ViewModels
@@ -20,26 +19,18 @@ namespace BuildsAppReborn.Client.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class BuildsStatusViewModel : ViewModelBase, ICloseable
     {
-        private readonly GeneralSettings generalSettings;
-
         [ImportingConstructor]
-        public BuildsStatusViewModel(BuildCache buildCache, GeneralSettings generalSettings)
+        public BuildsStatusViewModel(BuildCache buildCache)
         {
-            this.generalSettings = generalSettings;
             BuildCache = buildCache;
-            this.timeUpdateTimer = new Timer {Interval = TimeSpan.FromMilliseconds(100).TotalMilliseconds, AutoReset = true};
-            this.stopWatch = new Stopwatch();
-            this.timeUpdateTimer.Elapsed += (sender, args) =>
-            {
-                var elapsedMilliseconds = this.stopWatch.ElapsedMilliseconds;
-
-                Progress = ProgressMaximum - elapsedMilliseconds;
-            };
+            this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
+            this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
+            BuildCache.CacheUpdated += OnBuildCacheUpdated;
 
             ProgressMinimum = 0;
-            ProgressMaximum = this.generalSettings.PollingInterval.TotalMilliseconds;
-            Progress = ProgressMaximum;
-            BuildCache.CacheUpdated += OnBuildCacheUpdated;
+            ProgressMaximum = BuildCache.ProgressComponent.MaximumProgress;
+            BuildCache.ProgressComponent.ProgressUpdated += progress => Progress = progress;
+
             HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => StartProcess(a?.Build?.WebUrl)));
             OpenArtifactCommand = new DelegateCommand<IArtifact>(a => Task.Run(() => OnOpenArtifactCommand(a)));
             TestRunClickCommand = new DelegateCommand<ITestRun>(a => Task.Run(() => StartProcess(a?.WebUrl)));
@@ -86,22 +77,20 @@ namespace BuildsAppReborn.Client.ViewModels
         public void OnClose()
         {
             BuildCache.CacheUpdated -= OnBuildCacheUpdated;
-            this.stopWatch?.Stop();
-            this.timeUpdateTimer?.Stop();
+            this.timer?.Stop();
+            this.timer?.Close();
+            this.timer?.Dispose();
         }
 
         private void OnBuildCacheUpdated(Object sender, EventArgs eventArgs)
         {
-            this.stopWatch?.Stop();
-            this.stopWatch?.Reset();
-            this.timeUpdateTimer?.Stop();
+            this.timer?.Stop();
             foreach (var buildStatus in BuildCache.BuildsStatus.ToList())
             {
                 buildStatus.CurrentBuild.Refresh();
             }
 
-            this.timeUpdateTimer?.Start();
-            this.stopWatch?.Start();
+            this.timer?.Start();
         }
 
         private void OnOpenArtifactCommand(IArtifact artifact)
@@ -156,11 +145,9 @@ namespace BuildsAppReborn.Client.ViewModels
 
         private readonly ILog logger = LogManager.GetLogger(typeof(BuildsStatusViewModel));
         private Double progress;
-        private readonly Stopwatch stopWatch;
-
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        private readonly Timer timeUpdateTimer;
         private Double progressMaximum;
         private Double progressMinimum;
+
+        private readonly Timer timer;
     }
 }

@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="Consts.cs" />
     <Compile Include="Helper\CloneHelper.cs" />
+    <Compile Include="ProgressTimer.cs" />
     <Compile Include="TolerantEnumConverter.cs" />
     <Compile Include="Collections\RangeObservableCollection.cs" />
     <Compile Include="Helper\EnumHelper.cs" />
