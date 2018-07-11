@@ -26,6 +26,7 @@ namespace BuildsAppReborn.Client
             this.buildDefinitionEqualityComparer = buildDefinitionEqualityComparer;
             this.pullRequstEqualityComparer = pullRequstEqualityComparer;
             this.generalSettings = generalSettings;
+            this.buildMonitor = buildMonitor;
             buildMonitor.BuildsUpdated += OnBuildsUpdated;
             buildMonitor.MonitorStopped += (sender, args) => CacheStatus = BuildCacheStatus.NotConfigured;
             buildMonitor.MonitorStarted += (sender, args) => CacheStatus = BuildCacheStatus.Loading;
@@ -67,6 +68,8 @@ namespace BuildsAppReborn.Client
                 }
             }
         }
+
+        public IProgressComponent ProgressComponent => this.buildMonitor;
 
         public event EventHandler CacheUpdated;
 
@@ -205,6 +208,7 @@ namespace BuildsAppReborn.Client
         }
 
         private readonly IEqualityComparer<IBuildDefinition> buildDefinitionEqualityComparer;
+        private readonly IBuildMonitorBasic buildMonitor;
         private BuildCacheStatus cacheStatus;
         private String currentIcon;
         private readonly GeneralSettings generalSettings;

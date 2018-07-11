@@ -40,11 +40,16 @@
     </Window.Icon>
     <materialDesign:DialogHost CloseOnClickAway="True" >
         <Grid>
-            <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ProgressBar Grid.Row="0" Value="{Binding Progress}" Maximum="{Binding ProgressMaximum}" Minimum="{Binding ProgressMinimum}" />
+            <Grid Grid.Column="0" Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <ItemsControl Grid.Row="0"
+            <ItemsControl Grid.Row="0"
                           HorizontalContentAlignment="Stretch"
                           Background="Transparent"
                           BorderBrush="Transparent"
@@ -375,28 +380,30 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Grid>
+        </Grid>
 
-            <!--  in case there are no builds (loaded yet):  -->
-            <ProgressBar Grid.Column="0"
+        <!--  in case there are no builds (loaded yet):  -->
+        <ProgressBar Grid.Column="0"
+                     Grid.Row="1"
                      Width="128"
                      Height="128"
                      Margin="20"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
                      IsIndeterminate="True">
-                <ProgressBar.Style>
-                    <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding BuildCache.CacheStatus}" Value="{x:Static client:BuildCacheStatus.Loading}">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ProgressBar.Style>
-            </ProgressBar>
-            <TextBlock Grid.Column="0"
+            <ProgressBar.Style>
+                <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding BuildCache.CacheStatus}" Value="{x:Static client:BuildCacheStatus.Loading}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ProgressBar.Style>
+        </ProgressBar>
+        <TextBlock Grid.Column="0"
+                   Grid.Row="1"
                    Margin="20"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"

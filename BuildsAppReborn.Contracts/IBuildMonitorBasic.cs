@@ -5,7 +5,7 @@ using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Contracts
 {
-    public interface IBuildMonitorBasic
+    public interface IBuildMonitorBasic : IProgressComponent
     {
         Boolean IsConfigured { get; }
 

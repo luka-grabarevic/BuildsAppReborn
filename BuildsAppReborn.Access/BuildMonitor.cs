@@ -29,9 +29,16 @@ namespace BuildsAppReborn.Access
             this.generalSettings = generalSettings;
             this.notificationProvider = notificationProviders.GetSupportedNotificationProvider();
             this.timer.Elapsed += (sender, args) => BeginPollingBuildsAsync().GetAwaiter().GetResult();
+            this.timer.ProgressElapsed += (sender, args) =>
+            {
+                OnProgressUpdated(MaximumProgress - this.timer.CurrentInterval);
+            };
         }
 
-        public Boolean IsConfigured => this.providerSettingsGroup.Any() && (this.generalSettings.ViewStyle == BuildViewStyle.GroupByPullRequest ||  this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any());
+        public Boolean IsConfigured => this.providerSettingsGroup.Any() && (this.generalSettings.ViewStyle == BuildViewStyle.GroupByPullRequest ||
+                                                                            this.providerSettingsGroup.SelectMany(a => a.Value).SelectMany(a => a.SelectedBuildDefinitions).Any());
+
+        public Double MaximumProgress => this.generalSettings.PollingInterval.TotalMilliseconds;
 
         public async Task BeginPollingBuildsAsync()
         {
@@ -79,6 +86,8 @@ namespace BuildsAppReborn.Access
 
         public event EventHandler MonitorStopped;
 
+        public event PollingProgressUpdated ProgressUpdated;
+
         private void Initialize(IEnumerable<BuildMonitorSettings> settings)
         {
             var groupedByProviderId = settings.GroupBy(a => a.BuildProviderId);
@@ -105,6 +114,11 @@ namespace BuildsAppReborn.Access
         private void OnMonitorStopped()
         {
             MonitorStopped?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnProgressUpdated(Double progress)
+        {
+            ProgressUpdated?.Invoke(progress);
         }
 
         private async Task<IEnumerable<IBuild>> PollBuildsAsync(IBuildProvider provider, BuildMonitorSettings settings)
@@ -161,6 +175,6 @@ namespace BuildsAppReborn.Access
 
         private readonly Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>> providerSettingsGroup = new Dictionary<IBuildProvider, ICollection<BuildMonitorSettings>>();
 
-        private readonly Timer timer = new Timer();
+        private readonly ProgressTimer timer = new ProgressTimer();
     }
 }

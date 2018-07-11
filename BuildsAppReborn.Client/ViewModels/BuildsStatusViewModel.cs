@@ -26,6 +26,11 @@ namespace BuildsAppReborn.Client.ViewModels
             this.timer = new Timer {Interval = 10000, AutoReset = true}; // update every 10 seconds
             this.timer.Elapsed += (sender, args) => { OnBuildCacheUpdated(null, null); };
             BuildCache.CacheUpdated += OnBuildCacheUpdated;
+
+            ProgressMinimum = 0;
+            ProgressMaximum = BuildCache.ProgressComponent.MaximumProgress;
+            BuildCache.ProgressComponent.ProgressUpdated += progress => Progress = progress;
+
             HistoryClickCommand = new DelegateCommand<BuildItem>(a => Task.Run(() => StartProcess(a?.Build?.WebUrl)));
             OpenArtifactCommand = new DelegateCommand<IArtifact>(a => Task.Run(() => OnOpenArtifactCommand(a)));
             TestRunClickCommand = new DelegateCommand<ITestRun>(a => Task.Run(() => StartProcess(a?.WebUrl)));
@@ -36,6 +41,36 @@ namespace BuildsAppReborn.Client.ViewModels
         public DelegateCommand<BuildItem> HistoryClickCommand { get; set; }
 
         public DelegateCommand<IArtifact> OpenArtifactCommand { get; set; }
+
+        public Double Progress
+        {
+            get { return this.progress; }
+            set
+            {
+                this.progress = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Double ProgressMaximum
+        {
+            get { return this.progressMaximum; }
+            set
+            {
+                this.progressMaximum = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Double ProgressMinimum
+        {
+            get { return this.progressMinimum; }
+            set
+            {
+                this.progressMinimum = value;
+                OnPropertyChanged();
+            }
+        }
 
         public DelegateCommand<ITestRun> TestRunClickCommand { get; set; }
 
@@ -109,6 +144,9 @@ namespace BuildsAppReborn.Client.ViewModels
         }
 
         private readonly ILog logger = LogManager.GetLogger(typeof(BuildsStatusViewModel));
+        private Double progress;
+        private Double progressMaximum;
+        private Double progressMinimum;
 
         private readonly Timer timer;
     }
