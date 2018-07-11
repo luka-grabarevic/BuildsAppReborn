@@ -9,6 +9,7 @@
                       xmlns:models="clr-namespace:BuildsAppReborn.Contracts.Models;assembly=BuildsAppReborn.Contracts"
                       xmlns:viewModels="clr-namespace:BuildsAppReborn.Client.ViewModels"
                       xmlns:localControls="clr-namespace:BuildsAppReborn.Client.Controls"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       Title="Builds Overview"
                       Width="500"
                       Height="400"
@@ -32,23 +33,22 @@
             <converter:TimeSpanToNiceStringConverter x:Key="TimeSpanToNiceStringConverter" />
             <converter:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
             <converter:TestRunToStackedItemsConverter x:Key="TestRunToStackedItemsConverter" />
-            <converter:NullVisibilityConverter x:Key="NullVisibilityConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <Window.Icon>
         <Binding Path="BuildCache.CurrentIcon" />
     </Window.Icon>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <ProgressBar Grid.Row="0" Value="{Binding Progress}" Maximum="{Binding ProgressMaximum}" Minimum="{Binding ProgressMinimum}" />
-        <Grid Grid.Column="0" Grid.Row="1">
+    <materialDesign:DialogHost CloseOnClickAway="True" >
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            <ProgressBar Grid.Row="0" Value="{Binding Progress}" Maximum="{Binding ProgressMaximum}" Minimum="{Binding ProgressMinimum}" />
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
             <ItemsControl Grid.Row="0"
                           HorizontalContentAlignment="Stretch"
                           Background="Transparent"
@@ -58,159 +58,183 @@
                           ScrollViewer.CanContentScroll="True"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           VirtualizingStackPanel.ScrollUnit="Pixel">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel CanVerticallyScroll="True" Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.Template>
-                    <ControlTemplate>
-                        <Border Padding="{TemplateBinding Control.Padding}"
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel CanVerticallyScroll="True" Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <Border Padding="{TemplateBinding Control.Padding}"
                                 Background="{TemplateBinding Panel.Background}"
                                 BorderBrush="{TemplateBinding Border.BorderBrush}"
                                 BorderThickness="{TemplateBinding Border.BorderThickness}"
                                 SnapsToDevicePixels="True">
-                            <ScrollViewer Padding="{TemplateBinding Control.Padding}"
+                                <ScrollViewer Padding="{TemplateBinding Control.Padding}"
                                           Focusable="False"
                                           VerticalScrollBarVisibility="Auto">
-                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </ItemsControl.Template>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="White" BorderThickness="0 0 0 1" Padding="12" Background="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToColorBackgroundConverter}}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <!--  The row's content:  -->
-                                <Grid HorizontalAlignment="Stretch" Grid.Row="0" >
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="80" />
-                                            <ColumnDefinition Width="80" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="80" />
-                                        </Grid.RowDefinitions>
-
-                                        <!--  Build history  -->
-                                        <Grid Grid.Row="0" Grid.Column="0" >
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="White" BorderThickness="0 0 0 1" Padding="12" Background="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToColorBackgroundConverter}}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <!--  The row's content:  -->
+                                    <Grid HorizontalAlignment="Stretch" Grid.Row="0" >
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="7" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="5" />
-                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="80" />
                                             </Grid.RowDefinitions>
-                                            <TextBlock Text="Build history:" Grid.Row="0"/>
-                                            <ItemsControl Grid.Row="5" ItemsSource="{Binding AllBuildItems}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <VirtualizingStackPanel Orientation="Horizontal" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Button Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
+
+                                            <!--  Build history  -->
+                                            <Grid Grid.Row="0" Grid.Column="0" >
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="5" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Build history:" Grid.Row="0"/>
+                                                <ItemsControl Grid.Row="2" 
+                                                              ItemsSource="{Binding AllBuildItems}" 
+                                                              Focusable="False"
+                                                              IsTabStop="False">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <VirtualizingStackPanel Orientation="Horizontal" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
+                                                                    Focusable="False"
+                                                                    IsTabStop="False"
                                                                 Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
                                                                 CommandParameter="{Binding}">
-                                                            <Button.ContextMenu>
-                                                                <ContextMenu ItemsSource="{Binding Build.Artifacts}" Visibility="{Binding Build.Artifacts, Converter={StaticResource CountToVisibilityConverter}}">
-                                                                    <ContextMenu.Resources>
-                                                                        <Image x:Key="FilePathIcon" Source="../Resources/Icons/PNG/ic_folder_open_black_24dp_1x.png" x:Shared="False"/>
-                                                                        <Image x:Key="ContainerIcon" Source="../Resources/Icons/PNG/ic_archive_black_24dp_1x.png" x:Shared="False"/>
-                                                                    </ContextMenu.Resources>
-                                                                    <ContextMenu.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <TextBlock Text="{Binding Name}" />
-                                                                        </DataTemplate>
-                                                                    </ContextMenu.ItemTemplate>
-                                                                    <ContextMenu.ItemContainerStyle>
-                                                                        <Style TargetType="MenuItem">
-                                                                            <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.OpenArtifactCommand}" />
-                                                                            <Setter Property="CommandParameter" Value="{Binding}" />
-                                                                            <Style.Triggers>
-                                                                                <DataTrigger Binding="{Binding Path=Type}" Value="FilePath">
-                                                                                    <Setter Property="Icon" Value="{StaticResource FilePathIcon}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Path=Type}" Value="Container">
-                                                                                    <Setter Property="Icon" Value="{StaticResource ContainerIcon}" />
-                                                                                </DataTrigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </ContextMenu.ItemContainerStyle>
-                                                                </ContextMenu>
-                                                            </Button.ContextMenu>
-                                                            <Button.Template>
-                                                                <ControlTemplate>
-                                                                    <Grid Width="12"
+                                                                <Button.ContextMenu>
+                                                                    <ContextMenu ItemsSource="{Binding Build.Artifacts}" Visibility="{Binding Build.Artifacts, Converter={StaticResource CountToVisibilityConverter}}">
+                                                                        <ContextMenu.Resources>
+                                                                            <Image x:Key="FilePathIcon" Source="../Resources/Icons/PNG/ic_folder_open_black_24dp_1x.png" x:Shared="False"/>
+                                                                            <Image x:Key="ContainerIcon" Source="../Resources/Icons/PNG/ic_archive_black_24dp_1x.png" x:Shared="False"/>
+                                                                        </ContextMenu.Resources>
+                                                                        <ContextMenu.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <TextBlock Text="{Binding Name}" />
+                                                                            </DataTemplate>
+                                                                        </ContextMenu.ItemTemplate>
+                                                                        <ContextMenu.ItemContainerStyle>
+                                                                            <Style TargetType="MenuItem">
+                                                                                <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.OpenArtifactCommand}" />
+                                                                                <Setter Property="CommandParameter" Value="{Binding}" />
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding Path=Type}" Value="FilePath">
+                                                                                        <Setter Property="Icon" Value="{StaticResource FilePathIcon}" />
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding Path=Type}" Value="Container">
+                                                                                        <Setter Property="Icon" Value="{StaticResource ContainerIcon}" />
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </ContextMenu.ItemContainerStyle>
+                                                                    </ContextMenu>
+                                                                </Button.ContextMenu>
+                                                                <Button.Template>
+                                                                    <ControlTemplate>
+                                                                        <Grid Width="12"
                                                                           Margin="0 0 5 0"
                                                                           Background="Transparent">
-                                                                        <Grid.ToolTip>
-                                                                            <TextBlock>
-                                                                                <TextBlock.Style>
-                                                                                    <Style TargetType="TextBlock">
-                                                                                        <Setter Property="Text">
-                                                                                            <Setter.Value>
-                                                                                                <MultiBinding StringFormat="{}{5}&#x0d;&#x0a;{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
-                                                                                                    <Binding Path="RequesterText" />
-                                                                                                    <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
-                                                                                                    <Binding Path="Comment" />
-                                                                                                    <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
-                                                                                                    <Binding Path="BuildStatus" />
-                                                                                                    <Binding Path="Description" />
-                                                                                                </MultiBinding>
-                                                                                            </Setter.Value>
-                                                                                        </Setter>
-                                                                                        <Style.Triggers>
-                                                                                            <DataTrigger Binding="{Binding BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
-                                                                                                <Setter Property="Text">
-                                                                                                    <Setter.Value>
-                                                                                                        <MultiBinding StringFormat="{}{4}&#x0d;&#x0a;{0} ({3} for {2})&#x0d;&#x0a;{1}">
-                                                                                                            <Binding Path="RequesterText" />
-                                                                                                            <Binding Path="Comment" />
-                                                                                                            <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
-                                                                                                            <Binding Path="BuildStatus" />
-                                                                                                            <Binding Path="Description" />
-                                                                                                        </MultiBinding>
-                                                                                                    </Setter.Value>
-                                                                                                </Setter>
-                                                                                            </DataTrigger>
-                                                                                        </Style.Triggers>
-                                                                                    </Style>
-                                                                                </TextBlock.Style>
-                                                                            </TextBlock>
-                                                                        </Grid.ToolTip>
-                                                                        <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
-                                                                            <Grid.Margin>
-                                                                                <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
-                                                                                    <Binding />
-                                                                                    <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
-                                                                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
-                                                                                    <Binding Path="BuildStateTime" />
-                                                                                </MultiBinding>
-                                                                            </Grid.Margin>
+                                                                            <Grid.ToolTip>
+                                                                                <TextBlock>
+                                                                                    <TextBlock.Style>
+                                                                                        <Style TargetType="TextBlock">
+                                                                                            <Setter Property="Text">
+                                                                                                <Setter.Value>
+                                                                                                    <MultiBinding StringFormat="{}{5}&#x0d;&#x0a;{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
+                                                                                                        <Binding Path="RequesterText" />
+                                                                                                        <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
+                                                                                                        <Binding Path="Comment" />
+                                                                                                        <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                                        <Binding Path="BuildStatus" />
+                                                                                                        <Binding Path="Description" />
+                                                                                                    </MultiBinding>
+                                                                                                </Setter.Value>
+                                                                                            </Setter>
+                                                                                            <Style.Triggers>
+                                                                                                <DataTrigger Binding="{Binding BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
+                                                                                                    <Setter Property="Text">
+                                                                                                        <Setter.Value>
+                                                                                                            <MultiBinding StringFormat="{}{4}&#x0d;&#x0a;{0} ({3} for {2})&#x0d;&#x0a;{1}">
+                                                                                                                <Binding Path="RequesterText" />
+                                                                                                                <Binding Path="Comment" />
+                                                                                                                <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
+                                                                                                                <Binding Path="BuildStatus" />
+                                                                                                                <Binding Path="Description" />
+                                                                                                            </MultiBinding>
+                                                                                                        </Setter.Value>
+                                                                                                    </Setter>
+                                                                                                </DataTrigger>
+                                                                                            </Style.Triggers>
+                                                                                        </Style>
+                                                                                    </TextBlock.Style>
+                                                                                </TextBlock>
+                                                                            </Grid.ToolTip>
+                                                                            <Grid Background="{Binding Build.Status, Converter={StaticResource BuildStatusToSolidColorBrushForegroundConverter}}">
+                                                                                <Grid.Margin>
+                                                                                    <MultiBinding Converter="{StaticResource BuildItemToRelativeMarginConverter}">
+                                                                                        <Binding />
+                                                                                        <Binding Path="ItemsSource" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                                        <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}" />
+                                                                                        <Binding Path="BuildStateTime" />
+                                                                                    </MultiBinding>
+                                                                                </Grid.Margin>
+                                                                            </Grid>
                                                                         </Grid>
-                                                                    </Grid>
-                                                                </ControlTemplate>
-                                                            </Button.Template>
-                                                        </Button>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
-                                        <!--  requester image  -->
-                                        <Image Grid.Column="1"
-                                               Grid.Row="0"
-                                               Margin="7 0 0 0"
-                                               Source="{Binding CurrentBuild.RequesterImage}" />
+                                                                    </ControlTemplate>
+                                                                </Button.Template>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
 
-                                        <!-- test count -->
-                                        <!--<localControls:StackedBarGraph Grid.Column="2"
+                                            <!--  requester image  -->
+                                            <Button Grid.Column="2"
+                                                    Focusable="False"
+                                                    IsTabStop="False"
+                                                    Grid.Row="0" 
+                                                    Height="80"
+                                                    Width="80"
+                                                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                                                <Button.Template>
+                                                    <ControlTemplate>
+                                                        <Image Source="{Binding CurrentBuild.RequesterImage}" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <Button.CommandParameter>
+                                                    <StackPanel Margin="16" Focusable="False">
+                                                        <Image Source="{Binding CurrentBuild.RequesterImage}" />
+                                                        <Button Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True" 
+                                                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                                                HorizontalAlignment="Center">CLOSE</Button>
+                                                    </StackPanel>
+                                                </Button.CommandParameter>
+                                            </Button>
+
+                                            <!-- test count -->
+                                            <!--<localControls:StackedBarGraph Grid.Column="3"
                                                                        Grid.Row="0"
                                                                        Title="Test Run"
                                                                        ClickCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.TestRunClickCommand}"
@@ -218,139 +242,144 @@
                                                                        Items="{Binding CurrentBuild.CurrentTestRun, Converter={StaticResource TestRunToStackedItemsConverter}}"
                                                                        Visibility="{Binding CurrentBuild.CurrentTestRun, Converter={StaticResource NullVisibilityConverter}}" />-->
 
-                                        <!--
+                                            <!--
                                             Rows with details:
                                             0: Definition name,
                                             1: last status, last ago time, status icon
                                             2: requester name,
                                             3: checkin comment
                                         -->
-                                        <Grid Grid.Column="3" Grid.Row="0" Margin="10 0 0 0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="20" />
-                                                <RowDefinition Height="20" />
-                                                <RowDefinition Height="20" />
-                                                <RowDefinition Height="20" />
-                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Column="4" Grid.Row="0" Margin="10 0 0 0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="20" />
+                                                    <RowDefinition Height="20" />
+                                                    <RowDefinition Height="20" />
+                                                    <RowDefinition Height="20" />
+                                                </Grid.RowDefinitions>
 
-                                            <Button Grid.Row="0" VerticalAlignment="Center" 
-                                                    Foreground="{StaticResource MaterialDesignBody}"
-                                                    Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
-                                                    CommandParameter="{Binding CurrentBuild}">
-                                                <Button.Template>
-                                                    <ControlTemplate>
-                                                        <TextBlock VerticalAlignment="Center"
+                                                <Button Grid.Row="0" 
+                                                        VerticalAlignment="Center" 
+                                                        Focusable="False"
+                                                        IsTabStop="False"
+                                                        Foreground="{StaticResource MaterialDesignBody}"
+                                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.HistoryClickCommand}"
+                                                        CommandParameter="{Binding CurrentBuild}">
+                                                    <Button.Template>
+                                                        <ControlTemplate>
+                                                            <TextBlock VerticalAlignment="Center"
                                                                    FontSize="14"
                                                                    FontWeight="Bold"
                                                                    Text="{Binding CurrentBuild.Description}"
                                                                    TextTrimming="CharacterEllipsis" />
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
-                
-                                            <Grid Grid.Row="1">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="1"
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+
+                                                <Grid Grid.Row="1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="1"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding CurrentBuild.Build.Status}"
                                                            TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2"
+                                                    <TextBlock Grid.Column="2"
                                                            Margin="3 0 0 0"
                                                            VerticalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Text">
-                                                                <Setter.Value>
-                                                                    <MultiBinding StringFormat="{}({0} ago, ran for {1})">
-                                                                        <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="CurrentBuild.BuildStateTime" />
-                                                                        <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="CurrentBuild.BuildDuration" />
-                                                                    </MultiBinding>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding CurrentBuild.BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
-                                                                    <Setter Property="Text" Value="{Binding StringFormat='{}for {0}', Converter={StaticResource TimeSpanToNiceStringConverter}, Path=CurrentBuild.BuildDuration}" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                                <Image Grid.Column="3"
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text">
+                                                                    <Setter.Value>
+                                                                        <MultiBinding StringFormat="{}({0} ago, ran for {1})">
+                                                                            <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="CurrentBuild.BuildStateTime" />
+                                                                            <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="CurrentBuild.BuildDuration" />
+                                                                        </MultiBinding>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding CurrentBuild.BuildStatus}" Value="{x:Static models:BuildStatus.Running}">
+                                                                        <Setter Property="Text" Value="{Binding StringFormat='{}for {0}', Converter={StaticResource TimeSpanToNiceStringConverter}, Path=CurrentBuild.BuildDuration}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <Image Grid.Column="3"
                                                        Height="18"
                                                        Margin="3 0 0 0"
                                                        VerticalAlignment="Center"
                                                        Source="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToImageConverter}}" />
-                                            </Grid>
+                                                </Grid>
 
-                                            <TextBlock Grid.Row="2"
+                                                <TextBlock Grid.Row="2"
                                                        VerticalAlignment="Center"
                                                        Text="{Binding CurrentBuild.RequesterText}"
                                                        TextTrimming="CharacterEllipsis" />
 
-                                            <TextBlock Grid.Row="3"
+                                                <TextBlock Grid.Row="3"
                                                        VerticalAlignment="Center"
                                                        Text="{Binding CurrentBuild.Comment}"
                                                        TextTrimming="CharacterEllipsis"
                                                        TextWrapping="Wrap">
-                                                <TextBlock.ToolTip>
-                                                    <TextBlock MaxWidth="800"
+                                                    <TextBlock.ToolTip>
+                                                        <TextBlock MaxWidth="800"
                                                                Text="{Binding CurrentBuild.Comment}"
                                                                TextWrapping="Wrap" />
-                                                </TextBlock.ToolTip>
+                                                    </TextBlock.ToolTip>
                                             </TextBlock>
 
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Expander Grid.Row="1"
-                                    Background="Transparent" 
-                                    Padding="0" 
-                                    Margin="0" 
-                                    IsExpanded="{Binding AdditionalInformationShown}" 
-                                    Visibility="{Binding AdditionalInformationAvailable, 
-                                        Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Expander.Header>
-                                        <TextBlock Text="Additional Information" />
-                                    </Expander.Header>
-                                    <Expander.Content>
-                                        <Grid Height="80">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="5"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Testruns:" Grid.Row="0" />
-                                            <ItemsControl ItemsSource="{Binding AllBuildItems}" Grid.Row="2">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <VirtualizingStackPanel Orientation="Horizontal" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <localControls:StackedBarGraph BarWidth="12"
+                                    <Expander Grid.Row="1"
+                                              Focusable="False"
+                                              IsTabStop="False"
+                                              Background="Transparent" 
+                                              Padding="0" 
+                                              Margin="0" 
+                                              IsExpanded="{Binding AdditionalInformationShown}" 
+                                              Visibility="{Binding AdditionalInformationAvailable, 
+                                              Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Expander.Header>
+                                            <TextBlock Text="Additional Information" />
+                                        </Expander.Header>
+                                        <Expander.Content>
+                                            <Grid Height="80">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Testruns:" Grid.Row="0" />
+                                                <ItemsControl ItemsSource="{Binding AllBuildItems}" Grid.Row="2"  IsTabStop="False" Focusable="False">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <VirtualizingStackPanel Orientation="Horizontal" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <localControls:StackedBarGraph BarWidth="12"
                                                                                        Width="12"
                                                                                         Margin="0 0 5 0"
                                                                                         ClickCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.TestRunClickCommand}"
                                                                                         ClickCommandParameter="{Binding CurrentTestRun}"
                                                                                         Items="{Binding CurrentTestRun, Converter={StaticResource TestRunToStackedItemsConverter}}" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
-                                    </Expander.Content>
-                                </Expander>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </Expander.Content>
+                                    </Expander>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
         </Grid>
 
         <!--  in case there are no builds (loaded yet):  -->
@@ -381,16 +410,17 @@
                    FontSize="16"
                    Text="Please configure in settings to start getting build results."
                    TextWrapping="WrapWithOverflow">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding BuildCache.CacheStatus}" Value="{x:Static client:BuildCacheStatus.NotConfigured}">
-                            <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-    </Grid>
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding BuildCache.CacheStatus}" Value="{x:Static client:BuildCacheStatus.NotConfigured}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+    </materialDesign:DialogHost>
 </controls:MetroWindow>
