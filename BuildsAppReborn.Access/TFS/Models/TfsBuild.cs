@@ -28,6 +28,23 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("definition")]
         public abstract IBuildDefinition Definition { get; protected set; }
 
+        [JsonIgnore]
+        public IUser DisplayUser
+        {
+            get
+            {
+                if (SourceVersion != null)
+                {
+                    if (SourceVersion.Pusher.Id != TfsConsts.MicrosoftTeamFoundationSystemId)
+                    {
+                        return SourceVersion.Pusher;
+                    }
+                }
+
+                return Requester;
+            }
+        }
+
         [JsonProperty("finishTime")]
         public DateTime FinishDateTime { get; private set; }
 
@@ -39,6 +56,48 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("queueTime")]
         public DateTime QueueDateTime { get; private set; }
+
+        [JsonIgnore]
+        public BuildReason Reason
+        {
+            get
+            {
+                if (this.reason == "batchedCI" ||
+                    this.reason == "individualCI" ||
+                    this.reason == "checkInShelveset")
+                {
+                    return BuildReason.ContinuousIntegration;
+                }
+
+                if (this.reason == "manual")
+                {
+                    return BuildReason.Manual;
+                }
+
+                if (this.reason == "pullRequest")
+                {
+                    return BuildReason.PullRequest;
+                }
+
+                if (this.reason == "schedule")
+                {
+                    return BuildReason.Schedule;
+                }
+
+                if (this.reason == "triggered")
+                {
+                    return BuildReason.Triggered;
+                }
+
+                if (this.reason == "validateShelveset" ||
+                    this.reason == "checkInShelveset")
+                {
+                    return BuildReason.Validation;
+                }
+
+                return BuildReason.Unknown;
+            }
+        }
 
         [JsonProperty("requestedFor")]
         public abstract IUser Requester { get; protected set; }
@@ -122,6 +181,8 @@ namespace BuildsAppReborn.Access.Models
 
         [JsonProperty("uri")]
         internal String Uri { get; private set; }
+
+        [JsonProperty("reason")] private String reason;
 
         [JsonProperty("result")] private String result;
 

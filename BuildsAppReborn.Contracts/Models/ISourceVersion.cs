@@ -6,6 +6,10 @@ namespace BuildsAppReborn.Contracts.Models
     {
         INamedObject Author { get; }
 
+        INamedObject Committer { get; }
+
+        IUser Pusher { get; }
+
         String Comment { get; }
 
         String PortalUrl { get; }

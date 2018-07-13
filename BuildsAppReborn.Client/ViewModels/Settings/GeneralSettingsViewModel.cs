@@ -51,7 +51,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
         public void OnSave()
         {
-            this.globalSettingsContainer.GeneralSettings = GeneralSettings.Clone();
+            this.globalSettingsContainer.Update(GeneralSettings.Clone());
             this.globalSettingsContainer.Save();
 
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);

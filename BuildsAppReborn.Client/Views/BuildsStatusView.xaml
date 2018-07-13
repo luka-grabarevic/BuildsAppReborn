@@ -163,7 +163,7 @@
                                                                                             <Setter Property="Text">
                                                                                                 <Setter.Value>
                                                                                                     <MultiBinding StringFormat="{}{5}&#x0d;&#x0a;{0} ({4}, {1} ago, ran for {3})&#x0d;&#x0a;{2}">
-                                                                                                        <Binding Path="RequesterText" />
+                                                                                                        <Binding Path="DisplayUserText" />
                                                                                                         <Binding Converter="{StaticResource BuildTimeToElapsedTimeConverter}" Path="BuildStateTime" />
                                                                                                         <Binding Path="Comment" />
                                                                                                         <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
@@ -177,7 +177,7 @@
                                                                                                     <Setter Property="Text">
                                                                                                         <Setter.Value>
                                                                                                             <MultiBinding StringFormat="{}{4}&#x0d;&#x0a;{0} ({3} for {2})&#x0d;&#x0a;{1}">
-                                                                                                                <Binding Path="RequesterText" />
+                                                                                                                <Binding Path="DisplayUserText" />
                                                                                                                 <Binding Path="Comment" />
                                                                                                                 <Binding Converter="{StaticResource TimeSpanToNiceStringConverter}" Path="BuildDuration" />
                                                                                                                 <Binding Path="BuildStatus" />
@@ -220,12 +220,12 @@
                                                     Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
                                                 <Button.Template>
                                                     <ControlTemplate>
-                                                        <Image Source="{Binding CurrentBuild.RequesterImage}" />
+                                                        <Image Source="{Binding CurrentBuild.DisplayUserImage}" />
                                                     </ControlTemplate>
                                                 </Button.Template>
                                                 <Button.CommandParameter>
                                                     <StackPanel Margin="16" Focusable="False">
-                                                        <Image Source="{Binding CurrentBuild.RequesterImage}" />
+                                                        <Image Source="{Binding CurrentBuild.DisplayUserImage}" />
                                                         <Button Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True" 
                                                                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                                                                 HorizontalAlignment="Center">CLOSE</Button>
@@ -317,7 +317,7 @@
 
                                                 <TextBlock Grid.Row="2"
                                                        VerticalAlignment="Center"
-                                                       Text="{Binding CurrentBuild.RequesterText}"
+                                                       Text="{Binding CurrentBuild.DisplayUserText}"
                                                        TextTrimming="CharacterEllipsis" />
 
                                                 <TextBlock Grid.Row="3"

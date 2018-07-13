@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BuildsAppReborn.Contracts.Models;
 using BuildsAppReborn.Infrastructure;
 
@@ -25,15 +26,7 @@ namespace BuildsAppReborn.Client
         /// The general settings.
         /// </value>
         [Export]
-        public GeneralSettings GeneralSettings
-        {
-            get { return this.generalSettingsContainer.Single(); }
-            set
-            {
-                this.generalSettingsContainer.Clear();
-                this.generalSettingsContainer.Add(value);
-            }
-        }
+        public GeneralSettings GeneralSettings => this.generalSettingsContainer.Single();
 
         public void Save()
         {
@@ -41,18 +34,26 @@ namespace BuildsAppReborn.Client
             this.generalSettingsContainer.Save(this.generalSettingsFilePath);
         }
 
+        public void Update(GeneralSettings generalSettings)
+        {
+            foreach (var property in this.generalSettingsProperties)
+            {
+                property.SetValue(GeneralSettings, property.GetValue(generalSettings));
+            }
+        }
+
         private void Load()
         {
-            var buidSettings = "buildMonitorSettings.json";
-            var generalsettingsJson = "generalSettings.json";
+            var buildSettings = "buildMonitorSettings.json";
+            var generalSettingsJson = "generalSettings.json";
 
 #if DEBUG
-            buidSettings = "buildMonitorSettings_debug.json";
-            generalsettingsJson = "generalSettings_debug.json";
+            buildSettings = "buildMonitorSettings_debug.json";
+            generalSettingsJson = "generalSettings_debug.json";
 #endif
 
-            this.buildMonitorSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, buidSettings);
-            this.generalSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, generalsettingsJson);
+            this.buildMonitorSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, buildSettings);
+            this.generalSettingsFilePath = Path.Combine(Consts.ApplicationUserProfileFolder, generalSettingsJson);
 
             BuildMonitorSettingsContainer = SettingsContainer<BuildMonitorSettings>.Load(this.buildMonitorSettingsFilePath);
             this.generalSettingsContainer = SettingsContainer<GeneralSettings>.Load(this.generalSettingsFilePath);
@@ -68,5 +69,8 @@ namespace BuildsAppReborn.Client
         private SettingsContainer<GeneralSettings> generalSettingsContainer;
 
         private String generalSettingsFilePath;
+
+        private readonly PropertyInfo[] generalSettingsProperties =
+            typeof(GeneralSettings).GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(a => a.CanWrite).ToArray();
     }
 }

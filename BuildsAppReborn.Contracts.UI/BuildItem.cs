@@ -79,7 +79,7 @@ namespace BuildsAppReborn.Contracts.UI
             {
                 if (Build?.SourceVersion?.Comment != null)
                 {
-                    return !RequesterIsCommitter ? $"{Build.SourceVersion.Author.Name}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
+                    return ManualRequested ? $"{Build.DisplayUser.DisplayName}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
                 }
 
                 return "-";
@@ -101,9 +101,9 @@ namespace BuildsAppReborn.Contracts.UI
             }
         }
 
-        public Byte[] RequesterImage => Build?.Requester?.ImageData;
+        public Byte[] DisplayUserImage => Build?.DisplayUser?.ImageData;
 
-        public String RequesterText => !RequesterIsCommitter ? $"Requested by: {Build.Requester.DisplayName}" : Build.Requester.DisplayName;
+        public String DisplayUserText => ManualRequested ? $"Requested by: {Build.Requester.DisplayName}" : Build.DisplayUser.DisplayName;
 
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
         public void Refresh()
@@ -116,7 +116,7 @@ namespace BuildsAppReborn.Contracts.UI
             OnPropertyChanged(nameof(CurrentTestRun));
         }
 
-        private Boolean RequesterIsCommitter => Build?.SourceVersion?.Author?.Name == Build?.Requester?.DisplayName;
+        private Boolean ManualRequested => Build.Reason == BuildReason.Manual;
 
         private readonly BuildViewStyle viewStyle;
     }

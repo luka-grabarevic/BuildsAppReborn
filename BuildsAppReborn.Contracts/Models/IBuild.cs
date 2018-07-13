@@ -12,6 +12,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         IBuildDefinition Definition { get; }
 
+        IUser DisplayUser { get; }
+
         DateTime FinishDateTime { get; }
 
         Int32 Id { get; }
@@ -19,6 +21,8 @@ namespace BuildsAppReborn.Contracts.Models
         IPullRequest PullRequest { get; }
 
         DateTime QueueDateTime { get; }
+
+        BuildReason Reason { get; }
 
         IUser Requester { get; }
 

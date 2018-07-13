@@ -13,6 +13,12 @@ namespace BuildsAppReborn.Access
         public INamedObject Author => this.commit?.Author;
 
         [JsonIgnore]
+        public INamedObject Committer { get; set; }
+
+        [JsonIgnore]
+        public IUser Pusher { get; set; }
+
+        [JsonIgnore]
         public String Comment => this.commit?.Message;
 
         [JsonProperty("html_url")]
