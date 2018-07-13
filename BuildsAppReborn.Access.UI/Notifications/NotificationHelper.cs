@@ -25,7 +25,7 @@ namespace BuildsAppReborn.Access.UI.Notifications
 
         public static String GenerateUsername(this IBuild build)
         {
-            return build.Requester.DisplayName;
+            return build.DisplayUser.DisplayName;
         }
     }
 }

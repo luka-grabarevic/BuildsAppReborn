@@ -175,6 +175,54 @@ namespace BuildsAppReborn.Access
             return await HttpRequestHelper.GetRequestResponseAsync(requestUrl, credentials).ConfigureAwait(false);
         }
 
+        private static async Task<TInnerSourceVersion> GetSourceVersionAsync<TInnerSourceVersion>(BuildMonitorSettings settings, String requestUrl)
+            where TInnerSourceVersion : ISourceVersion, new()
+        {
+            var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
+            if (requestResponse.IsSuccessStatusCode)
+            {
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<TInnerSourceVersion>(result);
+            }
+
+            return default(TInnerSourceVersion);
+        }
+
+        private static async Task<TSourceVersion> GetTfsGitSourceVersionAsync(BuildMonitorSettings settings, String projectUrl, TBuild build)
+        {
+            var requestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{build.SourceVersionInternal}?api-version=1.0";
+            var sourceVersion = await GetSourceVersionAsync<TSourceVersion>(settings, requestUrl).ConfigureAwait(false);
+
+            // special case detection if it as auto merge commit made by TFS pull requests
+            if (build.Reason == BuildReason.PullRequest || 
+                build.Reason == BuildReason.Validation)
+            {
+                if (sourceVersion != null && sourceVersion.Parents.Length > 1 && sourceVersion.Pusher.Id == TfsConsts.MicrosoftTeamFoundationSystemId)
+                {
+                    var innerRequestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{sourceVersion.Parents.Last()}?api-version=1.0";
+
+                    return await GetSourceVersionAsync<TSourceVersion>(settings, innerRequestUrl).ConfigureAwait(false);
+                }
+            }
+
+            return sourceVersion;
+        }
+
+        private static async Task ResolveTestRunsAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
+        {
+            foreach (var build in builds)
+            {
+                var requestUrl = $"{projectUrl}/_apis/test/runs?api-version=1.0&buildUri={build.Uri}";
+
+                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
+                if (requestResponse.IsSuccessStatusCode)
+                {
+                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    build.TestRuns = JsonConvert.DeserializeObject<IEnumerable<TTestRun>>(JObject.Parse(result)["value"].ToString());
+                }
+            }
+        }
+
         private async Task<DataResponse<IEnumerable<TBuild>>> GetBuildsOfPullRequestAsync(IPullRequest pullRequest, BuildMonitorSettings settings)
         {
             var projectUrl = settings.GetValueStrict<String>(ProjectUrlSettingKey).TrimEnd('/');
@@ -220,11 +268,12 @@ namespace BuildsAppReborn.Access
         private async Task ResolveAdditionalBuildDataAsync(BuildMonitorSettings settings, List<TBuild> data, String projectUrl)
         {
             data.Select(d => d.Definition).OfType<TBuildDefinition>().ToList().ForEach(d => d.BuildSettingsId = settings.UniqueId);
-            data.Select(d => d.Requester).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageDataAsync(settings, a));
 
             await ResolveSourceVersionAsync(data, projectUrl, settings).ConfigureAwait(false);
             await ResolveArtifactsAsync(data, projectUrl, settings).ConfigureAwait(false);
             await ResolveTestRunsAsync(data, projectUrl, settings).ConfigureAwait(false);
+
+            data.Select(d => d.DisplayUser).OfType<TUser>().ToList().ForEach(a => a.ImageDataLoader = GetImageDataAsync(settings, a));
         }
 
         private async Task ResolveArtifactsAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
@@ -252,15 +301,14 @@ namespace BuildsAppReborn.Access
                     foreach (var build in group)
                     {
                         var requestUrl = $"{projectUrl}/_apis/tfvc/changesets/{build.SourceVersionInternal}?api-version=1.0&includeDetails=true";
-                        await SetSourceVersionAsync<TSourceVersion>(settings, requestUrl, build).ConfigureAwait(false);
+                        build.SourceVersion = await GetSourceVersionAsync<TSourceVersion>(settings, requestUrl).ConfigureAwait(false);
                     }
                 }
                 else if (group.Key == RepositoryType.TfsGit)
                 {
                     foreach (var build in group)
                     {
-                        var requestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{build.SourceVersionInternal}?api-version=1.0";
-                        await SetSourceVersionAsync<TSourceVersion>(settings, requestUrl, build).ConfigureAwait(false);
+                        build.SourceVersion = await GetTfsGitSourceVersionAsync(settings, projectUrl, build).ConfigureAwait(false);
                     }
                 }
                 else if (group.Key == RepositoryType.GitHub)
@@ -284,31 +332,6 @@ namespace BuildsAppReborn.Access
                     }
 #endif
                 }
-            }
-        }
-
-        private static async Task ResolveTestRunsAsync(IEnumerable<TBuild> builds, String projectUrl, BuildMonitorSettings settings)
-        {
-            foreach (var build in builds)
-            {
-                var requestUrl = $"{projectUrl}/_apis/test/runs?api-version=1.0&buildUri={build.Uri}";
-
-                var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-                if (requestResponse.IsSuccessStatusCode)
-                {
-                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    build.TestRuns = JsonConvert.DeserializeObject<IEnumerable<TTestRun>>(JObject.Parse(result)["value"].ToString());
-                }
-            }
-        }
-
-        private static async Task SetSourceVersionAsync<TInnerSourceVersion>(BuildMonitorSettings settings, String requestUrl, TBuild build) where TInnerSourceVersion : ISourceVersion, new()
-        {
-            var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-            if (requestResponse.IsSuccessStatusCode)
-            {
-                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                build.SourceVersion = JsonConvert.DeserializeObject<TInnerSourceVersion>(result);
             }
         }
     }

@@ -67,6 +67,7 @@
     <Compile Include="IProgressComponent.cs" />
     <Compile Include="Models\Base\IWebItem.cs" />
     <Compile Include="Models\BuildMonitorSettings.cs" />
+    <Compile Include="Models\BuildReason.cs" />
     <Compile Include="Models\BuildStatus.cs" />
     <Compile Include="Models\AuthenticationModes.cs" />
     <Compile Include="Models\DataResponse.cs" />

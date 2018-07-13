@@ -68,10 +68,12 @@
     <Compile Include="TFS2017\Models\Tfs2017User.cs" />
     <Compile Include="TFS2017\Models\TfsTestRun.cs" />
     <Compile Include="TFS2017\Tfs2017BuildProvider.cs" />
+    <Compile Include="TFS\Models\Internal\ITfsPush.cs" />
     <Compile Include="TFS\Models\Internal\LinksContainer.cs" />
     <Compile Include="TFS\Models\Internal\Repository.cs" />
     <Compile Include="TFS\Models\Internal\RepositoryType.cs" />
     <Compile Include="TFS\Models\Internal\Resource.cs" />
+    <Compile Include="TFS\Models\Internal\TfsPush.cs" />
     <Compile Include="TFS\Models\TfsBuild.cs" />
     <Compile Include="TFS\Models\TfsBuildDefinition.cs" />
     <Compile Include="TFS\Models\TfsProject.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TFS\Models\TfsArtifact.cs" />
     <Compile Include="TFS\TfsBuildProviderBase.cs" />
+    <Compile Include="TFS\TfsConsts.cs" />
     <Compile Include="VSTS\Models\VstsPullRequest.cs" />
     <Compile Include="VSTS\Models\VstsTestRun.cs" />
     <Compile Include="VSTS\Models\VstsArtifact.cs" />

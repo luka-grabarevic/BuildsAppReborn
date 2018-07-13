@@ -181,7 +181,7 @@ namespace BuildsAppReborn.Client
                 var relevantBuilds = new List<IBuild>();
                 foreach (var buildStatus in BuildsStatus)
                 {
-                    var lastFinishedBuild = buildStatus.AllBuildItems.Last(a => a.Build.Status != BuildStatus.Running && a.Build.Status != BuildStatus.Queued);
+                    var lastFinishedBuild = buildStatus.AllBuildItems.LastOrDefault(a => a.Build.Status != BuildStatus.Running && a.Build.Status != BuildStatus.Queued);
                     if (lastFinishedBuild != null)
                     {
                         relevantBuilds.Add(lastFinishedBuild.Build);
