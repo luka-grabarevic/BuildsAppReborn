@@ -43,7 +43,7 @@ namespace BuildsAppReborn.Access
         public async Task BeginPollingBuildsAsync()
         {
             var builds = new List<IBuild>();
-            foreach (var pair in this.providerSettingsGroup)
+            foreach (var pair in this.providerSettingsGroup.ToList())
             {
                 foreach (var setting in pair.Value)
                 {

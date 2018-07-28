@@ -14,6 +14,8 @@ namespace BuildsAppReborn.Contracts.UI
 
         String Url { get; }
 
+        Boolean IsInEditMode { get; set; }
+
         void Initialize(BuildMonitorSettings settings);
     }
 }

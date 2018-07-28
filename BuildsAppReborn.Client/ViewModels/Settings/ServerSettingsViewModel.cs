@@ -56,6 +56,12 @@ namespace BuildsAppReborn.Client.ViewModels
         {
             this.globalSettingsContainer.BuildMonitorSettingsContainer = this.buildMonitorSettingsContainer.Clone();
             this.globalSettingsContainer.Save();
+
+            foreach (var viewModel in Views.Select(a => a.ViewModel))
+            {
+                viewModel.IsInEditMode = false;
+            }
+
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);
             this.buildMonitor.BeginPollingBuildsAsync();
         }

@@ -56,7 +56,10 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <materialDesign:Flipper Margin="4 4 0 0" Style="{StaticResource MaterialDesignCardFlipper}">
+                                    <materialDesign:Flipper 
+                                        Margin="4 4 0 0" 
+                                        Style="{StaticResource MaterialDesignCardFlipper}"
+                                        IsFlipped="{Binding ViewModel.IsInEditMode, UpdateSourceTrigger=PropertyChanged}">
                                         <materialDesign:Flipper.BackContent>
                                             <Grid Name="backGrid">
                                                 <Grid.RowDefinitions>

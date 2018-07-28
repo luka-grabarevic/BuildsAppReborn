@@ -24,6 +24,16 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public abstract String Url { get; }
 
+        public Boolean IsInEditMode
+        {
+            get { return this.isInEditMode; }
+            set
+            {
+                this.isInEditMode = value;
+                OnPropertyChanged();
+            }
+        }
+
         public virtual void Initialize(BuildMonitorSettings settings)
         {
             if (settings == null)
@@ -68,6 +78,8 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         [ImportMany]
 #pragma warning disable 649
         private Lazy<IBuildProvider, IBuildProviderMetadata>[] buildProviders;
+
+        private Boolean isInEditMode;
 
 #pragma warning restore 649
     }
