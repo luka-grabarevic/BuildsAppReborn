@@ -59,7 +59,7 @@ namespace BuildsAppReborn.Client.ViewModels
 
             foreach (var viewModel in Views.Select(a => a.ViewModel))
             {
-                viewModel.IsInEditMode = false;
+                viewModel.Save();
             }
 
             this.buildMonitor.Start(this.globalSettingsContainer.BuildMonitorSettingsContainer, this.globalSettingsContainer.GeneralSettings);

@@ -18,6 +18,16 @@ namespace BuildsAppReborn.Access.UI.ViewModel.SubViewModels
 
         public IBuildDefinition BuildDefinition { get; }
 
+        public Boolean IsDeleted
+        {
+            get { return this.isDeleted; }
+            set
+            {
+                this.isDeleted = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Boolean IsSelected
         {
             get { return this.isSelected; }
@@ -29,6 +39,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel.SubViewModels
         }
 
         public String Name => BuildDefinition.Name;
+        private Boolean isDeleted;
 
         private Boolean isSelected;
     }

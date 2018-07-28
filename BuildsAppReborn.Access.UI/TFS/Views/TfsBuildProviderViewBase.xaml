@@ -114,7 +114,18 @@
                                 </Grid.ColumnDefinitions>
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsSelected}" />
                                 <StackPanel Grid.Column="1" Margin="8 0 0 0">
-                                    <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                    <TextBlock FontWeight="Bold" Text="{Binding Name}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDeleted}" Value="True">
+                                                        <Setter Property="Foreground" Value="Red" />
+                                                        <Setter Property="ToolTip" Value="Build Definition is deleted on TFS. Will be removed when settings are saved." />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                             </Grid>
                         </Border>

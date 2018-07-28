@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using BuildsAppReborn.Contracts;
@@ -14,16 +15,6 @@ namespace BuildsAppReborn.Access.UI.ViewModel
     {
         public abstract String DisplayName { get; protected set; }
 
-        public BuildMonitorSettings MonitorSettings { get; private set; }
-
-        public abstract IEnumerable<IBuildDefinition> SelectedBuildDefinitions { get; }
-
-        public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
-
-        public Boolean SupportsPersonalAccessToken => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.AccessToken);
-
-        public abstract String Url { get; }
-
         public Boolean IsInEditMode
         {
             get { return this.isInEditMode; }
@@ -33,6 +24,16 @@ namespace BuildsAppReborn.Access.UI.ViewModel
                 OnPropertyChanged();
             }
         }
+
+        public BuildMonitorSettings MonitorSettings { get; private set; }
+
+        public abstract ObservableCollection<IBuildDefinition> SelectedBuildDefinitions { get; }
+
+        public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
+
+        public Boolean SupportsPersonalAccessToken => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.AccessToken);
+
+        public abstract String Url { get; }
 
         public virtual void Initialize(BuildMonitorSettings settings)
         {
@@ -65,6 +66,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             {
                 throw new Exception($"No build provider found for id {identifierExportAttribute?.Id}");
             }
+        }
+
+        public virtual void Save()
+        {
         }
 
         protected IBuildProvider BuildProvider { get; private set; }
