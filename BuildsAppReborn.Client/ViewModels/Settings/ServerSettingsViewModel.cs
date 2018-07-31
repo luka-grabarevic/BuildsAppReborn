@@ -33,6 +33,7 @@ namespace BuildsAppReborn.Client.ViewModels
             SaveCommand = new DelegateCommand(OnSave);
             AddProviderCommand = new DelegateCommand<IIdentifierMetadata>(OnAddProvider);
             RemoveProviderCommand = new DelegateCommand<IBuildProviderView>(OnRemoveView);
+            EditCommand = new DelegateCommand<IBuildProviderView>(OnEdit);
         }
 
         public DelegateCommand<IIdentifierMetadata> AddProviderCommand { get; }
@@ -40,6 +41,8 @@ namespace BuildsAppReborn.Client.ViewModels
         public IEnumerable<IIdentifierMetadata> AvailableProvider => BuildProviderViews.MetaData;
 
         public ExportFactoryContainer<IBuildProviderView, IIdentifierMetadata> BuildProviderViews { get; }
+
+        public DelegateCommand<IBuildProviderView> EditCommand { get; }
 
         public DelegateCommand<IBuildProviderView> RemoveProviderCommand { get; }
 
@@ -95,6 +98,11 @@ namespace BuildsAppReborn.Client.ViewModels
             this.buildMonitorSettingsContainer.Add(buildMonitorSettings);
 
             AddView(providerid, buildMonitorSettings);
+        }
+
+        private void OnEdit(IBuildProviderView view)
+        {
+            view.ViewModel.IsInEditMode = !view.ViewModel.IsInEditMode;
         }
 
         private void OnRemoveView(IBuildProviderView view)

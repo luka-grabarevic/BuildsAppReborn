@@ -104,19 +104,22 @@ namespace BuildsAppReborn.Access.UI.ViewModel
 
         public override void Save()
         {
-            base.Save();
-
-            MonitorSettings.SelectedBuildDefinitions.Clear();
-            var selected = BuildDefinitions.Where(a => a.IsSelected && !a.IsDeleted);
-            foreach (var viewModel in selected)
+            if (IsInEditMode)
             {
-                MonitorSettings.SelectedBuildDefinitions.Add(viewModel.BuildDefinition);
+                base.Save();
+
+                MonitorSettings.SelectedBuildDefinitions.Clear();
+                var selected = BuildDefinitions.Where(a => a.IsSelected && !a.IsDeleted);
+                foreach (var viewModel in selected)
+                {
+                    MonitorSettings.SelectedBuildDefinitions.Add(viewModel.BuildDefinition);
+                }
+
+                IsInEditMode = false;
+
+                UpdateSelectedCollection();
+                BuildDefinitions.Clear();
             }
-
-            IsInEditMode = false;
-
-            UpdateSelectedCollection();
-            BuildDefinitions.Clear();
         }
 
         protected abstract String ProviderName { get; }

@@ -9,7 +9,7 @@ namespace BuildsAppReborn.Contracts.UI
     {
         String DisplayName { get; }
 
-        Boolean IsInEditMode { get; }
+        Boolean IsInEditMode { get; set; }
 
         BuildMonitorSettings MonitorSettings { get; }
 

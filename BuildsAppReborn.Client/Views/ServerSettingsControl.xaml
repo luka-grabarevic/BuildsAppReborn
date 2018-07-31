@@ -69,7 +69,9 @@
                                                 <materialDesign:ColorZone Mode="PrimaryMid" Padding="5">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Button HorizontalAlignment="Left"
-                                                                Command="{x:Static materialDesign:Flipper.FlipCommand}"
+                                                                Command="{Binding Path=DataContext.EditCommand,
+                                                                              RelativeSource={RelativeSource AncestorType=views:ServerSettingsControl}}"
+                                                                CommandParameter="{Binding}"
                                                                 Style="{StaticResource MaterialDesignToolForegroundButton}">
                                                             <materialDesign:PackIcon HorizontalAlignment="Right" Kind="ArrowLeft" />
                                                         </Button>
@@ -106,7 +108,9 @@
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <Button Grid.Column="0"
-                                                            Command="{x:Static materialDesign:Flipper.FlipCommand}"
+                                                            Command="{Binding Path=DataContext.EditCommand,
+                                                                              RelativeSource={RelativeSource AncestorType=views:ServerSettingsControl}}"
+                                                            CommandParameter="{Binding}"
                                                             Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
                                                         <materialDesign:PackIcon Kind="Pencil" />
                                                     </Button>
