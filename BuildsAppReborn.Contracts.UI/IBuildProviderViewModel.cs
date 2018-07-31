@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using BuildsAppReborn.Contracts.Models;
 
 namespace BuildsAppReborn.Contracts.UI
@@ -8,12 +9,16 @@ namespace BuildsAppReborn.Contracts.UI
     {
         String DisplayName { get; }
 
+        Boolean IsInEditMode { get; set; }
+
         BuildMonitorSettings MonitorSettings { get; }
 
-        IEnumerable<IBuildDefinition> SelectedBuildDefinitions { get; }
+        ObservableCollection<IBuildDefinition> SelectedBuildDefinitions { get; }
 
         String Url { get; }
 
         void Initialize(BuildMonitorSettings settings);
+
+        void Save();
     }
 }

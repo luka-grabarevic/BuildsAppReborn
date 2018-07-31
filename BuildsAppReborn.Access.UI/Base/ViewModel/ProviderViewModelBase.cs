@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using BuildsAppReborn.Contracts;
@@ -14,9 +15,19 @@ namespace BuildsAppReborn.Access.UI.ViewModel
     {
         public abstract String DisplayName { get; protected set; }
 
+        public Boolean IsInEditMode
+        {
+            get { return this.isInEditMode; }
+            set
+            {
+                this.isInEditMode = value;
+                OnPropertyChanged();
+            }
+        }
+
         public BuildMonitorSettings MonitorSettings { get; private set; }
 
-        public abstract IEnumerable<IBuildDefinition> SelectedBuildDefinitions { get; }
+        public abstract ObservableCollection<IBuildDefinition> SelectedBuildDefinitions { get; }
 
         public Boolean SupportsDefaultCredentials => BuildProviderMetaData.SupportedAuthenticationModes.HasFlag(AuthenticationModes.Default);
 
@@ -57,6 +68,10 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
         }
 
+        public virtual void Save()
+        {
+        }
+
         protected IBuildProvider BuildProvider { get; private set; }
 
         protected IBuildProviderMetadata BuildProviderMetaData { get; private set; }
@@ -68,6 +83,8 @@ namespace BuildsAppReborn.Access.UI.ViewModel
         [ImportMany]
 #pragma warning disable 649
         private Lazy<IBuildProvider, IBuildProviderMetadata>[] buildProviders;
+
+        private Boolean isInEditMode;
 
 #pragma warning restore 649
     }

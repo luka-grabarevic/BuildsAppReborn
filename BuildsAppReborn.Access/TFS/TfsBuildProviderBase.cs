@@ -34,19 +34,16 @@ namespace BuildsAppReborn.Access
                 var requestUrl = $"{projectUrl}/_apis/build/definitions?api-version={ApiVersion}";
 
                 var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-                if (requestResponse.IsSuccessStatusCode)
+                requestResponse.ThrowIfUnsuccessful();
+                
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var data = JsonConvert.DeserializeObject<List<TBuildDefinition>>(JObject.Parse(result)["value"].ToString());
+                foreach (var buildDefinition in data)
                 {
-                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    var data = JsonConvert.DeserializeObject<List<TBuildDefinition>>(JObject.Parse(result)["value"].ToString());
-                    foreach (var buildDefinition in data)
-                    {
-                        buildDefinition.BuildSettingsId = settings.UniqueId;
-                    }
-
-                    return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
+                    buildDefinition.BuildSettingsId = settings.UniqueId;
                 }
 
-                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = Enumerable.Empty<IBuildDefinition>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuildDefinition>> {Data = data, StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception("Error while processing method!");
@@ -70,16 +67,13 @@ namespace BuildsAppReborn.Access
                 var buildDefinitionsCommaList = String.Join(",", buildDefinitionsList.Select(a => a.Id));
                 var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&definitions={buildDefinitionsCommaList}&maxBuildsPerDefinition={maxBuilds}";
                 var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-                if (requestResponse.IsSuccessStatusCode)
-                {
-                    var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
-                    await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
+                requestResponse.ThrowIfUnsuccessful();
 
-                    return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
-                }
+                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+                await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
 
-                return new DataResponse<IEnumerable<IBuild>> {Data = Enumerable.Empty<TBuild>(), StatusCode = requestResponse.StatusCode};
+                return new DataResponse<IEnumerable<IBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
             }
 
             throw new Exception("Error while processing method!");
@@ -91,39 +85,36 @@ namespace BuildsAppReborn.Access
 
             var requestUrl = $"{projectUrl}/_apis/git/pullrequests?api-version={ApiVersion}";
             var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-            if (requestResponse.IsSuccessStatusCode)
+            requestResponse.ThrowIfUnsuccessful();
+
+            var dict = new Dictionary<IPullRequest, IEnumerable<TBuild>>();
+
+            var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var data = JsonConvert.DeserializeObject<List<TPullRequest>>(JObject.Parse(result)["value"].ToString());
+
+            foreach (var pullRequest in data)
             {
-                var dict = new Dictionary<IPullRequest, IEnumerable<TBuild>>();
-
-                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var data = JsonConvert.DeserializeObject<List<TPullRequest>>(JObject.Parse(result)["value"].ToString());
-
-                foreach (var pullRequest in data)
+                var buildsResponse = await GetBuildsOfPullRequestAsync(pullRequest, settings).ConfigureAwait(false);
+                if (buildsResponse.IsSuccessStatusCode)
                 {
-                    var buildsResponse = await GetBuildsOfPullRequestAsync(pullRequest, settings).ConfigureAwait(false);
-                    if (buildsResponse.IsSuccessStatusCode)
-                    {
-                        dict.Add(pullRequest, buildsResponse.Data);
-                    }
-                    else
-                    {
-                        throw new Exception("Error while processing method!");
-                    }
+                    dict.Add(pullRequest, buildsResponse.Data);
                 }
-
-                // sets the relation of the PR to the build object
-                foreach (var keyValuePair in dict)
+                else
                 {
-                    foreach (var build in keyValuePair.Value)
-                    {
-                        build.PullRequest = keyValuePair.Key;
-                    }
+                    throw new Exception("Error while processing method!");
                 }
-
-                return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a => a).ToList(), StatusCode = requestResponse.StatusCode};
             }
 
-            throw new Exception("Error while processing method!");
+            // sets the relation of the PR to the build object
+            foreach (var keyValuePair in dict)
+            {
+                foreach (var build in keyValuePair.Value)
+                {
+                    build.PullRequest = keyValuePair.Key;
+                }
+            }
+
+            return new DataResponse<IEnumerable<IBuild>> {Data = dict.Values.SelectMany(a => a).ToList(), StatusCode = requestResponse.StatusCode};
         }
 
         protected abstract String ApiVersion { get; }
@@ -232,17 +223,14 @@ namespace BuildsAppReborn.Access
 
             var requestUrl = $"{projectUrl}/_apis/build/builds?api-version={ApiVersion}&branchName=refs%2Fpull%2F{pullRequest.Id}%2Fmerge&$top={maxBuilds}";
             var requestResponse = await GetRequestResponseAsync(requestUrl, settings).ConfigureAwait(false);
-            if (requestResponse.IsSuccessStatusCode)
-            {
-                var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
+            requestResponse.ThrowIfUnsuccessful();
 
-                await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
+            var result = await requestResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var data = JsonConvert.DeserializeObject<List<TBuild>>(JObject.Parse(result)["value"].ToString());
 
-                return new DataResponse<IEnumerable<TBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
-            }
+            await ResolveAdditionalBuildDataAsync(settings, data, projectUrl).ConfigureAwait(false);
 
-            throw new Exception("Error while processing method!");
+            return new DataResponse<IEnumerable<TBuild>> {Data = data, StatusCode = requestResponse.StatusCode};
         }
 
         private Tuple<String, String> GetGitOwnerAndRepo(String gitHubRepoUrl)
