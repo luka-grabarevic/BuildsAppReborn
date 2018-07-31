@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using BuildsAppReborn.Access.UI.ViewModel.SubViewModels;
@@ -196,7 +197,7 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             {
                 Application.Current.Dispatcher.Invoke(() => { BuildDefinitions.Clear(); });
 
-                var buildDefinitions = await Task.Run(() => BuildProvider.GetBuildDefinitionsAsync(MonitorSettings)).ConfigureAwait(false);
+                var buildDefinitions = await BuildProvider.GetBuildDefinitionsAsync(MonitorSettings).ConfigureAwait(false);
 
                 if (buildDefinitions.IsSuccessStatusCode)
                 {
@@ -206,16 +207,12 @@ namespace BuildsAppReborn.Access.UI.ViewModel
                 }
                 else
                 {
-                    if (buildDefinitions.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        ShowPersonalAccessTokenInput = true;
-                        StatusText = $"Authorization failed, please provide personal access token!";
-                    }
-                    else
-                    {
-                        StatusText = $"Error connecting. StatusCode: {buildDefinitions.StatusCode}";
-                    }
+                    AccessTokenInputWhenUnauthorized(buildDefinitions.StatusCode);
                 }
+            }
+            catch (AdvancedHttpRequestException ex)
+            {
+                AccessTokenInputWhenUnauthorized(ex.StatusCode);
             }
             catch (Exception ex)
             {
@@ -223,6 +220,19 @@ namespace BuildsAppReborn.Access.UI.ViewModel
             }
 
             IsConnecting = false;
+        }
+
+        private void AccessTokenInputWhenUnauthorized(HttpStatusCode statusCode)
+        {
+            if (statusCode == HttpStatusCode.Unauthorized)
+            {
+                ShowPersonalAccessTokenInput = true;
+                StatusText = $"Authorization failed, please provide personal access token!";
+            }
+            else
+            {
+                StatusText = $"Error connecting. StatusCode: {statusCode}";
+            }
         }
 
         private void SetDisplayName(IEnumerable<IBuildDefinition> buildDefinitions)

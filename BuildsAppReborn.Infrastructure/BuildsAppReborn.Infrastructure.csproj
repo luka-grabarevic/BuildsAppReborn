@@ -51,8 +51,10 @@
     <Compile Include="..\BuildsAppReborn.Client\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdvancedHttpRequestException.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="Helper\CloneHelper.cs" />
+    <Compile Include="HttpResponseMessageExtensions.cs" />
     <Compile Include="ProgressTimer.cs" />
     <Compile Include="TolerantEnumConverter.cs" />
     <Compile Include="Collections\RangeObservableCollection.cs" />
