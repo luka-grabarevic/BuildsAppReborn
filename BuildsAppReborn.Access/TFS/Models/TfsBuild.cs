@@ -33,14 +33,22 @@ namespace BuildsAppReborn.Access.Models
         {
             get
             {
+                // if not requested by service user, it was by user. So show user.
+                if (Requester != null && !Requester.IsServiceUser)
+                {
+                    return Requester;
+                }
+
+                // tries to determine the pusher of the commit, and show him if not service user
                 if (SourceVersion != null)
                 {
-                    if (SourceVersion.Pusher.Id != TfsConsts.MicrosoftTeamFoundationSystemId)
+                    if (!SourceVersion.Pusher.IsServiceUser)
                     {
                         return SourceVersion.Pusher;
                     }
                 }
 
+                // fallback value
                 return Requester;
             }
         }
@@ -99,7 +107,7 @@ namespace BuildsAppReborn.Access.Models
             }
         }
 
-        [JsonProperty("requestedFor")]
+        [JsonProperty("requestedBy")]
         public abstract IUser Requester { get; protected set; }
 
         [JsonIgnore]
