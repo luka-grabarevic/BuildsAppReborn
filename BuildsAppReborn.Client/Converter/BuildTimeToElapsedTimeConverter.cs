@@ -27,6 +27,11 @@ namespace BuildsAppReborn.Client.Converter
 
         private String GetReadableTimespan(TimeSpan elapsedTimeSpan)
         {
+            if (elapsedTimeSpan.TotalSeconds < 1)
+            {
+                return "1s";
+            }
+
             var seconds = elapsedTimeSpan.Seconds;
             var minutes = elapsedTimeSpan.Minutes;
             var hours = elapsedTimeSpan.Hours;
