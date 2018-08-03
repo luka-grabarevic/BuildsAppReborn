@@ -40,7 +40,7 @@ namespace BuildsAppReborn.Access.Models
                 }
 
                 // tries to determine the pusher of the commit, and show him if not service user
-                if (SourceVersion != null)
+                if (SourceVersion?.Pusher != null)
                 {
                     if (!SourceVersion.Pusher.IsServiceUser)
                     {
