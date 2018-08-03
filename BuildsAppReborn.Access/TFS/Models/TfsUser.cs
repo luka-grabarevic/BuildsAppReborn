@@ -34,6 +34,9 @@ namespace BuildsAppReborn.Access.Models
         [JsonProperty("imageUrl")]
         public String ImageUrl { get; private set; }
 
+        [JsonIgnore]
+        public Boolean IsServiceUser => Id == TfsConsts.MicrosoftTeamFoundationSystemId;
+
         public override String Name
         {
             get { return base.Name ?? DisplayName; }

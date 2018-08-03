@@ -79,7 +79,7 @@ namespace BuildsAppReborn.Contracts.UI
             {
                 if (Build?.SourceVersion?.Comment != null)
                 {
-                    return ManualRequested ? $"{Build.DisplayUser.DisplayName}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
+                    return ManuallyRequested ? $"{Build.SourceVersion.Pusher.DisplayName}: {Build.SourceVersion.Comment}" : Build.SourceVersion.Comment;
                 }
 
                 return "-";
@@ -103,7 +103,7 @@ namespace BuildsAppReborn.Contracts.UI
 
         public Byte[] DisplayUserImage => Build?.DisplayUser?.ImageData;
 
-        public String DisplayUserText => ManualRequested ? $"Requested by: {Build.Requester.DisplayName}" : Build.DisplayUser.DisplayName;
+        public String DisplayUserText => ManuallyRequested ? $"Requested by: {Build.Requester.DisplayName}" : Build.DisplayUser.DisplayName;
 
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
         public void Refresh()
@@ -116,7 +116,7 @@ namespace BuildsAppReborn.Contracts.UI
             OnPropertyChanged(nameof(CurrentTestRun));
         }
 
-        private Boolean ManualRequested => Build.Reason == BuildReason.Manual;
+        private Boolean ManuallyRequested => !Build.Requester.IsServiceUser;
 
         private readonly BuildViewStyle viewStyle;
     }

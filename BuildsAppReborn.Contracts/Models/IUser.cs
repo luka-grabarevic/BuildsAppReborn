@@ -13,6 +13,8 @@ namespace BuildsAppReborn.Contracts.Models
 
         String ImageUrl { get; }
 
+        Boolean IsServiceUser { get; }
+
         String UniqueName { get; }
     }
 }

@@ -188,7 +188,7 @@ namespace BuildsAppReborn.Access
             if (build.Reason == BuildReason.PullRequest || 
                 build.Reason == BuildReason.Validation)
             {
-                if (sourceVersion != null && sourceVersion.Parents.Length > 1 && sourceVersion.Pusher.Id == TfsConsts.MicrosoftTeamFoundationSystemId)
+                if (sourceVersion?.Parents != null && sourceVersion.Parents.Length > 1 && sourceVersion.Pusher != null && sourceVersion.Pusher.IsServiceUser)
                 {
                     var innerRequestUrl = $"{projectUrl}/_apis/git/repositories/{build.Repository.Id}/commits/{sourceVersion.Parents.Last()}?api-version=1.0";
 
