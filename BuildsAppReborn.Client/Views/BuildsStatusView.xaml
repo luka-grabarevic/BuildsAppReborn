@@ -281,6 +281,7 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Grid.Column="1"
                                                            VerticalAlignment="Center"
@@ -313,6 +314,12 @@
                                                        Margin="3 0 0 0"
                                                        VerticalAlignment="Center"
                                                        Source="{Binding CurrentBuild.Build.Status, Converter={StaticResource BuildStatusToImageConverter}}" />
+                                                    <Image Grid.Column="4"
+                                                           Height="18"
+                                                           Margin="3 0 0 0"
+                                                           VerticalAlignment="Center"
+                                                           Visibility="{Binding CurrentBuild.Build.Artifacts, Converter={StaticResource CountToVisibilityConverter}}"
+                                                           Source="../Resources/Icons/PNG/ic_archive_black_24dp_1x.png" />
                                                 </Grid>
 
                                                 <TextBlock Grid.Row="2"
